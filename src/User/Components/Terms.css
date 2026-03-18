@@ -1,0 +1,165 @@
+/* --- VARIABLES & THEME --- */
+:root {
+  --pt-primary: #0f172a;       /* Deep Navy */
+  --pt-bg: #f8fafc;            /* Light gray-blue background */
+  --pt-card-bg: #ffffff;
+  --pt-text-main: #334155;     /* Slate text for readability */
+  --pt-text-light: #94a3b8;
+  --pt-border: #e2e8f0;
+  --pt-accent: #d97706;        /* Subtle gold accent */
+  --pt-font: 'Inter', 'Segoe UI', sans-serif;
+}
+
+/* --- LAYOUT WRAPPERS --- */
+.pro-terms-wrapper {
+  font-family: var(--pt-font);
+  background-color: var(--pt-bg);
+  min-height: 100vh;
+  padding-bottom: 4rem;
+}
+
+/* --- HEADER BANNER --- */
+.pro-terms-header-banner {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  padding: 5rem 1rem 6rem 1rem; /* Extra bottom padding for overlap effect */
+  text-align: center;
+  position: relative;
+  margin-top:50px;
+}
+
+.pro-terms-header-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.pro-terms-main-title {
+  color: #ffffff;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.02em;
+}
+
+.pro-terms-last-updated {
+  color: #cbd5e1;
+  font-size: 1rem;
+  font-weight: 400;
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* --- DOCUMENT CONTAINER (Overlaps Banner) --- */
+.pro-terms-body-container {
+  max-width: 850px;
+  margin: -4rem auto 0; /* Pulls the card up into the banner */
+  padding: 0 1rem;
+  position: relative;
+  z-index: 10;
+}
+
+/* --- PAPER CARD --- */
+.pro-terms-paper-card {
+  background: var(--pt-card-bg);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  padding: 3.5rem 4rem;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+/* --- RICH TEXT FORMATTING (The actual parsed content) --- */
+.pro-terms-rich-text {
+  color: var(--pt-text-main);
+  font-size: 1.05rem;
+  line-height: 1.8;
+  white-space: pre-line; /* CRITICAL: Respects the \n line breaks from your regex */
+}
+
+/* Targeting the injected h2 tags */
+.pro-terms-h2 {
+  color: var(--pt-primary);
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-top: 2.5rem;
+  margin-bottom: 0.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--pt-border);
+}
+
+/* Removes top margin from the very first heading if it's at the top */
+.pro-terms-rich-text .pro-terms-h2:first-child {
+  margin-top: 0;
+}
+
+.pro-terms-rich-text strong {
+  color: var(--pt-primary);
+  font-weight: 600;
+}
+
+/* --- LOADING SKELETON --- */
+.pro-terms-loader {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pro-terms-skeleton {
+  height: 16px;
+  background: #e2e8f0;
+  border-radius: 8px;
+  width: 100%;
+  animation: pt-pulse 1.5s infinite ease-in-out;
+}
+
+.pro-terms-skeleton.skel-title {
+  height: 28px;
+  width: 60%;
+  margin-bottom: 1rem;
+}
+
+.pro-terms-skeleton.skel-short {
+  width: 80%;
+}
+
+@keyframes pt-pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS (SMALL FONTS)
+   ========================================= */
+@media (max-width: 768px) {
+  
+  .pro-terms-header-banner {
+    padding: 3rem 1rem 4rem 1rem; /* Adjust padding for mobile */
+  }
+
+  .pro-terms-main-title {
+    font-size: 1.6rem; /* Smaller hero title */
+  }
+
+  .pro-terms-last-updated {
+    font-size: 0.85rem;
+  }
+
+  .pro-terms-body-container {
+    margin-top: -2.5rem; /* Less extreme overlap on mobile */
+  }
+
+  .pro-terms-paper-card {
+    padding: 1.5rem; /* Smaller padding inside the card */
+    border-radius: 12px;
+  }
+
+  .pro-terms-rich-text {
+    font-size: 0.85rem; /* SMALL FONT SIZE AS REQUESTED */
+    line-height: 1.6;
+  }
+
+  .pro-terms-h2 {
+    font-size: 1.05rem; /* Scaled down heading */
+    margin-top: 1.5rem;
+    padding-bottom: 0.25rem;
+  }
+}

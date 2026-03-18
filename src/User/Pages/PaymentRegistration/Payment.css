@@ -1,0 +1,474 @@
+/* --- BRAND VARIABLES (Updated to Premium Sapphire Blue) --- */
+:root {
+  --ks-primary-theme: #2563EB; /* Sapphire Blue */
+  --ks-primary-dark: #1D4ED8;  /* Deep Blue */
+  --ks-text-main: #111827;
+  --ks-text-muted: #4B5563;
+  --ks-bg-solid: #ffffff;
+  --ks-font-brand: 'Plus Jakarta Sans', sans-serif;
+  --ks-font-ui: 'Inter', sans-serif;
+  --ks-success: #166534;
+  --ks-warning: #B45309;
+}
+
+/* --- 1. LAYOUT (Split Screen Design) --- */
+.ks-payment-layout {
+  padding-top: var(--ks-nav-height, 72px);
+  background-color: var(--ks-bg-solid);
+  min-height: 100vh;
+  font-family: var(--ks-font-ui);
+}
+
+.ks-payment-container {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  min-height: calc(100vh - var(--ks-nav-height, 72px));
+}
+
+/* --- 2. LEFT PANEL: SUMMARY (Deep Premium Slate) --- */
+.ks-summary-panel {
+  background-color: #0F172A; 
+  color: #F8FAFC;
+  padding: 80px 10%; 
+  display: flex;
+  flex-direction: column;
+}
+
+.ks-summary-header {
+  margin-bottom: 48px;
+}
+
+.ks-summary-title {
+  font-family: var(--ks-font-brand);
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #94A3B8; 
+  margin: 0 0 16px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ks-price-tag {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.ks-amount {
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+}
+
+.ks-currency {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ks-primary-theme);
+  margin-top: 8px;
+}
+
+.ks-features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-bottom: 48px;
+}
+
+.ks-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.ks-icon-wrapper {
+  color: var(--ks-primary-theme);
+  margin-top: 2px;
+}
+
+.ks-feature-text strong {
+  display: block;
+  font-size: 1.1rem;
+  color: #FFFFFF;
+  margin-bottom: 6px;
+}
+
+.ks-feature-text p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #94A3B8;
+  line-height: 1.5;
+}
+
+.ks-secure-badge {
+  margin-top: auto; 
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #10B981; 
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding-top: 40px;
+}
+
+/* --- 3. RIGHT PANEL: ACTION / FORM (Clean White) --- */
+.ks-action-panel {
+  background-color: #ffffff;
+  padding: 80px 10%;
+  display: flex;
+  flex-direction: column;
+}
+
+.ks-action-content {
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto; 
+}
+
+.ks-action-title {
+  font-family: var(--ks-font-brand);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ks-text-main);
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.ks-step-desc {
+  font-size: 1.05rem;
+  color: var(--ks-text-muted);
+  margin-bottom: 32px;
+}
+
+/* --- 4. ALERT INFO BOX --- */
+.ks-alert-box {
+  background-color: #EFF6FF; 
+  border-left: 4px solid var(--ks-primary-theme);
+  padding: 16px 20px;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 32px;
+}
+
+.ks-alert-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1E3A8A; 
+  margin-bottom: 6px;
+}
+
+.ks-alert-box p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #1E3A8A;
+  line-height: 1.5;
+}
+
+/* --- 5. QR CODE SECTION --- */
+.ks-qr-container {
+  text-align: center;
+  margin: 40px 0;
+}
+
+.ks-qr-box {
+  background: #ffffff;
+  padding: 16px;
+  border: 2px dashed #E2E8F0; 
+  display: inline-block;
+  border-radius: 16px;
+  margin-bottom: 16px;
+}
+
+.ks-qr-text {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ks-text-main);
+  margin: 0;
+}
+
+.ks-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 24px 0;
+  color: #9CA3AF;
+}
+
+.ks-divider::before, 
+.ks-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.ks-divider span {
+  padding: 0 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.ks-manual-upi {
+  font-size: 1.1rem;
+  color: var(--ks-text-muted);
+  margin: 0;
+}
+
+.ks-manual-upi strong {
+  color: var(--ks-text-main);
+  user-select: all; 
+}
+
+/* --- 6. FORMS & INPUTS --- */
+.ks-input-group {
+  margin-bottom: 24px;
+}
+
+.ks-input-group label {
+  display: block;
+  font-family: var(--ks-font-brand);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--ks-text-main);
+  margin-bottom: 8px;
+}
+
+.ks-input-field {
+  width: 100%;
+  padding: 14px 16px;
+  font-family: var(--ks-font-ui);
+  font-size: 1rem;
+  color: var(--ks-text-main);
+  background-color: #F9FAFB;
+  border: 1px solid #D1D5DB;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.ks-input-field:focus {
+  outline: none;
+  border-color: var(--ks-primary-theme);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.ks-file-drop-area {
+  border: 2px dashed #D1D5DB;
+  background-color: #F9FAFB;
+  padding: 24px;
+  border-radius: 12px;
+  text-align: center;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.ks-file-drop-area:hover {
+  border-color: var(--ks-primary-theme);
+  background-color: #EFF6FF;
+}
+
+.ks-file-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.ks-file-msg {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ks-text-muted);
+}
+
+/* --- 7. BUTTONS & LINKS --- */
+.ks-manual-link-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid #E5E7EB;
+}
+
+.ks-mobile-link-area {
+  margin-top: 0;
+  margin-bottom: 32px;
+  padding-top: 0;
+  border-top: none;
+  border-bottom: 1px solid #E5E7EB;
+  padding-bottom: 24px;
+}
+
+.ks-manual-link-area p {
+  margin: 0;
+  font-weight: 500;
+  color: var(--ks-text-muted);
+}
+
+.ks-btn-text {
+  background: none;
+  border: none;
+  color: var(--ks-primary-theme);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+}
+
+.ks-btn-text:hover {
+  color: var(--ks-primary-dark);
+  text-decoration: underline;
+}
+
+.ks-btn-group {
+  display: flex;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.ks-btn-primary, .ks-btn-secondary {
+  padding: 14px 32px;
+  border-radius: 9999px; 
+  font-family: var(--ks-font-brand);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1; 
+}
+
+.ks-btn-primary {
+  background: linear-gradient(180deg, var(--ks-primary-theme) 0%, var(--ks-primary-dark) 100%);
+  color: white;
+  border: none;
+}
+
+.ks-btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.2);
+}
+
+.ks-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ks-btn-secondary {
+  background: transparent;
+  color: var(--ks-text-main);
+  border: 1px solid #D1D5DB;
+}
+
+.ks-btn-secondary:hover {
+  background: #F3F4F6;
+}
+
+/* --- 8. SUCCESS / PENDING STATUS VIEW --- */
+.ks-status-view {
+  text-align: center;
+  padding-top: 40px;
+}
+
+.ks-status-icon {
+  margin-bottom: 24px;
+}
+
+.ks-text-success { color: var(--ks-success); font-family: var(--ks-font-brand); font-size: 1.8rem; margin: 0 0 12px 0; }
+.ks-text-warning { color: var(--ks-warning); font-family: var(--ks-font-brand); font-size: 1.8rem; margin: 0 0 12px 0; }
+
+.ks-status-desc {
+  color: var(--ks-text-muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
+.ks-mt-lg {
+  margin-top: 24px;
+  width: auto;
+  padding-left: 48px;
+  padding-right: 48px;
+}
+
+/* --- 9. SKELETON LOADERS --- */
+@keyframes shimmer {
+  0% { background-position: -800px 0; }
+  100% { background-position: 800px 0; }
+}
+
+.ks-skeleton {
+  background: #E5E7EB; 
+  background-image: linear-gradient(90deg, rgba(255,255,255,0) 0, rgba(255,255,255,0.4) 20%, rgba(255,255,255,0) 40%);
+  background-size: 800px 100%;
+  animation: shimmer 2s infinite linear;
+  border-radius: 6px;
+}
+
+.ks-skeleton-text { height: 16px; }
+.ks-skeleton-price { height: 60px; }
+.ks-skeleton-icon { height: 24px; width: 24px; border-radius: 50%; }
+.ks-skeleton-title { height: 32px; }
+.ks-skeleton-button { height: 50px; width: 100%; border-radius: 9999px; }
+
+/* --- 10. RESPONSIVE DESIGN (Medium Mobile Sizing) --- */
+@media (max-width: 992px) {
+  .ks-payment-container {
+    grid-template-columns: 1fr; 
+  }
+
+  .ks-summary-panel, .ks-action-panel {
+    padding: 40px 24px;
+  }
+}
+
+/* Mobile-Specific Tweaks for Reduced Font Sizes */
+@media (max-width: 768px) {
+  .ks-summary-panel, .ks-action-panel {
+    padding: 32px 20px;
+  }
+  
+  /* Scale down text elements */
+  .ks-amount { font-size: 2.5rem; }
+  .ks-summary-title { font-size: 1rem; }
+  .ks-action-title { font-size: 1.35rem; }
+  .ks-step-desc { font-size: 0.85rem; margin-bottom: 24px; }
+  
+  /* Summary features and alerts */
+  .ks-feature-text strong { font-size: 0.95rem; }
+  .ks-feature-text p { font-size: 0.85rem; }
+  .ks-secure-badge { font-size: 0.85rem; }
+  .ks-alert-box p { font-size: 0.85rem; }
+  .ks-qr-text { font-size: 0.85rem; }
+  .ks-manual-upi { font-size: 0.95rem; }
+
+  /* Inputs and buttons */
+  .ks-input-group label { font-size: 0.85rem; }
+  .ks-input-field {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+  }
+  .ks-file-msg { font-size: 0.85rem; }
+  
+  .ks-btn-primary, .ks-btn-secondary {
+    padding: 12px 24px;
+    font-size: 0.85rem;
+  }
+  .ks-btn-text { font-size: 0.85rem; }
+
+  .ks-manual-link-area {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .ks-manual-link-area p { font-size: 0.85rem; }
+
+  /* Status View */
+  .ks-text-success, .ks-text-warning { font-size: 1.4rem; }
+  .ks-status-desc { font-size: 0.9rem; }
+}

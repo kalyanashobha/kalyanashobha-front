@@ -1,0 +1,366 @@
+/* --- PREMIUM PAYMENTS DASHBOARD STYLES --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Fluid Typography for perfect scaling (Smaller on mobile, readable on desktop) */
+  --pmt-font-xs: clamp(0.7rem, 1vw, 0.75rem);
+  --pmt-font-sm: clamp(0.75rem, 1.2vw, 0.85rem);
+  --pmt-font-base: clamp(0.85rem, 1.5vw, 0.95rem);
+  --pmt-font-lg: clamp(1rem, 2vw, 1.15rem);
+  --pmt-font-xl: clamp(1.25rem, 3vw, 1.75rem);
+
+  /* Colors */
+  --pmt-bg-body: #F8FAFC;
+  --pmt-bg-card: #FFFFFF;
+  --pmt-bg-header: #F1F5F9;
+  --pmt-border: #E2E8F0;
+  --pmt-border-light: #F1F5F9;
+  
+  --pmt-text-main: #0F172A;
+  --pmt-text-sub: #475569;
+  --pmt-text-muted: #94A3B8;
+  
+  /* Status Colors */
+  --pmt-success-bg: #ECFDF5;
+  --pmt-success-text: #059669;
+  --pmt-failed-bg: #FEF2F2;
+  --pmt-failed-text: #DC2626;
+  --pmt-pending-bg: #FFFBEB;
+  --pmt-pending-text: #D97706;
+
+  /* Icon Colors */
+  --pmt-blue-bg: #EFF6FF;
+  --pmt-blue-text: #3B82F6;
+  --pmt-green-bg: #ECFDF5;
+  --pmt-green-text: #10B981;
+  --pmt-purple-bg: #F5F3FF;
+  --pmt-purple-text: #8B5CF6;
+  --pmt-orange-bg: #FFF7ED;
+  --pmt-orange-text: #F97316;
+
+  /* Shadows & Radii */
+  --pmt-shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
+  --pmt-radius-card: 16px;
+  --pmt-radius-pill: 20px;
+  
+  /* Easing */
+  --pmt-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  margin: 0;
+  background-color: var(--pmt-bg-body);
+  font-family: 'Inter', -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- LAYOUT & HEADER --- */
+.pmt-dashboard {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 100px 24px 40px; /* Accounts for fixed navbar */
+  min-height: 100vh;
+  margin-top:20px;
+}
+
+.pmt-header {
+  margin-bottom: 32px;
+}
+
+.pmt-title {
+  font-size: var(--pmt-font-xl);
+  font-weight: 700;
+  color: var(--pmt-text-main);
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.pmt-subtitle {
+  font-size: var(--pmt-font-base);
+  color: var(--pmt-text-sub);
+  margin: 0;
+}
+
+/* --- TABLE CONTAINER (DESKTOP GRID) --- */
+.pmt-table-container {
+  width: 100%;
+}
+
+.pmt-content {
+  background: var(--pmt-bg-card);
+  border-radius: var(--pmt-radius-card);
+  border: 1px solid var(--pmt-border);
+  box-shadow: var(--pmt-shadow-card);
+  overflow: hidden;
+}
+
+.pmt-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1.5fr 1fr;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--pmt-border-light);
+  transition: background-color 0.2s var(--pmt-ease);
+}
+
+.pmt-header-row {
+  background-color: var(--pmt-bg-header);
+  border-bottom: 1px solid var(--pmt-border);
+  padding: 14px 24px;
+}
+
+.pmt-data-row:last-child {
+  border-bottom: none;
+}
+
+.pmt-data-row:hover {
+  background-color: #F8FAFC;
+}
+
+/* --- TABLE COLUMNS & CELLS --- */
+.pmt-col {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--pmt-font-sm);
+  font-weight: 600;
+  color: var(--pmt-text-sub);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pmt-data-row .pmt-col {
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 500;
+  color: var(--pmt-text-main);
+}
+
+.pmt-cell-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Typography & Elements inside cells */
+.pmt-text-primary {
+  font-size: var(--pmt-font-base);
+  font-weight: 600;
+  color: var(--pmt-text-main);
+}
+
+.pmt-text-secondary {
+  font-size: var(--pmt-font-xs);
+  font-weight: 500;
+  color: var(--pmt-text-muted);
+}
+
+.pmt-amount {
+  font-size: var(--pmt-font-lg);
+  font-weight: 700;
+  color: var(--pmt-text-main);
+  letter-spacing: -0.01em;
+}
+
+.pmt-ref-badge {
+  font-family: 'SFMono-Regular', Consolas, Menlo, monospace;
+  font-size: var(--pmt-font-xs);
+  color: var(--pmt-text-sub);
+  background-color: var(--pmt-bg-body);
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--pmt-border);
+  letter-spacing: 0.5px;
+}
+
+/* --- STATUS PILLS --- */
+.pmt-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--pmt-radius-pill);
+  font-size: var(--pmt-font-xs);
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+.pmt-status-success {
+  background-color: var(--pmt-success-bg);
+  color: var(--pmt-success-text);
+}
+
+.pmt-status-failed {
+  background-color: var(--pmt-failed-bg);
+  color: var(--pmt-failed-text);
+}
+
+.pmt-status-pending {
+  background-color: var(--pmt-pending-bg);
+  color: var(--pmt-pending-text);
+}
+
+/* --- UTILITY ICONS --- */
+.ks-icon-box-small {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+}
+
+.ks-bg-blue { background-color: var(--pmt-blue-bg); color: var(--pmt-blue-text); }
+.ks-bg-green { background-color: var(--pmt-green-bg); color: var(--pmt-green-text); }
+.ks-bg-purple { background-color: var(--pmt-purple-bg); color: var(--pmt-purple-text); }
+.ks-bg-orange { background-color: var(--pmt-orange-bg); color: var(--pmt-orange-text); }
+
+/* --- EMPTY STATE --- */
+.pmt-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  text-align: center;
+}
+
+.pmt-empty-icon {
+  color: #CBD5E1;
+  margin-bottom: 16px;
+}
+
+.pmt-empty-title {
+  font-size: var(--pmt-font-lg);
+  font-weight: 600;
+  color: var(--pmt-text-main);
+  margin: 0 0 8px 0;
+}
+
+.pmt-empty-sub {
+  font-size: var(--pmt-font-sm);
+  color: var(--pmt-text-sub);
+  margin: 0;
+  max-width: 300px;
+}
+
+/* --- SKELETON LOADER --- */
+.skeleton-header .skeleton-line {
+  height: 12px;
+  border-radius: 4px;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 6px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s var(--pmt-ease) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* =========================================
+   MOBILE RESPONSIVENESS (CARD TRANSFORMATION)
+   ========================================= */
+@media (max-width: 768px) {
+  .pmt-dashboard {
+    padding: 80px 16px 32px;
+  }
+  
+  .pmt-header {
+    margin-bottom: 24px;
+  }
+  
+  .pmt-content {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+  
+  /* Hide the Desktop Header */
+  .pmt-header-row {
+    display: none;
+  }
+  
+  /* Transform Rows into Cards */
+  .pmt-row.pmt-data-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background: var(--pmt-bg-card);
+    border-radius: 16px;
+    border: 1px solid var(--pmt-border);
+    box-shadow: var(--pmt-shadow-card);
+    margin-bottom: 16px;
+    padding: 16px;
+    gap: 12px;
+  }
+  
+  /* Transform Columns into Label/Value rows */
+  .pmt-col {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--pmt-border-light);
+  }
+  
+  .pmt-col:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  
+  .pmt-col:first-child {
+    padding-top: 0;
+  }
+  
+  /* Create Mobile Labels using the data-label attribute */
+  .pmt-col::before {
+    content: attr(data-label);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--pmt-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  /* Alignment Fixes for Mobile */
+  .pmt-cell-wrap {
+    align-items: flex-end; /* Align values to the right */
+    text-align: right;
+  }
+  
+  .pmt-amount {
+    font-size: 1.15rem; /* Make amount pop more on mobile */
+  }
+
+  .pmt-text-primary {
+    font-size: 0.9rem; /* Keep text compact */
+  }
+  
+  .pmt-ref-badge {
+    font-size: 0.65rem;
+    padding: 4px 8px;
+  }
+  
+  .pmt-status-pill {
+    font-size: 0.7rem;
+    padding: 4px 10px;
+  }
+}

@@ -1,0 +1,518 @@
+/* --- BASE & LAYOUT --- */
+.mp-page-wrapper {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: #f8fafc; /* Very subtle grey background for contrast */
+}
+
+.mp-container {
+  max-width: 1024px;
+  margin: 80px auto 4rem auto;
+  padding: 2.5rem 1.5rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #0f172a; 
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.mp-fade-in {
+  animation: mpFadeIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes mpFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- THEME GRADIENTS --- */
+:root {
+  --mp-brand-gradient: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%); 
+  --mp-brand-glow: rgba(245, 158, 11, 0.15);
+}
+
+/* --- HERO SECTION (REDESIGNED FOR CLEANER LOOK) --- */
+.mp-hero {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 2.5rem;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04); 
+}
+
+/* Removed the gradient line at the top completely */
+
+.mp-avatar-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+}
+
+.mp-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid #ffffff;
+  box-shadow: 0 8px 16px -4px rgba(15, 23, 42, 0.1); 
+  transition: transform 0.3s ease;
+}
+
+.mp-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  padding: 3px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.mp-hero-info {
+  flex: 1;
+  min-width: 250px;
+}
+
+/* Changed name to solid color instead of gradient */
+.mp-name {
+  font-size: 1.6rem; 
+  font-weight: 700; 
+  color: #0f172a; 
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.01em;
+}
+
+.mp-meta {
+  display: flex;
+  gap: 1.5rem;
+  color: #64748b;
+  font-size: 0.95rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  font-weight: 500;
+}
+
+.mp-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.mp-tags {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.mp-tag {
+  padding: 0.35rem 1rem;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px; 
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  letter-spacing: 0.02em;
+}
+
+.mp-hero-actions {
+  margin-left: auto;
+}
+
+/* --- CARDS & GRID --- */
+.mp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.75rem;
+}
+
+.mp-card {
+  background: #ffffff;
+  border-radius: 20px; 
+  border: 1px solid #e2e8f0;
+  padding: 2rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02); 
+}
+
+.mp-card:hover {
+  box-shadow: 0 12px 24px -10px rgba(15, 23, 42, 0.06);
+  border-color: #cbd5e1;
+}
+
+.mp-card-full {
+  grid-column: 1 / -1;
+}
+
+.mp-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 1.75rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* --- DISPLAY INFO --- */
+.mp-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1.5rem; 
+}
+
+.mp-info-label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.06em; 
+  color: #94a3b8;
+  margin-bottom: 0.4rem;
+}
+
+.mp-info-value {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.mp-info-sub {
+  font-size: 0.75rem;
+  color: #64748b;
+  display: block;
+  margin-top: 0.25rem;
+}
+
+.mp-empty {
+  color: #cbd5e1;
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* --- FORMS & FLOATING LABELS --- */
+.mp-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.mp-input-group {
+  position: relative;
+}
+
+.mp-input {
+  width: 100%;
+  padding: 1.4rem 1rem 0.6rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px; 
+  font-size: 0.95rem;
+  font-weight: 500;
+  background: #f8fafc;
+  color: #0f172a;
+  transition: all 0.2s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.mp-input:hover {
+  border-color: #cbd5e1;
+}
+
+.mp-input:focus {
+  background: #ffffff;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 4px var(--mp-brand-glow);
+}
+
+.mp-input-group label {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.95rem;
+  color: #64748b;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  font-weight: 400;
+}
+
+.mp-input:focus ~ label,
+.mp-input:not(:placeholder-shown) ~ label,
+.mp-label-active {
+  top: 0.75rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 700 !important;
+  transform: translateY(0) !important;
+  color: #f59e0b !important;
+}
+
+.mp-input:not(:focus):not(:placeholder-shown) ~ label,
+.mp-label-active:not(:focus) {
+  color: #64748b !important;
+}
+
+select.mp-input {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+}
+
+/* --- BUTTONS --- */
+.mp-btn {
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.mp-btn-primary {
+  background: var(--mp-brand-gradient);
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2); 
+}
+
+.mp-btn-primary:hover {
+  box-shadow: 0 6px 14px rgba(245, 158, 11, 0.3);
+  transform: translateY(-1px);
+}
+
+.mp-btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.2);
+}
+
+.mp-btn-ghost {
+  background: #ffffff;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.mp-btn-ghost:hover {
+  background: #f8fafc; 
+  color: #0f172a;
+}
+
+.mp-form-actions {
+  margin-top: 2.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+/* --- PHOTO UPLOADS --- */
+.mp-photo-grid {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.mp-photo-item {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.mp-photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mp-photo-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(4px);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.mp-photo-remove:hover {
+  background: rgba(239, 68, 68, 1);
+}
+
+.mp-photo-upload {
+  width: 110px;
+  height: 110px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748b;
+  background: #f8fafc;
+}
+
+.mp-photo-upload:hover {
+  border-color: #f59e0b;
+  color: #d97706;
+}
+
+/* --- MODALS (FIXED ALIGNMENT & SIZING) --- */
+.mp-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5); 
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.mp-modal {
+  background: #ffffff;
+  width: 90%;
+  max-width: 340px;
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.mp-modal-header h3 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.2rem;
+  text-align: center;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.mp-time-inputs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.mp-time-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Reduced size here to prevent squeezing on small mobile screens */
+.mp-time-col input, 
+.mp-time-col select {
+  width: 65px; 
+  height: 60px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  background: #f8fafc;
+  color: #0f172a;
+  outline: none;
+  transition: all 0.2s ease;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+  padding: 0;
+}
+
+/* Fixed the colon style to align perfectly */
+.mp-time-colon {
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: #0f172a;
+  margin-top: -24px; /* offset to align with inputs */
+}
+
+.mp-time-col input:focus, 
+.mp-time-col select:focus {
+  border-color: #f59e0b;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px var(--mp-brand-glow);
+}
+
+.mp-time-col span {
+  font-size: 0.7rem;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Button alignment fix in modal */
+.mp-modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.mp-modal-actions .mp-btn {
+  flex: 1;
+  padding: 0.75rem 0.25rem; /* tight padding so texts fit */
+  font-size: 0.9rem;
+}
+
+/* --- SKELETON LOADER --- */
+.mp-skeleton {
+  background: #e2e8f0; 
+  border-radius: 10px;
+  animation: mpPulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes mpPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* --- RESPONSIVE MOBILE FIXES --- */
+@media (max-width: 768px) {
+  .mp-container { padding: 1rem; margin-top: 80px !important; }
+  
+  /* Centered mobile hero layout */
+  .mp-hero { 
+    padding: 2rem 1.5rem; 
+    text-align: center; 
+    flex-direction: column; 
+    gap: 1rem; 
+    border-radius: 16px; 
+  }
+  .mp-hero-actions { margin: 0 auto; width: 100%; margin-top: 0.5rem; }
+  .mp-hero-actions .mp-btn { width: 100%; justify-content: center; }
+  .mp-meta, .mp-tags { justify-content: center; }
+  
+  .mp-card { padding: 1.5rem; border-radius: 16px; }
+  .mp-form-actions { flex-direction: column-reverse; gap: 0.75rem; }
+  .mp-form-actions .mp-btn { width: 100%; justify-content: center; }
+}
