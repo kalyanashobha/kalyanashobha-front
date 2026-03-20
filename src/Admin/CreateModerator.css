@@ -1,59 +1,59 @@
 /* =========================================
-   Moderator Management Dashboard Styles
+   Role Management Dashboard Styles
    ========================================= */
 
 :root {
-  --mod-primary: #1976d2;
-  --mod-primary-hover: #1565c0;
-  --mod-danger: #d32f2f;
-  --mod-danger-hover: #c62828;
-  --mod-danger-bg: #ffebee;
-  --mod-surface: #ffffff;
-  --mod-background: #f4f6f8;
-  --mod-border: #e0e0e0;
-  --mod-text-main: #333333;
-  --mod-text-muted: #666666;
-  --mod-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --mod-radius: 8px;
-  --mod-transition: all 0.2s ease-in-out;
+  --mgr-primary: #1976d2;
+  --mgr-primary-hover: #1565c0;
+  --mgr-danger: #d32f2f;
+  --mgr-danger-hover: #c62828;
+  --mgr-danger-bg: #ffebee;
+  --mgr-surface: #ffffff;
+  --mgr-background: #f4f6f8;
+  --mgr-border: #e0e0e0;
+  --mgr-text-main: #333333;
+  --mgr-text-muted: #666666;
+  --mgr-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --mgr-radius: 8px;
+  --mgr-transition: all 0.2s ease-in-out;
 }
 
-.admin-mod-wrapper {
+.role-mgr-wrapper {
   padding: 24px;
   max-width: 1200px;
   margin: 0 auto;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  color: var(--mod-text-main);
+  color: var(--mgr-text-main);
 }
 
-.admin-mod-card {
-  background-color: var(--mod-surface);
-  border-radius: var(--mod-radius);
-  box-shadow: var(--mod-shadow);
+.role-mgr-card {
+  background-color: var(--mgr-surface);
+  border-radius: var(--mgr-radius);
+  box-shadow: var(--mgr-shadow);
   padding: 28px;
   margin-bottom: 24px;
-  border: 1px solid var(--mod-border);
+  border: 1px solid var(--mgr-border);
 }
 
-.admin-mod-table-card {
+.role-mgr-table-card {
   margin-top: 32px;
 }
 
-.admin-mod-header h2 {
+.role-mgr-header h2 {
   margin: 0 0 8px 0;
   font-size: 1.5rem;
   font-weight: 600;
   color: #111827;
 }
 
-.admin-mod-header p {
+.role-mgr-header p {
   margin: 0 0 24px 0;
-  color: var(--mod-text-muted);
+  color: var(--mgr-text-muted);
   font-size: 0.95rem;
 }
 
 /* --- Alerts --- */
-.admin-mod-alert {
+.role-mgr-alert {
   padding: 12px 16px;
   border-radius: 6px;
   margin-bottom: 24px;
@@ -61,67 +61,67 @@
   font-weight: 500;
 }
 
-.admin-mod-alert-success {
+.role-mgr-alert-success {
   background-color: #ecfdf5;
   color: #065f46;
   border: 1px solid #a7f3d0;
 }
 
-.admin-mod-alert-error {
+.role-mgr-alert-error {
   background-color: #fef2f2;
   color: #991b1b;
   border: 1px solid #fecaca;
 }
 
 /* --- Form Layout --- */
-.admin-mod-form {
+.role-mgr-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.admin-mod-input-grid {
+.role-mgr-input-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 20px;
 }
 
-.admin-mod-form-group {
+.role-mgr-form-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.admin-mod-form-group label {
+.role-mgr-form-group label {
   font-size: 0.9rem;
   font-weight: 600;
   color: #374151;
 }
 
-.admin-mod-form-group input {
+.role-mgr-form-group input {
   padding: 12px 16px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 0.95rem;
-  transition: var(--mod-transition);
+  transition: var(--mgr-transition);
   outline: none;
 }
 
-.admin-mod-form-group input:focus {
-  border-color: var(--mod-primary);
+.role-mgr-form-group input:focus {
+  border-color: var(--mgr-primary);
   box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
 }
 
 /* --- Permissions Panel --- */
-.admin-mod-permissions-panel {
+.role-mgr-permissions-panel {
   margin-top: 10px;
   background-color: #f9fafb;
-  border: 1px solid var(--mod-border);
-  border-radius: var(--mod-radius);
+  border: 1px solid var(--mgr-border);
+  border-radius: var(--mgr-radius);
   padding: 20px;
 }
 
-.admin-mod-permissions-header {
+.role-mgr-permissions-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -130,68 +130,68 @@
   gap: 12px;
 }
 
-.admin-mod-perm-titles h3 {
+.role-mgr-perm-titles h3 {
   margin: 0 0 4px 0;
   font-size: 1.1rem;
   color: #1f2937;
 }
 
-.admin-mod-perm-titles p {
+.role-mgr-perm-titles p {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--mod-text-muted);
+  color: var(--mgr-text-muted);
 }
 
-.admin-mod-permissions-grid {
+.role-mgr-permissions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 12px;
 }
 
-.admin-mod-checkbox-wrapper {
+.role-mgr-checkbox-wrapper {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
   background: white;
-  border: 1px solid var(--mod-border);
+  border: 1px solid var(--mgr-border);
   border-radius: 6px;
   cursor: pointer;
-  transition: var(--mod-transition);
+  transition: var(--mgr-transition);
   user-select: none;
 }
 
-.admin-mod-checkbox-wrapper:hover {
+.role-mgr-checkbox-wrapper:hover {
   border-color: #9ca3af;
 }
 
-.admin-mod-checkbox-wrapper.active {
-  border-color: var(--mod-primary);
+.role-mgr-checkbox-wrapper.active {
+  border-color: var(--mgr-primary);
   background-color: #eff6ff;
 }
 
-.admin-mod-checkbox-wrapper input[type="checkbox"] {
+.role-mgr-checkbox-wrapper input[type="checkbox"] {
   cursor: pointer;
   width: 16px;
   height: 16px;
-  accent-color: var(--mod-primary);
+  accent-color: var(--mgr-primary);
 }
 
-.admin-mod-checkbox-text {
+.role-mgr-checkbox-text {
   font-size: 0.9rem;
   font-weight: 500;
   color: #4b5563;
 }
 
 /* --- Buttons --- */
-.admin-mod-form-actions {
+.role-mgr-form-actions {
   display: flex;
   gap: 12px;
   margin-top: 12px;
 }
 
-.admin-mod-btn-primary {
-  background-color: var(--mod-primary);
+.role-mgr-btn-primary {
+  background-color: var(--mgr-primary);
   color: white;
   padding: 12px 24px;
   border: none;
@@ -199,19 +199,19 @@
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--mod-transition);
+  transition: var(--mgr-transition);
 }
 
-.admin-mod-btn-primary:hover:not(:disabled) {
-  background-color: var(--mod-primary-hover);
+.role-mgr-btn-primary:hover:not(:disabled) {
+  background-color: var(--mgr-primary-hover);
 }
 
-.admin-mod-btn-primary:disabled {
+.role-mgr-btn-primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.admin-mod-btn-outline {
+.role-mgr-btn-outline {
   background: transparent;
   color: #4b5563;
   border: 1px solid #d1d5db;
@@ -220,15 +220,15 @@
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--mod-transition);
+  transition: var(--mgr-transition);
 }
 
-.admin-mod-btn-outline:hover {
+.role-mgr-btn-outline:hover {
   background-color: #f3f4f6;
   border-color: #9ca3af;
 }
 
-.admin-mod-btn-cancel {
+.role-mgr-btn-cancel {
   background-color: transparent;
   color: #6b7280;
   padding: 12px 24px;
@@ -237,33 +237,33 @@
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--mod-transition);
+  transition: var(--mgr-transition);
 }
 
-.admin-mod-btn-cancel:hover {
+.role-mgr-btn-cancel:hover {
   background-color: #f3f4f6;
   color: #374151;
 }
 
 /* --- Table Styles --- */
-.admin-mod-table-container {
+.role-mgr-table-container {
   overflow-x: auto;
-  border: 1px solid var(--mod-border);
-  border-radius: var(--mod-radius);
+  border: 1px solid var(--mgr-border);
+  border-radius: var(--mgr-radius);
   background: white;
 }
 
-.admin-mod-table {
+.role-mgr-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
   white-space: nowrap;
 }
 
-.admin-mod-table th {
+.role-mgr-table th {
   padding: 16px;
   background-color: #f9fafb;
-  border-bottom: 2px solid var(--mod-border);
+  border-bottom: 2px solid var(--mgr-border);
   font-weight: 600;
   color: #374151;
   font-size: 0.9rem;
@@ -271,31 +271,31 @@
   letter-spacing: 0.05em;
 }
 
-.admin-mod-table td {
+.role-mgr-table td {
   padding: 16px;
   border-bottom: 1px solid #f3f4f6;
   font-size: 0.95rem;
   vertical-align: middle;
 }
 
-.admin-mod-table tbody tr:hover {
+.role-mgr-table tbody tr:hover {
   background-color: #f9fafb;
 }
 
-.admin-mod-table tbody tr:last-child td {
+.role-mgr-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.admin-mod-td-bold {
+.role-mgr-td-bold {
   font-weight: 600;
   color: #111827;
 }
 
-.admin-mod-td-muted {
-  color: var(--mod-text-muted);
+.role-mgr-td-muted {
+  color: var(--mgr-text-muted);
 }
 
-.admin-mod-badge {
+.role-mgr-badge {
   background: #f0f4f8;
   color: #475569;
   padding: 6px 10px;
@@ -305,44 +305,44 @@
   border: 1px solid #e2e8f0;
 }
 
-.admin-mod-actions-cell {
+.role-mgr-actions-cell {
   display: flex;
   gap: 10px;
 }
 
-.admin-mod-btn-edit {
+.role-mgr-btn-edit {
   padding: 8px 16px;
   background-color: #e3f2fd;
-  color: var(--mod-primary);
+  color: var(--mgr-primary);
   border: none;
   border-radius: 6px;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--mod-transition);
+  transition: var(--mgr-transition);
 }
 
-.admin-mod-btn-edit:hover {
+.role-mgr-btn-edit:hover {
   background-color: #bbdefb;
 }
 
-.admin-mod-btn-delete {
+.role-mgr-btn-delete {
   padding: 8px 16px;
-  background-color: var(--mod-danger-bg);
-  color: var(--mod-danger);
+  background-color: var(--mgr-danger-bg);
+  color: var(--mgr-danger);
   border: none;
   border-radius: 6px;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--mod-transition);
+  transition: var(--mgr-transition);
 }
 
-.admin-mod-btn-delete:hover {
+.role-mgr-btn-delete:hover {
   background-color: #ffcdd2;
 }
 
-.admin-mod-empty-state {
+.role-mgr-empty-state {
   text-align: center;
   padding: 40px !important;
   color: #9ca3af;
@@ -351,25 +351,25 @@
 
 /* --- Responsive Adjustments --- */
 @media (max-width: 768px) {
-  .admin-mod-wrapper {
+  .role-mgr-wrapper {
     padding: 16px;
   }
   
-  .admin-mod-card {
+  .role-mgr-card {
     padding: 20px;
   }
 
-  .admin-mod-permissions-header {
+  .role-mgr-permissions-header {
     flex-direction: column;
     align-items: flex-start;
   }
   
-  .admin-mod-form-actions {
+  .role-mgr-form-actions {
     flex-direction: column;
   }
   
-  .admin-mod-btn-primary, 
-  .admin-mod-btn-cancel {
+  .role-mgr-btn-primary, 
+  .role-mgr-btn-cancel {
     width: 100%;
   }
 }
