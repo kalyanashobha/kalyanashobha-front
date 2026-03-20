@@ -1,38 +1,23 @@
 /* =========================================
    Role Management Dashboard Styles
+   (Variables replaced with hardcoded values for React compatibility)
    ========================================= */
-
-:root {
-  --mgr-primary: #1976d2;
-  --mgr-primary-hover: #1565c0;
-  --mgr-danger: #d32f2f;
-  --mgr-danger-hover: #c62828;
-  --mgr-danger-bg: #ffebee;
-  --mgr-surface: #ffffff;
-  --mgr-background: #f4f6f8;
-  --mgr-border: #e0e0e0;
-  --mgr-text-main: #333333;
-  --mgr-text-muted: #666666;
-  --mgr-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --mgr-radius: 8px;
-  --mgr-transition: all 0.2s ease-in-out;
-}
 
 .role-mgr-wrapper {
   padding: 24px;
   max-width: 1200px;
   margin: 0 auto;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  color: var(--mgr-text-main);
+  color: #333333;
 }
 
 .role-mgr-card {
-  background-color: var(--mgr-surface);
-  border-radius: var(--mgr-radius);
-  box-shadow: var(--mgr-shadow);
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   padding: 28px;
   margin-bottom: 24px;
-  border: 1px solid var(--mgr-border);
+  border: 1px solid #e0e0e0;
 }
 
 .role-mgr-table-card {
@@ -48,7 +33,7 @@
 
 .role-mgr-header p {
   margin: 0 0 24px 0;
-  color: var(--mgr-text-muted);
+  color: #666666;
   font-size: 0.95rem;
 }
 
@@ -103,12 +88,12 @@
   border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 0.95rem;
-  transition: var(--mgr-transition);
+  transition: all 0.2s ease-in-out;
   outline: none;
 }
 
 .role-mgr-form-group input:focus {
-  border-color: var(--mgr-primary);
+  border-color: #1976d2;
   box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
 }
 
@@ -116,8 +101,8 @@
 .role-mgr-permissions-panel {
   margin-top: 10px;
   background-color: #f9fafb;
-  border: 1px solid var(--mgr-border);
-  border-radius: var(--mgr-radius);
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
   padding: 20px;
 }
 
@@ -139,7 +124,7 @@
 .role-mgr-perm-titles p {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--mgr-text-muted);
+  color: #666666;
 }
 
 .role-mgr-permissions-grid {
@@ -154,10 +139,10 @@
   gap: 8px;
   padding: 10px 12px;
   background: white;
-  border: 1px solid var(--mgr-border);
+  border: 1px solid #e0e0e0;
   border-radius: 6px;
   cursor: pointer;
-  transition: var(--mgr-transition);
+  transition: all 0.2s ease-in-out;
   user-select: none;
 }
 
@@ -166,7 +151,7 @@
 }
 
 .role-mgr-checkbox-wrapper.active {
-  border-color: var(--mgr-primary);
+  border-color: #1976d2;
   background-color: #eff6ff;
 }
 
@@ -174,7 +159,7 @@
   cursor: pointer;
   width: 16px;
   height: 16px;
-  accent-color: var(--mgr-primary);
+  accent-color: #1976d2;
 }
 
 .role-mgr-checkbox-text {
@@ -191,7 +176,7 @@
 }
 
 .role-mgr-btn-primary {
-  background-color: var(--mgr-primary);
+  background-color: #1976d2;
   color: white;
   padding: 12px 24px;
   border: none;
@@ -199,11 +184,11 @@
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--mgr-transition);
+  transition: all 0.2s ease-in-out;
 }
 
 .role-mgr-btn-primary:hover:not(:disabled) {
-  background-color: var(--mgr-primary-hover);
+  background-color: #1565c0;
 }
 
 .role-mgr-btn-primary:disabled {
@@ -220,7 +205,7 @@
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--mgr-transition);
+  transition: all 0.2s ease-in-out;
 }
 
 .role-mgr-btn-outline:hover {
@@ -237,7 +222,7 @@
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--mgr-transition);
+  transition: all 0.2s ease-in-out;
 }
 
 .role-mgr-btn-cancel:hover {
@@ -248,8 +233,8 @@
 /* --- Table Styles --- */
 .role-mgr-table-container {
   overflow-x: auto;
-  border: 1px solid var(--mgr-border);
-  border-radius: var(--mgr-radius);
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
   background: white;
 }
 
@@ -263,7 +248,7 @@
 .role-mgr-table th {
   padding: 16px;
   background-color: #f9fafb;
-  border-bottom: 2px solid var(--mgr-border);
+  border-bottom: 2px solid #e0e0e0;
   font-weight: 600;
   color: #374151;
   font-size: 0.9rem;
@@ -292,7 +277,7 @@
 }
 
 .role-mgr-td-muted {
-  color: var(--mgr-text-muted);
+  color: #666666;
 }
 
 .role-mgr-badge {
@@ -313,13 +298,13 @@
 .role-mgr-btn-edit {
   padding: 8px 16px;
   background-color: #e3f2fd;
-  color: var(--mgr-primary);
+  color: #1976d2;
   border: none;
   border-radius: 6px;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--mgr-transition);
+  transition: all 0.2s ease-in-out;
 }
 
 .role-mgr-btn-edit:hover {
@@ -328,14 +313,14 @@
 
 .role-mgr-btn-delete {
   padding: 8px 16px;
-  background-color: var(--mgr-danger-bg);
-  color: var(--mgr-danger);
+  background-color: #ffebee;
+  color: #d32f2f;
   border: none;
   border-radius: 6px;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--mgr-transition);
+  transition: all 0.2s ease-in-out;
 }
 
 .role-mgr-btn-delete:hover {
