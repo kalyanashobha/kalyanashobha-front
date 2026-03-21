@@ -408,6 +408,30 @@
   .ui-btn {
     flex: 1;
   }
+  
+  /* --- FIX FOR MOBILE TAB OVERFLOW --- */
+  .ui-tabs {
+    gap: 12px; /* Reduced from 32px */
+    justify-content: space-between; /* Spreads tabs out evenly to fit */
+  }
+
+  .ui-tab {
+    font-size: 13px; /* Slightly smaller text */
+    gap: 4px; /* Reduced space between icon and text */
+    padding: 0 0 12px 0;
+  }
+
+  /* Make icons scale down gracefully */
+  .ui-tab svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Shrink the red notification badge slightly */
+  .ui-tab__badge {
+    padding: 2px 6px;
+    font-size: 10px;
+  }
 }
 
 /* NEW: --- TOAST CONFIRMATION DIALOG STYLES --- */
