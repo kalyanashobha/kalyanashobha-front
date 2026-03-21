@@ -1,44 +1,69 @@
 /* =========================================
-   Role Management Dashboard Styles
-   (Variables replaced with hardcoded values for React compatibility)
+   Moderator Management Dashboard Styles
    ========================================= */
 
-.role-mgr-wrapper {
+:root {
+  --mod-primary: #1976d2;
+  --mod-primary-hover: #1565c0;
+  --mod-danger: #d32f2f;
+  --mod-danger-hover: #c62828;
+  --mod-danger-bg: #ffebee;
+  --mod-surface: #ffffff;
+  --mod-background: #f4f6f8;
+  --mod-border: #e0e0e0;
+  --mod-text-main: #333333;
+  --mod-text-muted: #666666;
+  --mod-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --mod-radius: 8px;
+  --mod-transition: all 0.2s ease-in-out;
+}
+
+/* --- NEW: Universal Box Sizing to prevent future overlap issues --- */
+.admin-mod-wrapper * {
+  box-sizing: border-box;
+}
+
+.admin-mod-wrapper {
   padding: 24px;
   max-width: 1200px;
   margin: 0 auto;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  color: #333333;
+  color: var(--mod-text-main);
+  /* NEW: Ensure wrapper never exceeds viewport */
+  width: 100%; 
+  overflow-x: hidden;
 }
 
-.role-mgr-card {
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+.admin-mod-card {
+  background-color: var(--mod-surface);
+  border-radius: var(--mod-radius);
+  box-shadow: var(--mod-shadow);
   padding: 28px;
   margin-bottom: 24px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--mod-border);
+  /* NEW: Ensure card respects parent width */
+  width: 100%; 
 }
 
-.role-mgr-table-card {
+.admin-mod-table-card {
   margin-top: 32px;
 }
 
-.role-mgr-header h2 {
+.admin-mod-header h2 {
   margin: 0 0 8px 0;
   font-size: 1.5rem;
   font-weight: 600;
   color: #111827;
 }
 
-.role-mgr-header p {
+.admin-mod-header p {
   margin: 0 0 24px 0;
-  color: #666666;
+  color: var(--mod-text-muted);
   font-size: 0.95rem;
 }
 
 /* --- Alerts --- */
-.role-mgr-alert {
+.admin-mod-alert {
   padding: 12px 16px;
   border-radius: 6px;
   margin-bottom: 24px;
@@ -46,67 +71,74 @@
   font-weight: 500;
 }
 
-.role-mgr-alert-success {
+.admin-mod-alert-success {
   background-color: #ecfdf5;
   color: #065f46;
   border: 1px solid #a7f3d0;
 }
 
-.role-mgr-alert-error {
+.admin-mod-alert-error {
   background-color: #fef2f2;
   color: #991b1b;
   border: 1px solid #fecaca;
 }
 
 /* --- Form Layout --- */
-.role-mgr-form {
+.admin-mod-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  width: 100%;
 }
 
-.role-mgr-input-grid {
+.admin-mod-input-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  /* FIXED: min(100%, 280px) allows it to shrink below 280px on tiny screens */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 20px;
+  width: 100%;
 }
 
-.role-mgr-form-group {
+.admin-mod-form-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
 }
 
-.role-mgr-form-group label {
+.admin-mod-form-group label {
   font-size: 0.9rem;
   font-weight: 600;
   color: #374151;
 }
 
-.role-mgr-form-group input {
+.admin-mod-form-group input {
+  /* FIXED: Force width to 100% so it respects the grid cell size */
+  width: 100%; 
   padding: 12px 16px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 0.95rem;
-  transition: all 0.2s ease-in-out;
+  transition: var(--mod-transition);
   outline: none;
 }
 
-.role-mgr-form-group input:focus {
-  border-color: #1976d2;
+.admin-mod-form-group input:focus {
+  border-color: var(--mod-primary);
   box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
 }
 
 /* --- Permissions Panel --- */
-.role-mgr-permissions-panel {
+.admin-mod-permissions-panel {
   margin-top: 10px;
   background-color: #f9fafb;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border: 1px solid var(--mod-border);
+  border-radius: var(--mod-radius);
   padding: 20px;
+  width: 100%;
 }
 
-.role-mgr-permissions-header {
+.admin-mod-permissions-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -115,68 +147,71 @@
   gap: 12px;
 }
 
-.role-mgr-perm-titles h3 {
+.admin-mod-perm-titles h3 {
   margin: 0 0 4px 0;
   font-size: 1.1rem;
   color: #1f2937;
 }
 
-.role-mgr-perm-titles p {
+.admin-mod-perm-titles p {
   margin: 0;
   font-size: 0.85rem;
-  color: #666666;
+  color: var(--mod-text-muted);
 }
 
-.role-mgr-permissions-grid {
+.admin-mod-permissions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  /* FIXED: Added min(100%, 180px) for safer wrapping on mobile */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
   gap: 12px;
 }
 
-.role-mgr-checkbox-wrapper {
+.admin-mod-checkbox-wrapper {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
   background: white;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--mod-border);
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: var(--mod-transition);
   user-select: none;
 }
 
-.role-mgr-checkbox-wrapper:hover {
+.admin-mod-checkbox-wrapper:hover {
   border-color: #9ca3af;
 }
 
-.role-mgr-checkbox-wrapper.active {
-  border-color: #1976d2;
+.admin-mod-checkbox-wrapper.active {
+  border-color: var(--mod-primary);
   background-color: #eff6ff;
 }
 
-.role-mgr-checkbox-wrapper input[type="checkbox"] {
+.admin-mod-checkbox-wrapper input[type="checkbox"] {
   cursor: pointer;
   width: 16px;
   height: 16px;
-  accent-color: #1976d2;
+  accent-color: var(--mod-primary);
+  flex-shrink: 0; /* Ensures checkbox doesn't squish */
 }
 
-.role-mgr-checkbox-text {
+.admin-mod-checkbox-text {
   font-size: 0.9rem;
   font-weight: 500;
   color: #4b5563;
+  word-break: break-word; /* Prevents long words from overflowing */
 }
 
 /* --- Buttons --- */
-.role-mgr-form-actions {
+.admin-mod-form-actions {
   display: flex;
   gap: 12px;
   margin-top: 12px;
 }
 
-.role-mgr-btn-primary {
-  background-color: #1976d2;
+.admin-mod-btn-primary {
+  background-color: var(--mod-primary);
   color: white;
   padding: 12px 24px;
   border: none;
@@ -184,19 +219,19 @@
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: var(--mod-transition);
 }
 
-.role-mgr-btn-primary:hover:not(:disabled) {
-  background-color: #1565c0;
+.admin-mod-btn-primary:hover:not(:disabled) {
+  background-color: var(--mod-primary-hover);
 }
 
-.role-mgr-btn-primary:disabled {
+.admin-mod-btn-primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.role-mgr-btn-outline {
+.admin-mod-btn-outline {
   background: transparent;
   color: #4b5563;
   border: 1px solid #d1d5db;
@@ -205,15 +240,15 @@
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: var(--mod-transition);
 }
 
-.role-mgr-btn-outline:hover {
+.admin-mod-btn-outline:hover {
   background-color: #f3f4f6;
   border-color: #9ca3af;
 }
 
-.role-mgr-btn-cancel {
+.admin-mod-btn-cancel {
   background-color: transparent;
   color: #6b7280;
   padding: 12px 24px;
@@ -222,33 +257,33 @@
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: var(--mod-transition);
 }
 
-.role-mgr-btn-cancel:hover {
+.admin-mod-btn-cancel:hover {
   background-color: #f3f4f6;
   color: #374151;
 }
 
 /* --- Table Styles --- */
-.role-mgr-table-container {
+.admin-mod-table-container {
   overflow-x: auto;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border: 1px solid var(--mod-border);
+  border-radius: var(--mod-radius);
   background: white;
 }
 
-.role-mgr-table {
+.admin-mod-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
   white-space: nowrap;
 }
 
-.role-mgr-table th {
+.admin-mod-table th {
   padding: 16px;
   background-color: #f9fafb;
-  border-bottom: 2px solid #e0e0e0;
+  border-bottom: 2px solid var(--mod-border);
   font-weight: 600;
   color: #374151;
   font-size: 0.9rem;
@@ -256,31 +291,31 @@
   letter-spacing: 0.05em;
 }
 
-.role-mgr-table td {
+.admin-mod-table td {
   padding: 16px;
   border-bottom: 1px solid #f3f4f6;
   font-size: 0.95rem;
   vertical-align: middle;
 }
 
-.role-mgr-table tbody tr:hover {
+.admin-mod-table tbody tr:hover {
   background-color: #f9fafb;
 }
 
-.role-mgr-table tbody tr:last-child td {
+.admin-mod-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.role-mgr-td-bold {
+.admin-mod-td-bold {
   font-weight: 600;
   color: #111827;
 }
 
-.role-mgr-td-muted {
-  color: #666666;
+.admin-mod-td-muted {
+  color: var(--mod-text-muted);
 }
 
-.role-mgr-badge {
+.admin-mod-badge {
   background: #f0f4f8;
   color: #475569;
   padding: 6px 10px;
@@ -290,44 +325,44 @@
   border: 1px solid #e2e8f0;
 }
 
-.role-mgr-actions-cell {
+.admin-mod-actions-cell {
   display: flex;
   gap: 10px;
 }
 
-.role-mgr-btn-edit {
+.admin-mod-btn-edit {
   padding: 8px 16px;
   background-color: #e3f2fd;
-  color: #1976d2;
+  color: var(--mod-primary);
   border: none;
   border-radius: 6px;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: var(--mod-transition);
 }
 
-.role-mgr-btn-edit:hover {
+.admin-mod-btn-edit:hover {
   background-color: #bbdefb;
 }
 
-.role-mgr-btn-delete {
+.admin-mod-btn-delete {
   padding: 8px 16px;
-  background-color: #ffebee;
-  color: #d32f2f;
+  background-color: var(--mod-danger-bg);
+  color: var(--mod-danger);
   border: none;
   border-radius: 6px;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: var(--mod-transition);
 }
 
-.role-mgr-btn-delete:hover {
+.admin-mod-btn-delete:hover {
   background-color: #ffcdd2;
 }
 
-.role-mgr-empty-state {
+.admin-mod-empty-state {
   text-align: center;
   padding: 40px !important;
   color: #9ca3af;
@@ -336,25 +371,25 @@
 
 /* --- Responsive Adjustments --- */
 @media (max-width: 768px) {
-  .role-mgr-wrapper {
+  .admin-mod-wrapper {
     padding: 16px;
   }
   
-  .role-mgr-card {
+  .admin-mod-card {
     padding: 20px;
   }
 
-  .role-mgr-permissions-header {
+  .admin-mod-permissions-header {
     flex-direction: column;
     align-items: flex-start;
   }
   
-  .role-mgr-form-actions {
+  .admin-mod-form-actions {
     flex-direction: column;
   }
   
-  .role-mgr-btn-primary, 
-  .role-mgr-btn-cancel {
+  .admin-mod-btn-primary, 
+  .admin-mod-btn-cancel {
     width: 100%;
   }
 }
