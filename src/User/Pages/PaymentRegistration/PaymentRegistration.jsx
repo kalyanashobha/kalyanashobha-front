@@ -76,28 +76,27 @@ const PaymentRegistration = () => {
     fetchData();
   }, [navigate]);
 
-  // Safely encode the spaces in the Payee Name
-  const upiLink = `upi://pay?pa=8897714968@axl&pn=${encodeURIComponent("Kalyana Shobha")}&am=${amount}&cu=INR`; 
+  const upiLink = `upi://pay?pa=8897714968@axl&pn=Kalyana%20Shobha&am=${amount}&cu=INR`; 
 
+  // --- UPDATED FUNCTION HERE ---
   const handlePayClick = () => {
     toast.loading("Opening UPI App...", { duration: 2000 });
     
-    // Create a temporary anchor element to trigger the deep link natively
+    // Create a temporary anchor element for a more reliable deep link trigger
     const link = document.createElement('a');
     link.href = upiLink;
-    
-    // Append to body, click, and remove (required for some browsers to register the click)
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 
-    // Transition to the verification step
+    // Move to step 2 after initiating the payment intent
     setTimeout(() => { setStep(2); }, 3000);
   };
+  // -----------------------------
 
   const handleFileChange = (e) => {
-    if (e.target.files && e.target.files) {
-      setScreenshot(e.target.files);
+    if (e.target.files && e.target.files[0]) {
+      setScreenshot(e.target.files[0]);
     }
   };
 
@@ -157,7 +156,7 @@ const PaymentRegistration = () => {
               <div className="ks-skeleton ks-skeleton-text" style={{ width: '30%', background: 'rgba(255,255,255,0.1)', marginBottom: '16px' }}></div>
               <div className="ks-skeleton ks-skeleton-price" style={{ width: '60%', background: 'rgba(255,255,255,0.1)', marginBottom: '50px' }}></div>
               <div className="ks-features-list">
-                {.map(i => (
+                {[1, 2, 3].map(i => (
                   <div key={i} className="ks-feature-item" style={{ alignItems: 'center' }}>
                     <div className="ks-skeleton ks-skeleton-icon" style={{ background: 'rgba(255,255,255,0.1)' }}></div>
                     <div style={{ flex: 1 }}>
