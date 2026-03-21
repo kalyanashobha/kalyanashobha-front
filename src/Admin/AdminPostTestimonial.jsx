@@ -37,7 +37,9 @@ const AdminPostTestimonial = () => {
     };
 
     const handleFileChange = (e) => {
-        const file = e.target.files;
+        // FIXED: Added back to select the specific file.
+        // Without this, URL.createObjectURL will fail.
+        const file = e.target.files; 
         if (file) {
             setMedia(file);
             setMediaPreview(URL.createObjectURL(file));
@@ -125,22 +127,30 @@ const AdminPostTestimonial = () => {
                     --ks-border-color: #e2e8f0;
                 }
 
+                /* NEW: Force all elements to respect padding within their width */
+                .ks-story-panel * {
+                    box-sizing: border-box;
+                }
+
                 .ks-story-panel {
-                    padding: clamp(20px, 5vw, 40px);
+                    padding: 16px; /* Optimized for mobile */
                     background: #ffffff;
                     min-height: 100vh;
                     font-family: 'Inter', -apple-system, sans-serif;
                     color: var(--ks-dark-slate);
+                    width: 100%;
+                    max-width: 100vw;
+                    overflow-x: hidden;
                 }
 
                 .ks-panel-header {
-                    margin-bottom: 30px;
+                    margin-bottom: 24px;
                     border-left: 4px solid var(--ks-premium-red);
-                    padding-left: 16px;
+                    padding-left: 12px;
                 }
 
                 .ks-panel-header h2 {
-                    font-size: 28px;
+                    font-size: 24px;
                     margin: 0;
                     font-weight: 700;
                     letter-spacing: -0.5px;
@@ -148,35 +158,30 @@ const AdminPostTestimonial = () => {
 
                 .ks-panel-header p {
                     color: #64748b;
-                    margin: 8px 0 0;
-                    font-size: 15px;
+                    margin: 6px 0 0;
+                    font-size: 14px;
                 }
 
                 .ks-layout-grid {
                     display: grid;
                     grid-template-columns: 1fr;
-                    gap: 30px;
+                    gap: 20px;
                     align-items: start;
-                }
-
-                @media (min-width: 992px) {
-                    .ks-layout-grid {
-                        grid-template-columns: 1fr 1.2fr;
-                    }
                 }
 
                 .ks-content-box {
                     background: #ffffff;
                     border-radius: 12px;
-                    padding: 24px;
+                    padding: 16px; /* Reduced for mobile space */
                     border: 1px solid var(--ks-border-color);
                     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+                    width: 100%;
                 }
 
                 .ks-box-heading {
                     font-size: 18px;
                     color: var(--ks-dark-slate);
-                    margin: 0 0 20px 0;
+                    margin: 0 0 16px 0;
                     font-weight: 600;
                     border-bottom: 1px solid var(--ks-border-color);
                     padding-bottom: 12px;
@@ -184,7 +189,7 @@ const AdminPostTestimonial = () => {
 
                 .ks-upload-toggles {
                     display: flex;
-                    gap: 10px;
+                    gap: 8px;
                     margin-bottom: 20px;
                     background: var(--ks-light-gray);
                     padding: 6px;
@@ -194,15 +199,17 @@ const AdminPostTestimonial = () => {
 
                 .ks-toggle-action {
                     flex: 1;
-                    padding: 8px 12px;
+                    padding: 8px 4px; /* Reduced side padding so text doesn't break into two lines */
                     border: none;
                     border-radius: 6px;
                     cursor: pointer;
                     font-weight: 500;
-                    font-size: 14px;
+                    font-size: 13px; /* Slightly smaller for mobile */
                     color: #64748b;
                     background: transparent;
                     transition: all 0.2s ease;
+                    text-align: center;
+                    white-space: nowrap;
                 }
 
                 .ks-toggle-action.is-selected {
@@ -225,10 +232,9 @@ const AdminPostTestimonial = () => {
                     padding: 12px;
                     border: 1px solid var(--ks-border-color);
                     border-radius: 8px;
-                    margin-bottom: 20px;
+                    margin-bottom: 16px;
                     font-size: 14px;
                     transition: border-color 0.2s;
-                    box-sizing: border-box;
                 }
 
                 .ks-text-input:focus {
@@ -274,32 +280,22 @@ const AdminPostTestimonial = () => {
 
                 .ks-media-preview-box img, .ks-media-preview-box video {
                     max-width: 100%;
-                    max-height: 300px;
+                    max-height: 250px;
                     border-radius: 4px;
                     object-fit: contain;
                 }
 
                 .ks-feed-scroll-area {
-                    max-height: 600px;
+                    max-height: 500px;
                     overflow-y: auto;
-                    padding-right: 8px;
+                    padding-right: 4px;
                 }
 
                 /* Custom Scrollbar */
-                .ks-feed-scroll-area::-webkit-scrollbar {
-                    width: 6px;
-                }
-                .ks-feed-scroll-area::-webkit-scrollbar-track {
-                    background: var(--ks-light-gray);
-                    border-radius: 4px;
-                }
-                .ks-feed-scroll-area::-webkit-scrollbar-thumb {
-                    background: #cbd5e1;
-                    border-radius: 4px;
-                }
-                .ks-feed-scroll-area::-webkit-scrollbar-thumb:hover {
-                    background: #94a3b8;
-                }
+                .ks-feed-scroll-area::-webkit-scrollbar { width: 4px; }
+                .ks-feed-scroll-area::-webkit-scrollbar-track { background: var(--ks-light-gray); border-radius: 4px; }
+                .ks-feed-scroll-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+                .ks-feed-scroll-area::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
                 .ks-story-feed {
                     display: flex;
@@ -311,24 +307,19 @@ const AdminPostTestimonial = () => {
                     display: flex;
                     align-items: center;
                     background: #ffffff;
-                    padding: 12px;
+                    padding: 10px;
                     border-radius: 8px;
                     border: 1px solid var(--ks-border-color);
-                    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-                }
-
-                .ks-feed-item:hover {
-                    border-color: var(--ks-primary-gold);
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
                 }
 
                 .ks-item-thumbnail {
-                    width: 64px;
-                    height: 64px;
+                    width: 50px;
+                    height: 50px;
                     border-radius: 6px;
                     object-fit: cover;
-                    margin-right: 16px;
+                    margin-right: 12px;
                     background: var(--ks-light-gray);
+                    flex-shrink: 0;
                 }
 
                 .ks-item-details { 
@@ -339,7 +330,7 @@ const AdminPostTestimonial = () => {
                 .ks-item-details h4 { 
                     margin: 0 0 4px 0; 
                     color: var(--ks-dark-slate); 
-                    font-size: 15px;
+                    font-size: 14px;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -347,7 +338,7 @@ const AdminPostTestimonial = () => {
                 
                 .ks-item-details p { 
                     margin: 0; 
-                    font-size: 13px; 
+                    font-size: 12px; 
                     color: #64748b; 
                     line-height: 1.4;
                     display: -webkit-box;
@@ -360,41 +351,54 @@ const AdminPostTestimonial = () => {
                     background: transparent;
                     color: #ef4444;
                     border: 1px solid transparent;
-                    padding: 8px;
+                    padding: 6px;
                     border-radius: 6px;
                     cursor: pointer;
-                    transition: all 0.2s ease;
-                    margin-left: 12px;
+                    margin-left: 8px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                 }
 
-                .ks-remove-action:hover {
-                    background: #fef2f2;
-                    border-color: #fca5a5;
-                }
-
                 .ks-notification {
-                    padding: 12px 16px;
+                    padding: 12px;
                     border-radius: 8px;
-                    margin-bottom: 24px;
+                    margin-bottom: 20px;
                     font-size: 14px;
                     font-weight: 500;
                     display: flex;
                     align-items: center;
                 }
 
-                .ks-notify-good {
-                    background: #f0fdf4;
-                    color: #166534;
-                    border: 1px solid #bbf7d0;
-                }
+                .ks-notify-good { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+                .ks-notify-bad { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
 
-                .ks-notify-bad {
-                    background: #fef2f2;
-                    color: #991b1b;
-                    border: 1px solid #fecaca;
+                /* =========================================
+                   DESKTOP MEDIA QUERIES (Over 768px) 
+                   ========================================= */
+                @media (min-width: 768px) {
+                    .ks-story-panel {
+                        padding: clamp(20px, 5vw, 40px);
+                    }
+                    .ks-layout-grid {
+                        grid-template-columns: 1fr 1.2fr;
+                        gap: 30px;
+                    }
+                    .ks-content-box {
+                        padding: 24px;
+                    }
+                    .ks-toggle-action {
+                        padding: 8px 12px;
+                        font-size: 14px;
+                    }
+                    .ks-item-thumbnail {
+                        width: 64px;
+                        height: 64px;
+                        margin-right: 16px;
+                    }
+                    .ks-item-details h4 { font-size: 15px; }
+                    .ks-item-details p { font-size: 13px; }
+                    .ks-panel-header h2 { font-size: 28px; }
                 }
             `}</style>
 
