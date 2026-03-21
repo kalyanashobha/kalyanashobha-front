@@ -1439,9 +1439,7 @@ const UserDashboard = () => {
                      <div className="dash-form-group"><label className="dash-label">Native Location</label><input type="text" name="nativeLocation" className="dash-input" placeholder="Native Place" value={extraDetailsForm.nativeLocation} onChange={handleExtraDetailsChange}/></div>
                      <DashboardComboInput label="Complexion" name="complexion" value={extraDetailsForm.complexion} onChange={handleExtraDetailsChange} options={dynamicOptions.Complexion} required={false} onKeyDown={handleEnterToNext}/>
                      
-                     <div className="dash-form-group" style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
-                       <h4 className="dash-section-title" style={{ border: 'none', marginBottom: '0.5rem', padding: 0 }}>Current Location</h4>
-                     </div>
+                     
 
                      
                    </div>
