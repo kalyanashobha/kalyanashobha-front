@@ -3,7 +3,7 @@ import Navbar from "../../Components/Navbar.jsx";
 import { useNavigate } from 'react-router-dom';
 import QRCode from "react-qr-code"; 
 import toast, { Toaster } from 'react-hot-toast'; 
-import { CheckCircle, ShieldCheck, AlertTriangle, Clock, ArrowRight, Smartphone } from 'lucide-react';
+import { CheckCircle, ShieldCheck, AlertTriangle, Clock, ArrowRight } from 'lucide-react';
 import { BsPatchCheck } from "react-icons/bs"; 
 import './Payment.css'; 
 
@@ -76,18 +76,28 @@ const PaymentRegistration = () => {
     fetchData();
   }, [navigate]);
 
-  const upiLink = `upi://pay?pa=8897714968@axl&pn=Kalyana%20Shobha&am=${amount}&cu=INR`; 
+  // Safely encode the spaces in the Payee Name
+  const upiLink = `upi://pay?pa=8897714968@axl&pn=${encodeURIComponent("Kalyana Shobha")}&am=${amount}&cu=INR`; 
 
   const handlePayClick = () => {
-    // Added a toast to let the user know the redirect is happening
     toast.loading("Opening UPI App...", { duration: 2000 });
-    window.location.href = upiLink;
+    
+    // Create a temporary anchor element to trigger the deep link natively
+    const link = document.createElement('a');
+    link.href = upiLink;
+    
+    // Append to body, click, and remove (required for some browsers to register the click)
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Transition to the verification step
     setTimeout(() => { setStep(2); }, 3000);
   };
 
   const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setScreenshot(e.target.files[0]);
+    if (e.target.files && e.target.files) {
+      setScreenshot(e.target.files);
     }
   };
 
@@ -100,7 +110,6 @@ const PaymentRegistration = () => {
     }
 
     setLoading(true);
-    // Capture the ID of the loading toast
     const toastId = toast.loading("Verifying payment..."); 
 
     try {
@@ -124,7 +133,6 @@ const PaymentRegistration = () => {
       
       const data = await response.json();
 
-      // Update the same toast ID with the success or error message
       if (data.success) {
         toast.success("Payment submitted successfully!", { id: toastId });
         setExistingStatus("PendingVerification"); 
@@ -149,7 +157,7 @@ const PaymentRegistration = () => {
               <div className="ks-skeleton ks-skeleton-text" style={{ width: '30%', background: 'rgba(255,255,255,0.1)', marginBottom: '16px' }}></div>
               <div className="ks-skeleton ks-skeleton-price" style={{ width: '60%', background: 'rgba(255,255,255,0.1)', marginBottom: '50px' }}></div>
               <div className="ks-features-list">
-                {[1, 2, 3].map(i => (
+                {.map(i => (
                   <div key={i} className="ks-feature-item" style={{ alignItems: 'center' }}>
                     <div className="ks-skeleton ks-skeleton-icon" style={{ background: 'rgba(255,255,255,0.1)' }}></div>
                     <div style={{ flex: 1 }}>
@@ -180,7 +188,6 @@ const PaymentRegistration = () => {
   return (
     <>
       <Navbar />
-      {/* Added containerStyle to prevent toast from hiding under the fixed Navbar */}
       <Toaster position="top-center" containerStyle={{ zIndex: 999999, top: 80 }} reverseOrder={false} />
 
       <div className="ks-payment-layout">
