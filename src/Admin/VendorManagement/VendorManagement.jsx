@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Plus, Trash2, Phone, Tag, X, Image as ImageIcon, Search } from "lucide-react";
+import { Plus, Trash2, Phone, Tag, X, Image as ImageIcon, Search, Mail } from "lucide-react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// --- NEW: Import image compression ---
 import imageCompression from 'browser-image-compression';
 import "./VendorManagement.css";
 
@@ -14,19 +13,20 @@ export default function VendorManagement() {
   
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Form State
+  // Form State (Added email field, cleared default category)
   const [formData, setFormData] = useState({
     businessName: "",
-    category: "Catering",
+    email: "",
+    category: "",
     contactNumber: "",
     priceRange: "",
     description: "",
   });
   const [files, setFiles] = useState([]);
   
-  // --- NEW: Compression loading state ---
   const [isCompressing, setIsCompressing] = useState(false);
 
+  // Suggestions for the datalist (enum removed on backend, but good for UX)
   const categories = [
     'Catering', 'Wedding halls', 'Photography', 'Decoration', 
     'Mehendi artists', 'Makeup', 'Event management', 'Travel', 'Pandit'
@@ -59,7 +59,7 @@ export default function VendorManagement() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // --- NEW: Handle file change with compression ---
+  // 3. Handle file change with compression
   const handleFileChange = async (e) => {
     const selectedFiles = Array.from(e.target.files);
     if (selectedFiles.length === 0) return;
@@ -69,24 +69,22 @@ export default function VendorManagement() {
 
     try {
       const options = {
-        maxSizeMB: 1, // Max size 1MB per image
+        maxSizeMB: 1, 
         maxWidthOrHeight: 1920,
-        useWebWorker: true, // Speeds up compression in the browser
+        useWebWorker: true, 
         alwaysKeepResolution: true
       };
 
-      // Compress all selected images in parallel
       const compressedFiles = await Promise.all(
         selectedFiles.map(async (file) => {
           try {
-            // Only attempt to compress image files
             if (file.type.startsWith('image/')) {
                return await imageCompression(file, options);
             }
             return file;
           } catch (err) {
             console.error(`Failed to compress ${file.name}`, err);
-            return file; // Fallback to original if compression fails for a specific file
+            return file; 
           }
         })
       );
@@ -101,13 +99,14 @@ export default function VendorManagement() {
     }
   };
 
-  // 3. Submit Vendor (Multipart Form Data)
+  // 4. Submit Vendor (Multipart Form Data)
   const handleSubmit = async (e) => {
     e.preventDefault();
     const toastId = toast.loading("Adding vendor...");
 
     const data = new FormData();
     data.append("businessName", formData.businessName);
+    data.append("email", formData.email); // Added email to payload
     data.append("category", formData.category);
     data.append("contactNumber", formData.contactNumber);
     data.append("priceRange", formData.priceRange);
@@ -128,8 +127,10 @@ export default function VendorManagement() {
 
       toast.update(toastId, { render: "Vendor Added Successfully", type: "success", isLoading: false, autoClose: 3000 });
       setShowModal(false);
+      
+      // Reset form state including email
       setFormData({
-        businessName: "", category: "Catering", contactNumber: "", priceRange: "", description: ""
+        businessName: "", email: "", category: "", contactNumber: "", priceRange: "", description: ""
       });
       setFiles([]);
       fetchVendors(); 
@@ -140,7 +141,7 @@ export default function VendorManagement() {
     }
   };
 
-  // 4. Delete Vendor
+  // 5. Delete Vendor
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this vendor?")) return;
     const toastId = toast.loading("Deleting...");
@@ -203,7 +204,7 @@ export default function VendorManagement() {
             <div key={vendor._id} className="vm-card">
               <div className="vm-card-image">
                 {vendor.images && vendor.images.length > 0 ? (
-                  <img src={vendor.images} alt={vendor.businessName} />
+                  <img src={vendor.images[0]} alt={vendor.businessName} />
                 ) : (
                   <div className="placeholder-img"><ImageIcon size={32} /></div>
                 )}
@@ -213,14 +214,25 @@ export default function VendorManagement() {
               <div className="vm-card-content">
                 <div className="vm-id-badge">{vendor.vendorId || "No ID"}</div>
                 <h3>{vendor.businessName}</h3>
-                <div className="vm-detail-row">
-                  <Phone size={14} className="icon-gold" />
-                  <span>{vendor.contactNumber}</span>
+                
+                {/* Contact Info Group */}
+                <div className="vm-contact-info">
+                  <div className="vm-detail-row">
+                    <Phone size={14} className="icon-gold" />
+                    <span>{vendor.contactNumber}</span>
+                  </div>
+                  {/* Added Email Display */}
+                  <div className="vm-detail-row">
+                    <Mail size={14} className="icon-gold" />
+                    <span>{vendor.email || "No email provided"}</span>
+                  </div>
                 </div>
+
                 <div className="vm-detail-row">
                   <Tag size={14} className="icon-gold" />
                   <span>{vendor.priceRange || "Price on Request"}</span>
                 </div>
+                
                 <p className="vm-desc">
                   {vendor.description ? vendor.description.substring(0, 60) + "..." : "No description available."}
                 </p>
@@ -246,17 +258,25 @@ export default function VendorManagement() {
             </div>
 
             <form onSubmit={handleSubmit} className="vm-form">
-              <div className="vm-form-group">
-                <label>Business Name</label>
-                <input type="text" name="businessName" required value={formData.businessName} onChange={handleInputChange} placeholder="e.g. Royal Catering Services" />
+              <div className="vm-form-row">
+                <div className="vm-form-group">
+                  <label>Business Name</label>
+                  <input type="text" name="businessName" required value={formData.businessName} onChange={handleInputChange} placeholder="e.g. Royal Catering" />
+                </div>
+                <div className="vm-form-group">
+                  <label>Email Address</label>
+                  <input type="email" name="email" required value={formData.email} onChange={handleInputChange} placeholder="vendor@example.com" />
+                </div>
               </div>
 
               <div className="vm-form-row">
                 <div className="vm-form-group">
                   <label>Category</label>
-                  <select name="category" value={formData.category} onChange={handleInputChange}>
-                    {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                  </select>
+                  {/* Replaced strict select with an input + datalist for flexibility */}
+                  <input type="text" name="category" required list="category-options" value={formData.category} onChange={handleInputChange} placeholder="Select or type category" />
+                  <datalist id="category-options">
+                    {categories.map(cat => <option key={cat} value={cat} />)}
+                  </datalist>
                 </div>
                 <div className="vm-form-group">
                     <label>Contact Number</label>
@@ -277,7 +297,6 @@ export default function VendorManagement() {
               <div className="vm-form-group">
                 <label>Upload Image</label>
                 <div className="file-input-wrapper">
-                  {/* --- NEW: Disabled input while compressing --- */}
                   <input type="file" multiple accept="image/*" onChange={handleFileChange} disabled={isCompressing} />
                   <div className="file-dummy" style={{ opacity: isCompressing ? 0.6 : 1 }}>
                     <ImageIcon size={18} />
@@ -288,7 +307,6 @@ export default function VendorManagement() {
                 </div>
               </div>
 
-              {/* --- NEW: Disable submit button during compression --- */}
               <button type="submit" className="vm-submit-btn" disabled={isCompressing}>
                 {isCompressing ? "Please wait..." : "Add Vendor"}
               </button>
