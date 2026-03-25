@@ -1,49 +1,44 @@
-import React, { useState, useEffect } from "react";
-import { Outlet, useLocation } from "react-router-dom";
-import AdminSidebar from "./Sidebar/AdminSidebar";
+import React, { useState } from "react";
+import { Outlet } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import "./AdminLayout.css";
+import AdminSidebar from "./Sidebar/AdminSidebar";
+import "./AdminLayout.css"; 
 
-export default function AdminLayout() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const location = useLocation(); // Keep track of the current route
-
-  // FIX: Automatically close the mobile sidebar whenever the route changes
-  useEffect(() => {
-    setIsMobileMenuOpen(false);
-  }, [location.pathname]);
-
-  const closeSidebar = () => {
-    setIsMobileMenuOpen(false);
-  };
+const AdminLayout = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="admin-layout-container">
-      {/* Mobile Top Bar */}
-      <div className="mobile-topbar">
+    <div className="admin-root-layout">
+      
+      {/* MOBILE HEADER (Visible only on mobile) */}
+      <div className="admin-mobile-header">
+        <div className="mobile-brand">
+            <span style={{color:'#D32F2F', fontWeight:'700'}}>Kalyana</span>Shobha
+        </div>
         <button 
-          className="mobile-menu-toggle" 
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="mobile-menu-btn"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
-        <span className="mobile-title">KalyanaShobha Admin</span>
       </div>
 
-      {/* Sidebar Wrapper */}
-      <div className={`sidebar-wrapper ${isMobileMenuOpen ? "open" : ""}`}>
-        <AdminSidebar onClose={closeSidebar} />
+      {/* SIDEBAR (Pass open state for mobile) */}
+      <div className={`sidebar-wrapper ${isSidebarOpen ? 'mobile-open' : ''}`}>
+        <AdminSidebar closeMobileMenu={() => setIsSidebarOpen(false)} />
+        {/* Overlay to close sidebar on click outside */}
+        <div 
+            className="sidebar-overlay" 
+            onClick={() => setIsSidebarOpen(false)}
+        ></div>
       </div>
 
-      {/* Overlay to close sidebar by clicking outside */}
-      {isMobileMenuOpen && (
-        <div className="mobile-overlay" onClick={closeSidebar}></div>
-      )}
-
-      {/* Main Content Area */}
+      {/* MAIN CONTENT AREA */}
       <main className="admin-main-content">
-        <Outlet /> 
+        <Outlet />
       </main>
     </div>
   );
-}
+};
+
+export default AdminLayout;
