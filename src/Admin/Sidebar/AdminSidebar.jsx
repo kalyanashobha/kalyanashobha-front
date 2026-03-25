@@ -8,7 +8,8 @@ import {
 import axios from "axios";
 import "./AdminSidebar.css";
 
-export default function AdminSidebar() {
+// --- ADDED closeSidebar PROP HERE ---
+export default function AdminSidebar({ closeSidebar }) {
   const navigate = useNavigate();
   const location = useLocation(); 
   
@@ -28,13 +29,11 @@ export default function AdminSidebar() {
     if (info) setAdminInfo(info);
   }, []);
 
-  // --- FIX: Wrapped in useCallback to keep the function stable for event listeners ---
   const fetchCounts = useCallback(async () => {
     try {
       const token = localStorage.getItem("adminToken");
       if (!token) return;
       
-      // --- FIX: Added explicit no-cache headers ---
       const headers = { 
         Authorization: token,
         'Cache-Control': 'no-cache',
@@ -43,7 +42,6 @@ export default function AdminSidebar() {
       };
       
       const API_BASE = "https://kalyanashobha-back.vercel.app";
-      // --- FIX: Cache-buster timestamp ensures the browser never loads old data ---
       const timestamp = new Date().getTime(); 
       
       const [statsRes, phase1Res, phase2Res, pendingDataRes, premiumRes, vendorLeadsRes] = await Promise.all([
@@ -72,9 +70,8 @@ export default function AdminSidebar() {
     } catch (e) {
       console.error("Failed to fetch sidebar stats", e);
     }
-  }, []); // Empty dependency array for useCallback
+  }, []); 
 
-  // --- FIX: Updated useEffect dependencies ---
   useEffect(() => {
     fetchCounts();
 
@@ -112,43 +109,11 @@ export default function AdminSidebar() {
   const allLinks = [
     { id: "dashboard", path: "/admin/dashboard", icon: <LayoutDashboard size={20} />, label: "Dashboard" },
     { id: "users", path: "/admin/users", icon: <Users size={20} />, label: "User Registry" },
-    
-    { 
-      id: "reg-approvals", 
-      path: "/admin/registration-approvals", 
-      icon: <CheckCircle size={20} />, 
-      label: "Reg. Approvals", 
-      badge: stats.pendingReg 
-    },
-    { 
-      id: "interest-approvals", 
-      path: "/admin/interest-approvals", 
-      icon: <Heart size={20} />, 
-      label: "Interest Approvals", 
-      badge: totalPendingInterests 
-    },
-    { 
-      id: "data-approval", 
-      path: "/admin/data-approval", 
-      icon: <FileCheck size={20} />, 
-      label: "Data Approval",
-      badge: stats.pendingData 
-    },
-    { 
-      id: "premium-users", 
-      path: "/admin/premium-users", 
-      icon: <Crown size={20} />, 
-      label: "Premium Requests",
-      badge: stats.pendingPremium
-    },
-    { 
-      id: "vendor-leads", 
-      path: "/admin/vendor-leads", 
-      icon: <Target size={20} />, 
-      label: "Vendor Leads", 
-      badge: stats.pendingVendorLeads 
-    },
-
+    { id: "reg-approvals", path: "/admin/registration-approvals", icon: <CheckCircle size={20} />, label: "Reg. Approvals", badge: stats.pendingReg },
+    { id: "interest-approvals", path: "/admin/interest-approvals", icon: <Heart size={20} />, label: "Interest Approvals", badge: totalPendingInterests },
+    { id: "data-approval", path: "/admin/data-approval", icon: <FileCheck size={20} />, label: "Data Approval", badge: stats.pendingData },
+    { id: "premium-users", path: "/admin/premium-users", icon: <Crown size={20} />, label: "Premium Requests", badge: stats.pendingPremium },
+    { id: "vendor-leads", path: "/admin/vendor-leads", icon: <Target size={20} />, label: "Vendor Leads", badge: stats.pendingVendorLeads },
     { id: "agents", path: "/admin/agents", icon: <Briefcase size={20} />, label: "Agents" },
     { id: "vendors", path: "/admin/vendors", icon: <Store size={20} />, label: "Vendors" },
     { id: "user-certificates", path: "/admin/user-certificates", icon: <Award size={20} />, label: "User Acceptance" },
@@ -177,7 +142,14 @@ export default function AdminSidebar() {
         <ul>
           {filteredLinks.map((link) => (
             <li key={link.id}>
-              <NavLink to={link.path} className={({ isActive }) => (isActive ? "ks-nav-link active" : "ks-nav-link")}>
+              {/* --- ADDED onClick HANDLER HERE --- */}
+              <NavLink 
+                to={link.path} 
+                className={({ isActive }) => (isActive ? "ks-nav-link active" : "ks-nav-link")}
+                onClick={() => {
+                  if (closeSidebar) closeSidebar();
+                }}
+              >
                 <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
                   {link.icon}
                   {link.badge > 0 && (
