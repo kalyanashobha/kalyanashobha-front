@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Plus, Trash2, Phone, Tag, X, Image as ImageIcon, Search, Mail } from "lucide-react";
+import { Plus, Trash2, Phone, Tag, X, Image as ImageIcon, Search, Mail, CheckCircle, XCircle } from "lucide-react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import imageCompression from 'browser-image-compression';
 import "./VendorManagement.css";
 
 export default function VendorManagement() {
-  const [vendors, setVendors] = useState([]);
+  // --- STATE FOR VENDORS & TABS ---
+  const [activeVendors, setActiveVendors] = useState([]);
+  const [pendingVendors, setPendingVendors] = useState([]);
+  const [activeTab, setActiveTab] = useState("active"); // 'active' or 'pending'
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Form State (Added email field, cleared default category)
+  // Form State 
   const [formData, setFormData] = useState({
     businessName: "",
     email: "",
@@ -26,13 +29,12 @@ export default function VendorManagement() {
   
   const [isCompressing, setIsCompressing] = useState(false);
 
-  // Suggestions for the datalist (enum removed on backend, but good for UX)
   const categories = [
     'Catering', 'Wedding halls', 'Photography', 'Decoration', 
     'Mehendi artists', 'Makeup', 'Event management', 'Travel', 'Pandit'
   ];
 
-  // 1. Fetch Vendors
+  // 1. Fetch Vendors and Split into Active/Pending
   const fetchVendors = async () => {
     setLoading(true);
     try {
@@ -41,7 +43,10 @@ export default function VendorManagement() {
         headers: { Authorization: token },
       });
       if (res.data.success) {
-        setVendors(res.data.vendors);
+        const allVendors = res.data.vendors || [];
+        // Filter based on isApproved flag
+        setActiveVendors(allVendors.filter(v => v.isApproved));
+        setPendingVendors(allVendors.filter(v => !v.isApproved));
       }
     } catch (err) {
       toast.error("Failed to fetch vendors");
@@ -99,14 +104,14 @@ export default function VendorManagement() {
     }
   };
 
-  // 4. Submit Vendor (Multipart Form Data)
+  // 4. Submit Vendor (Manual Add by Admin)
   const handleSubmit = async (e) => {
     e.preventDefault();
     const toastId = toast.loading("Adding vendor...");
 
     const data = new FormData();
     data.append("businessName", formData.businessName);
-    data.append("email", formData.email); // Added email to payload
+    data.append("email", formData.email); 
     data.append("category", formData.category);
     data.append("contactNumber", formData.contactNumber);
     data.append("priceRange", formData.priceRange);
@@ -128,7 +133,6 @@ export default function VendorManagement() {
       toast.update(toastId, { render: "Vendor Added Successfully", type: "success", isLoading: false, autoClose: 3000 });
       setShowModal(false);
       
-      // Reset form state including email
       setFormData({
         businessName: "", email: "", category: "", contactNumber: "", priceRange: "", description: ""
       });
@@ -141,7 +145,7 @@ export default function VendorManagement() {
     }
   };
 
-  // 5. Delete Vendor
+  // 5. Delete Active Vendor
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this vendor?")) return;
     const toastId = toast.loading("Deleting...");
@@ -157,7 +161,38 @@ export default function VendorManagement() {
     }
   };
 
-  const filteredVendors = vendors.filter((vendor) => {
+  // 6. --- NEW: Approve or Reject Pending Request ---
+  const handleAction = async (vendorId, actionType) => {
+    let rejectionReason = "";
+    
+    if (actionType === 'reject') {
+      rejectionReason = window.prompt("Optional: Enter reason for rejection (this will be sent to the vendor via email):");
+      if (rejectionReason === null) return; // Admin cancelled the prompt
+    }
+
+    const toastId = toast.loading(`${actionType === 'approve' ? 'Approving' : 'Rejecting'} vendor...`);
+    
+    try {
+      const token = localStorage.getItem("adminToken");
+      await axios.post("https://kalyanashobha-back.vercel.app/api/admin/vendors/action", {
+        vendorObjectId: vendorId,
+        action: actionType,
+        rejectionReason: rejectionReason
+      }, {
+        headers: { Authorization: token },
+      });
+      
+      toast.update(toastId, { render: `Vendor ${actionType}d successfully!`, type: "success", isLoading: false, autoClose: 2000 });
+      fetchVendors(); // Refresh lists
+    } catch (err) {
+      toast.update(toastId, { render: `Failed to ${actionType} vendor`, type: "error", isLoading: false, autoClose: 2000 });
+    }
+  };
+
+  // Determine which list to display
+  const currentList = activeTab === "active" ? activeVendors : pendingVendors;
+
+  const filteredVendors = currentList.filter((vendor) => {
     const searchLower = searchTerm.toLowerCase();
     const matchesId = vendor.vendorId?.toLowerCase().includes(searchLower);
     const matchesName = vendor.businessName?.toLowerCase().includes(searchLower);
@@ -171,7 +206,7 @@ export default function VendorManagement() {
       <div className="vm-header">
         <div className="vm-title-section">
           <h2>Vendor Management</h2>
-          <p>Manage wedding service providers and listings.</p>
+          <p>Manage wedding service providers and review join requests.</p>
         </div>
         
         <div className="vm-actions-section">
@@ -179,7 +214,7 @@ export default function VendorManagement() {
             <Search size={16} className="vm-search-icon" />
             <input 
               type="text" 
-              placeholder="Search ID (e.g., VND-0001) or Name..." 
+              placeholder="Search ID or Name..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -191,13 +226,43 @@ export default function VendorManagement() {
         </div>
       </div>
 
+      {/* --- NEW: TABS SECTION --- */}
+      <div style={{ display: 'flex', gap: '20px', padding: '0 20px', marginBottom: '20px', borderBottom: '1px solid #ddd' }}>
+        <button 
+          onClick={() => setActiveTab('active')}
+          style={{
+            padding: '10px 5px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold',
+            color: activeTab === 'active' ? '#D32F2F' : '#666',
+            borderBottom: activeTab === 'active' ? '3px solid #D32F2F' : '3px solid transparent'
+          }}
+        >
+          Active Vendors ({activeVendors.length})
+        </button>
+        <button 
+          onClick={() => setActiveTab('pending')}
+          style={{
+            padding: '10px 5px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold',
+            color: activeTab === 'pending' ? '#D32F2F' : '#666',
+            borderBottom: activeTab === 'pending' ? '3px solid #D32F2F' : '3px solid transparent',
+            display: 'flex', alignItems: 'center', gap: '6px'
+          }}
+        >
+          Pending Requests 
+          {pendingVendors.length > 0 && (
+            <span style={{ background: '#D32F2F', color: 'white', fontSize: '12px', padding: '2px 8px', borderRadius: '12px' }}>
+              {pendingVendors.length}
+            </span>
+          )}
+        </button>
+      </div>
+
       {/* VENDOR GRID */}
       <div className="vm-grid">
         {loading ? (
           <div className="vm-loading">Loading vendors...</div>
         ) : filteredVendors.length === 0 ? (
           <div className="vm-no-data">
-            {searchTerm ? "No vendors match your search." : "No vendors found. Add one to get started."}
+            {searchTerm ? "No vendors match your search." : activeTab === 'active' ? "No active vendors found." : "No pending registration requests."}
           </div>
         ) : (
           filteredVendors.map((vendor) => (
@@ -215,13 +280,11 @@ export default function VendorManagement() {
                 <div className="vm-id-badge">{vendor.vendorId || "No ID"}</div>
                 <h3>{vendor.businessName}</h3>
                 
-                {/* Contact Info Group */}
                 <div className="vm-contact-info">
                   <div className="vm-detail-row">
                     <Phone size={14} className="icon-gold" />
                     <span>{vendor.contactNumber}</span>
                   </div>
-                  {/* Added Email Display */}
                   <div className="vm-detail-row">
                     <Mail size={14} className="icon-gold" />
                     <span>{vendor.email || "No email provided"}</span>
@@ -239,9 +302,26 @@ export default function VendorManagement() {
               </div>
 
               <div className="vm-card-actions">
-                <button className="vm-btn-delete" onClick={() => handleDelete(vendor._id)}>
-                  <Trash2 size={16} /> Remove
-                </button>
+                {activeTab === 'active' ? (
+                  <button className="vm-btn-delete" onClick={() => handleDelete(vendor._id)}>
+                    <Trash2 size={16} /> Remove
+                  </button>
+                ) : (
+                  <div style={{ display: 'flex', gap: '10px', width: '100%', padding: '0 10px 10px 10px' }}>
+                    <button 
+                      onClick={() => handleAction(vendor._id, 'approve')}
+                      style={{ flex: 1, padding: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px', background: '#2e7d32', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+                    >
+                      <CheckCircle size={16} /> Approve
+                    </button>
+                    <button 
+                      onClick={() => handleAction(vendor._id, 'reject')}
+                      style={{ flex: 1, padding: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px', background: '#d32f2f', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+                    >
+                      <XCircle size={16} /> Reject
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))
@@ -272,7 +352,6 @@ export default function VendorManagement() {
               <div className="vm-form-row">
                 <div className="vm-form-group">
                   <label>Category</label>
-                  {/* Replaced strict select with an input + datalist for flexibility */}
                   <input type="text" name="category" required list="category-options" value={formData.category} onChange={handleInputChange} placeholder="Select or type category" />
                   <datalist id="category-options">
                     {categories.map(cat => <option key={cat} value={cat} />)}
@@ -316,4 +395,5 @@ export default function VendorManagement() {
       )}
     </div>
   );
-}
+            }
+                  
