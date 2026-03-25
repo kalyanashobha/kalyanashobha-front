@@ -8,7 +8,7 @@ import {
 import axios from "axios";
 import "./AdminSidebar.css";
 
-// --- FIX: Added onClose prop to handle closing the sidebar on mobile ---
+// PASS onClose AS A PROP HERE
 export default function AdminSidebar({ onClose }) {
   const navigate = useNavigate();
   const location = useLocation(); 
@@ -101,15 +101,7 @@ export default function AdminSidebar({ onClose }) {
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminInfo');
-    if (onClose) onClose(); // Also close sidebar on logout
     navigate('/admin/login');
-  };
-
-  // --- FIX: Reusable click handler to close the sidebar ---
-  const handleLinkClick = () => {
-    if (onClose) {
-      onClose();
-    }
   };
 
   const totalPendingInterests = stats.newRequests + stats.acceptedMatches;
@@ -117,41 +109,11 @@ export default function AdminSidebar({ onClose }) {
   const allLinks = [
     { id: "dashboard", path: "/admin/dashboard", icon: <LayoutDashboard size={20} />, label: "Dashboard" },
     { id: "users", path: "/admin/users", icon: <Users size={20} />, label: "User Registry" },
-    { 
-      id: "reg-approvals", 
-      path: "/admin/registration-approvals", 
-      icon: <CheckCircle size={20} />, 
-      label: "Reg. Approvals", 
-      badge: stats.pendingReg 
-    },
-    { 
-      id: "interest-approvals", 
-      path: "/admin/interest-approvals", 
-      icon: <Heart size={20} />, 
-      label: "Interest Approvals", 
-      badge: totalPendingInterests 
-    },
-    { 
-      id: "data-approval", 
-      path: "/admin/data-approval", 
-      icon: <FileCheck size={20} />, 
-      label: "Data Approval",
-      badge: stats.pendingData 
-    },
-    { 
-      id: "premium-users", 
-      path: "/admin/premium-users", 
-      icon: <Crown size={20} />, 
-      label: "Premium Requests",
-      badge: stats.pendingPremium
-    },
-    { 
-      id: "vendor-leads", 
-      path: "/admin/vendor-leads", 
-      icon: <Target size={20} />, 
-      label: "Vendor Leads", 
-      badge: stats.pendingVendorLeads 
-    },
+    { id: "reg-approvals", path: "/admin/registration-approvals", icon: <CheckCircle size={20} />, label: "Reg. Approvals", badge: stats.pendingReg },
+    { id: "interest-approvals", path: "/admin/interest-approvals", icon: <Heart size={20} />, label: "Interest Approvals", badge: totalPendingInterests },
+    { id: "data-approval", path: "/admin/data-approval", icon: <FileCheck size={20} />, label: "Data Approval", badge: stats.pendingData },
+    { id: "premium-users", path: "/admin/premium-users", icon: <Crown size={20} />, label: "Premium Requests", badge: stats.pendingPremium },
+    { id: "vendor-leads", path: "/admin/vendor-leads", icon: <Target size={20} />, label: "Vendor Leads", badge: stats.pendingVendorLeads },
     { id: "agents", path: "/admin/agents", icon: <Briefcase size={20} />, label: "Agents" },
     { id: "vendors", path: "/admin/vendors", icon: <Store size={20} />, label: "Vendors" },
     { id: "user-certificates", path: "/admin/user-certificates", icon: <Award size={20} />, label: "User Acceptance" },
@@ -180,11 +142,10 @@ export default function AdminSidebar({ onClose }) {
         <ul>
           {filteredLinks.map((link) => (
             <li key={link.id}>
-              {/* --- FIX: Added onClick={handleLinkClick} to trigger close --- */}
               <NavLink 
                 to={link.path} 
                 className={({ isActive }) => (isActive ? "ks-nav-link active" : "ks-nav-link")}
-                onClick={handleLinkClick}
+                onClick={onClose} // CALL onClose HERE SO THE MENU HIDES ON CLICK
               >
                 <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
                   {link.icon}
