@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Tag, Image as ImageIcon, X, Plus } from "lucide-react"; 
+import { Image as ImageIcon, X, Plus } from "lucide-react"; 
 import "./VendorList.css";
 import Navbar from "../../Components/Navbar";
 
@@ -22,7 +22,7 @@ export default function VendorList() {
     error: "",
   });
 
-  // --- NEW: Modal & Form State for "Join as Vendor" ---
+  // --- Modal & Form State for "Join as Vendor" ---
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [joinFormData, setJoinFormData] = useState({
     businessName: "",
@@ -48,11 +48,7 @@ export default function VendorList() {
   const fetchVendors = async () => {
     try {
       const token = localStorage.getItem("token"); 
-      const config = {};
-      if (token) {
-        config.headers = { Authorization: token };
-      }
-      
+      const config = token ? { headers: { Authorization: token } } : {};
       const res = await axios.get("https://kalyanashobha-back.vercel.app/api/user/vendors", config);
       
       if (res.data.success) {
@@ -96,9 +92,7 @@ export default function VendorList() {
 
       if (res.data.success) {
         setSubmitStatus({ loading: false, success: true, error: "" });
-        setTimeout(() => {
-          handleCloseModal();
-        }, 2000);
+        setTimeout(() => handleCloseModal(), 2000);
       }
     } catch (err) {
       setSubmitStatus({
@@ -109,7 +103,7 @@ export default function VendorList() {
     }
   };
 
-  // --- NEW: Handlers: Join as Vendor ---
+  // --- Handlers: Join as Vendor ---
   const handleOpenJoinModal = () => {
     setShowJoinModal(true);
     setJoinSubmitStatus({ loading: false, success: false, error: "" });
@@ -136,16 +130,13 @@ export default function VendorList() {
     setJoinSubmitStatus({ loading: true, success: false, error: "" });
 
     const data = new FormData();
-    data.append("businessName", joinFormData.businessName);
-    data.append("email", joinFormData.email);
-    data.append("category", joinFormData.category);
-    data.append("contactNumber", joinFormData.contactNumber);
-    data.append("priceRange", joinFormData.priceRange);
-    data.append("description", joinFormData.description);
+    Object.keys(joinFormData).forEach(key => {
+        data.append(key, joinFormData[key]);
+    });
 
-    for (let i = 0; i < joinFiles.length; i++) {
-      data.append("images", joinFiles[i]);
-    }
+    joinFiles.forEach(file => {
+      data.append("images", file);
+    });
 
     try {
       const res = await axios.post("https://kalyanashobha-back.vercel.app/api/vendor/register", data, {
@@ -154,9 +145,7 @@ export default function VendorList() {
 
       if (res.data.success) {
         setJoinSubmitStatus({ loading: false, success: true, error: "" });
-        setTimeout(() => {
-          handleCloseJoinModal();
-        }, 3000); // Close after 3 seconds so they can read the success message
+        setTimeout(() => handleCloseJoinModal(), 3000);
       }
     } catch (err) {
       setJoinSubmitStatus({
@@ -173,19 +162,11 @@ export default function VendorList() {
       <div className="v-premium-container">
         
         {/* HEADER SECTION */}
-        <div className="v-premium-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
-          <div>
-            <h1>Premium Wedding Vendors</h1>
-            <p>Curated services to make your special day perfect.</p>
-          </div>
-          
-          {/* --- NEW: Join as Vendor Button --- */}
-          <button 
-            className="v-contact-btn" 
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', fontSize: '16px' }}
-            onClick={handleOpenJoinModal}
-          >
-            <Plus size={18} /> Join as Vendor
+        <div className="v-premium-header">
+          <h1>Premium Wedding Vendors</h1>
+          <p>Curated services to make your special day perfect.</p>
+          <button className="v-join-btn" onClick={handleOpenJoinModal}>
+            <Plus size={20} /> Join as Vendor
           </button>
         </div>
 
@@ -219,15 +200,7 @@ export default function VendorList() {
                     {vendor.description ? vendor.description.substring(0, 80) + "..." : "No description available."}
                   </p>
                   
-                  <div className="v-card-details">
-                     {/* Add details here if needed */}
-                  </div>
-
-                  {/* Contact Button */}
-                  <button 
-                    className="v-contact-btn" 
-                    onClick={() => handleOpenModal(vendor)}
-                  >
+                  <button className="v-contact-btn" onClick={() => handleOpenModal(vendor)}>
                     Contact Now
                   </button>
                 </div>
@@ -236,12 +209,12 @@ export default function VendorList() {
           )}
         </div>
 
-        {/* --- EXISTING: Contact Vendor Modal --- */}
+        {/* --- Contact Vendor Modal --- */}
         {selectedVendor && (
           <div className="v-modal-overlay">
             <div className="v-modal-content">
               <button className="v-modal-close" onClick={handleCloseModal}>
-                <X size={20} />
+                <X size={24} />
               </button>
               
               <h2>Contact {selectedVendor.businessName}</h2>
@@ -252,23 +225,11 @@ export default function VendorList() {
                   Request sent successfully! We will be in touch soon.
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="v-lead-form">
-                  <input 
-                    type="text" name="name" placeholder="Full Name" 
-                    value={formData.name} onChange={handleInputChange} required 
-                  />
-                  <input 
-                    type="tel" name="phone" placeholder="Phone Number" 
-                    value={formData.phone} onChange={handleInputChange} required 
-                  />
-                  <input 
-                    type="email" name="email" placeholder="Email Address" 
-                    value={formData.email} onChange={handleInputChange} 
-                  />
-                  <textarea 
-                    name="message" placeholder="What are your requirements? (e.g., Dates, Venue)" 
-                    value={formData.message} onChange={handleInputChange} required rows="3"
-                  ></textarea>
+                <form onSubmit={handleSubmit} className="v-form-grid">
+                  <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleInputChange} required />
+                  <input type="tel" name="phone" placeholder="Phone Number" value={formData.phone} onChange={handleInputChange} required />
+                  <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleInputChange} />
+                  <textarea name="message" placeholder="What are your requirements? (e.g., Dates, Venue)" value={formData.message} onChange={handleInputChange} required rows="3"></textarea>
 
                   {submitStatus.error && <div className="v-error-message">{submitStatus.error}</div>}
 
@@ -281,81 +242,54 @@ export default function VendorList() {
           </div>
         )}
 
-        {/* --- NEW: Join as Vendor Modal --- */}
+        {/* --- Join as Vendor Modal --- */}
         {showJoinModal && (
           <div className="v-modal-overlay">
-            <div className="v-modal-content" style={{ maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div className="v-modal-content">
               <button className="v-modal-close" onClick={handleCloseJoinModal}>
-                <X size={20} />
+                <X size={24} />
               </button>
               
               <h2>Register Your Business</h2>
               <p>Join KalyanaShobha and connect with thousands of couples.</p>
 
               {joinSubmitStatus.success ? (
-                <div className="v-success-message" style={{ padding: '20px', textAlign: 'center' }}>
+                <div className="v-success-message">
                   <h3>Registration Submitted!</h3>
-                  <p>Our admin team will review your application. You will receive an email once your profile is approved and live.</p>
+                  <p>Our admin team will review your application. You will receive an email once your profile is approved.</p>
                 </div>
               ) : (
-                <form onSubmit={handleJoinSubmit} className="v-lead-form">
-                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                    <input 
-                      style={{ flex: '1 1 45%' }}
-                      type="text" name="businessName" placeholder="Business Name *" 
-                      value={joinFormData.businessName} onChange={handleJoinInputChange} required 
-                    />
-                    <input 
-                      style={{ flex: '1 1 45%' }}
-                      type="email" name="email" placeholder="Business Email *" 
-                      value={joinFormData.email} onChange={handleJoinInputChange} required 
-                    />
+                <form onSubmit={handleJoinSubmit} className="v-form-grid">
+                  
+                  <div className="v-form-row">
+                    <input type="text" name="businessName" placeholder="Business Name *" value={joinFormData.businessName} onChange={handleJoinInputChange} required />
+                    <input type="email" name="email" placeholder="Business Email *" value={joinFormData.email} onChange={handleJoinInputChange} required />
                   </div>
                   
-                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '10px' }}>
-                    <input 
-                      style={{ flex: '1 1 45%' }}
-                      type="text" name="category" list="vendor-categories" placeholder="Select Category *" 
-                      value={joinFormData.category} onChange={handleJoinInputChange} required 
-                    />
-                    <datalist id="vendor-categories">
-                      {categories.map(cat => <option key={cat} value={cat} />)}
-                    </datalist>
-
-                    <input 
-                      style={{ flex: '1 1 45%' }}
-                      type="tel" name="contactNumber" placeholder="Contact Number *" 
-                      value={joinFormData.contactNumber} onChange={handleJoinInputChange} required 
-                    />
+                  <div className="v-form-row">
+                    <select name="category" value={joinFormData.category} onChange={handleJoinInputChange} required>
+                      <option value="" disabled>Select Category *</option>
+                      {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                    </select>
+                    <input type="tel" name="contactNumber" placeholder="Contact Number *" value={joinFormData.contactNumber} onChange={handleJoinInputChange} required />
                   </div>
 
-                  <input 
-                    style={{ marginTop: '10px' }}
-                    type="text" name="priceRange" placeholder="Price Range (e.g. ₹50,000 - ₹1 Lakh)" 
-                    value={joinFormData.priceRange} onChange={handleJoinInputChange} 
-                  />
+                  <input type="text" name="priceRange" placeholder="Price Range (e.g. ₹50,000 - ₹1 Lakh)" value={joinFormData.priceRange} onChange={handleJoinInputChange} />
                   
-                  <textarea 
-                    style={{ marginTop: '10px' }}
-                    name="description" placeholder="Describe your services..." 
-                    value={joinFormData.description} onChange={handleJoinInputChange} rows="3"
-                  ></textarea>
+                  <textarea name="description" placeholder="Describe your services..." value={joinFormData.description} onChange={handleJoinInputChange} rows="3"></textarea>
 
-                  <div style={{ marginTop: '10px' }}>
-                    <label style={{ fontSize: '14px', color: '#555', marginBottom: '5px', display: 'block' }}>Upload Portfolio Images (Max 5)</label>
-                    <input 
-                      type="file" multiple accept="image/*" 
-                      onChange={handleJoinFileChange} 
-                      style={{ padding: '10px', border: '1px dashed #ccc', width: '100%', borderRadius: '4px' }}
-                    />
-                    {joinFiles.length > 0 && (
-                      <small style={{ color: '#2c3e50', display: 'block', marginTop: '5px' }}>{joinFiles.length} file(s) selected</small>
-                    )}
+                  <div>
+                    <label style={{ fontSize: '0.85rem', color: '#666', marginBottom: '8px', display: 'block' }}>
+                      Upload Portfolio Images (Max 5)
+                    </label>
+                    <div className="v-file-upload-box">
+                      <input type="file" multiple accept="image/*" onChange={handleJoinFileChange} />
+                    </div>
                   </div>
 
-                  {joinSubmitStatus.error && <div className="v-error-message" style={{ marginTop: '10px' }}>{joinSubmitStatus.error}</div>}
+                  {joinSubmitStatus.error && <div className="v-error-message">{joinSubmitStatus.error}</div>}
 
-                  <button type="submit" className="v-submit-btn" disabled={joinSubmitStatus.loading} style={{ marginTop: '15px' }}>
+                  <button type="submit" className="v-submit-btn" disabled={joinSubmitStatus.loading}>
                     {joinSubmitStatus.loading ? "Submitting Application..." : "Submit Registration"}
                   </button>
                 </form>
