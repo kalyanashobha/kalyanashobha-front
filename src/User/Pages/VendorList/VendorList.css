@@ -3,21 +3,21 @@
 
 :root {
   /* Core Brand Colors */
+  --vp-red: #D32F2F;        
   --vp-amber: #FFCA28;      
   --vp-gold-text: #B7791F;  
   
   /* UI Colors */
-  --vp-bg: #FAFAFA;
+  --vp-bg: #FAFAFA; /* Slightly off-white for better card contrast */
   --vp-card-bg: #FFFFFF;
   --vp-text-main: #111827;
   --vp-text-sub: #6B7280;
   --vp-border: #E5E7EB;
-  --vp-dark: #1A1A1A;
   
   /* Effects */
   --vp-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  --vp-hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --vp-radius: 16px;
+  --vp-hover-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+  --vp-radius: 12px;
   --vp-transition: all 0.3s ease-in-out;
 }
 
@@ -30,9 +30,9 @@
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
   color: var(--vp-text-main);
-  background-color: transparent;
+  background-color: var(--vp-bg);
   display: block;           
-  position: relative;
+  min-height: 80vh;
 }
 
 /* --- 3. HEADER --- */
@@ -44,12 +44,13 @@
   text-align: center;       
   margin-bottom: 50px;
   width: 100%;
+  clear: both;              
 }
 
 .v-premium-header h1 {
   font-size: 2.2rem;
   font-weight: 700;
-  color: var(--vp-dark);
+  color: #1a1a1a;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin: 0 0 12px 0;
@@ -64,7 +65,7 @@
   width: 70px;
   height: 4px;
   background: var(--vp-amber);
-  margin: 10px auto 0;      
+  margin: 12px auto 0;      
   border-radius: 2px;
 }
 
@@ -91,6 +92,7 @@
   border: 2px dashed var(--vp-border);
   border-radius: var(--vp-radius);
   color: var(--vp-text-sub);
+  background: #fff;
 }
 
 /* --- 5. CARD DESIGN --- */
@@ -113,21 +115,23 @@
   border-color: #d1d5db; 
 }
 
-/* Image Area */
+/* Image Area - FIXED */
 .v-card-image {
-  height: 240px;
+  height: 240px; /* Fixed height to prevent stretching */
   width: 100%;
   position: relative;
   overflow: hidden;
-  background: #f9fafb;
+  background: #f3f4f6;
+  flex-shrink: 0; /* Prevents image from shrinking in flexbox */
 }
 
 .v-card-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: top center; /* Prevents faces from being cut off */
+  object-fit: cover; /* Crops perfectly */
+  object-position: top center; /* Focuses on faces/top of image */
   transition: transform 0.6s ease;
+  display: block;
 }
 
 .v-premium-card:hover .v-card-image img {
@@ -143,12 +147,13 @@
   color: var(--vp-text-sub);
 }
 
+/* Category Badge */
 .v-badge-category {
   position: absolute;
   top: 16px;
   right: 16px;
   background: var(--vp-amber);
-  color: var(--vp-dark);
+  color: #000;
   font-size: 0.75rem;
   font-weight: 700;
   padding: 6px 14px;
@@ -168,7 +173,7 @@
 }
 
 .v-card-title {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--vp-text-main);
   margin: 0 0 10px 0;
@@ -183,54 +188,55 @@
   flex-grow: 1;
 }
 
+/* --- 6. BUTTONS --- */
 .v-contact-btn {
   width: 100%;
   padding: 14px;
   margin-top: auto;
-  background-color: var(--vp-dark); 
+  background-color: #1a1a1a; 
   color: white;
   border: none;
   border-radius: 8px;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition: all 0.2s ease;
+  font-family: 'Poppins', sans-serif;
 }
 
 .v-contact-btn:hover {
   background-color: #333;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.v-contact-btn:active {
-  transform: scale(0.98);
-}
-
-/* --- 6. FLOATING ACTION BUTTON (FAB) --- */
-.v-fab-join {
+/* --- FIXED JOIN BUTTON (NEW) --- */
+.v-fixed-join-btn {
   position: fixed;
   bottom: 30px;
   right: 30px;
-  background-color: var(--vp-dark);
-  color: white;
-  padding: 16px 28px;
+  background-color: #1a1a1a;
+  color: #fff;
+  border: 2px solid #fff;
   border-radius: 50px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  padding: 14px 24px;
+  font-weight: 600;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   gap: 10px;
-  font-weight: 600;
-  font-size: 16px;
-  z-index: 900;
   cursor: pointer;
-  border: none;
-  transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  z-index: 999;
+  transition: all 0.3s ease;
   font-family: 'Poppins', sans-serif;
 }
 
-.v-fab-join:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
-  background-color: #000;
+.v-fixed-join-btn:hover {
+  background-color: var(--vp-amber);
+  color: #000;
+  border-color: var(--vp-amber);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.3);
 }
 
 /* --- 7. MODALS --- */
@@ -240,7 +246,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.65);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -253,166 +259,180 @@
 .v-modal-content {
   background-color: white;
   width: 100%;
-  max-width: 500px;
+  max-width: 480px;
   padding: 35px 30px;
-  border-radius: 16px;
+  border-radius: 12px;
   position: relative;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
   max-height: 90vh;
   overflow-y: auto;
 }
 
-.v-modal-content.large {
-  max-width: 650px;
-}
-
 .v-modal-content h2 {
   margin: 0 0 8px 0;
-  font-size: 22px;
-  color: var(--vp-dark);
-  padding-right: 30px; /* Space for close button */
+  font-size: 1.5rem;
+  color: #1a1a1a;
+  font-weight: 700;
 }
 
 .v-modal-content p {
   margin: 0 0 24px 0;
-  font-size: 14px;
-  color: var(--vp-text-sub);
+  font-size: 0.95rem;
+  color: #666;
 }
 
 .v-modal-close {
   position: absolute;
-  top: 24px;
-  right: 24px;
+  top: 20px;
+  right: 20px;
   background: #f3f4f6;
   border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 8px;
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  color: var(--vp-text-sub);
   transition: all 0.2s ease;
 }
 
 .v-modal-close:hover {
   background: #e5e7eb;
-  color: var(--vp-dark);
+  color: #000;
 }
 
-/* --- 8. FORMS --- */
+/* --- Form Elements --- */
 .v-lead-form {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.v-form-row {
-  display: flex;
+/* New Form Grid specifically for the modal */
+.v-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
-  width: 100%;
 }
 
 .v-lead-form input,
 .v-lead-form textarea,
 .v-lead-form select {
   width: 100%;
-  padding: 14px 16px;
-  border: 1.5px solid var(--vp-border);
+  padding: 14px;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 14px;
+  font-family: inherit;
+  font-size: 0.95rem;
   box-sizing: border-box;
-  background: #fafafa;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  background: #f9fafb;
+  transition: border-color 0.2s ease;
 }
 
 .v-lead-form input:focus,
 .v-lead-form textarea:focus,
 .v-lead-form select:focus {
   outline: none;
-  border-color: var(--vp-dark);
+  border-color: #1a1a1a;
   background: #fff;
 }
 
 .v-file-upload {
-  padding: 20px;
+  padding: 16px;
   border: 2px dashed #d1d5db;
   border-radius: 8px;
-  text-align: center;
   background: #f9fafb;
+  text-align: center;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .v-file-upload:hover {
-  border-color: var(--vp-dark);
-  background: #f3f4f6;
+  border-color: #1a1a1a;
 }
 
 .v-submit-btn {
   padding: 16px;
-  background-color: var(--vp-dark);
+  background-color: #1a1a1a;
   color: white;
   border: none;
   border-radius: 8px;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
   margin-top: 10px;
+  width: 100%;
 }
 
-.v-submit-btn:disabled {
-  background-color: #9ca3af;
-  cursor: not-allowed;
-}
-
-.v-submit-btn:not(:disabled):hover {
+.v-submit-btn:hover:not(:disabled) {
   background-color: #333;
 }
 
-/* --- 9. SKELETON --- */
+.v-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* --- Status Messages --- */
+.v-success-message {
+  padding: 24px;
+  background-color: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.v-error-message {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-top: -8px;
+}
+
+/* --- 8. SKELETON --- */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 .v-skeleton {
-  height: 440px;
+  height: 420px;
   background: #f6f7f8;
   background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
   background-repeat: no-repeat;
   background-size: 200% 100%; 
   animation: shimmer 1.5s infinite linear;
   border: none;
-  box-shadow: none;
 }
 
-/* --- 10. RESPONSIVE --- */
+/* --- 9. RESPONSIVE --- */
 @media (max-width: 768px) {
   .v-premium-container {
-    padding: 0 16px !important;
+    padding: 20px 16px !important;
     margin-top: 80px;
   }
   
   .v-premium-header h1 {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
   }
 
   .v-premium-grid {
     grid-template-columns: 1fr; 
   }
   
-  .v-fab-join {
+  .v-premium-header p {
+    font-size: 0.95rem;
+  }
+
+  .v-form-grid {
+    grid-template-columns: 1fr; /* Stacks inputs vertically on mobile */
+  }
+
+  .v-fixed-join-btn {
     bottom: 20px;
     right: 20px;
-    padding: 14px 20px;
-    font-size: 14px;
-  }
-  
-  .v-form-row {
-    flex-direction: column;
-    gap: 16px;
+    padding: 12px 20px;
+    font-size: 0.9rem;
   }
 }
