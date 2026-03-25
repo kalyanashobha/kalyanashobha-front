@@ -8,8 +8,7 @@ import {
 import axios from "axios";
 import "./AdminSidebar.css";
 
-// PASS onClose AS A PROP HERE
-export default function AdminSidebar({ onClose }) {
+export default function AdminSidebar({ closeMobileMenu }) {
   const navigate = useNavigate();
   const location = useLocation(); 
   
@@ -70,7 +69,7 @@ export default function AdminSidebar({ onClose }) {
     } catch (e) {
       console.error("Failed to fetch sidebar stats", e);
     }
-  }, []);
+  }, []); 
 
   useEffect(() => {
     fetchCounts();
@@ -99,6 +98,7 @@ export default function AdminSidebar({ onClose }) {
   }, [fetchCounts, location.pathname]); 
 
   const handleLogout = () => {
+    if (closeMobileMenu) closeMobileMenu(); // Also close sidebar on logout
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminInfo');
     navigate('/admin/login');
@@ -142,10 +142,11 @@ export default function AdminSidebar({ onClose }) {
         <ul>
           {filteredLinks.map((link) => (
             <li key={link.id}>
+              {/* Trigger closeMobileMenu on click */}
               <NavLink 
                 to={link.path} 
                 className={({ isActive }) => (isActive ? "ks-nav-link active" : "ks-nav-link")}
-                onClick={onClose} // CALL onClose HERE SO THE MENU HIDES ON CLICK
+                onClick={closeMobileMenu}
               >
                 <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
                   {link.icon}
