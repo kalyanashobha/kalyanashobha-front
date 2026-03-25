@@ -40,6 +40,25 @@ const DataApproval = () => {
     };
 
     const handleAction = async (pendingId, action) => {
+        // --- NEW LOGIC START ---
+        if (action === 'approve') {
+            // Find the item being approved
+            const currentItem = pendingItems.find(item => item._id === pendingId);
+            
+            // Check if it has a parent AND if that parent is still in the pending list
+            if (currentItem && currentItem.parentValue) {
+                const isParentStillPending = pendingItems.some(
+                    pending => pending.value === currentItem.parentValue
+                );
+
+                if (isParentStillPending) {
+                    toast.warning(`Please approve the parent element "${currentItem.parentValue}" first!`);
+                    return; // Stop the function here so the API call doesn't run
+                }
+            }
+        }
+        // --- NEW LOGIC END ---
+
         setActionLoading(pendingId);
         const toastId = toast.loading(`Processing ${action}...`);
 
