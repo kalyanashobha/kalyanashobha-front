@@ -98,28 +98,6 @@ export default function AdminSidebar({ closeMobileMenu }) {
     }
   }, [fetchCounts, location.pathname]); 
 
-  // --- Check if the menu can be scrolled ---
-  const checkScroll = () => {
-    if (navRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = navRef.current;
-      // If there is more than 5px left to scroll, show the arrow
-      setCanScroll(scrollHeight - scrollTop > clientHeight + 5);
-    }
-  };
-
-  useEffect(() => {
-    checkScroll(); // Check on mount
-    window.addEventListener('resize', checkScroll);
-    return () => window.removeEventListener('resize', checkScroll);
-  }, []);
-
-  const handleLogout = () => {
-    if (closeMobileMenu) closeMobileMenu(); 
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminInfo');
-    navigate('/admin/login');
-  };
-
   const totalPendingInterests = stats.newRequests + stats.acceptedMatches;
 
   // Added iconColor to give each item a distinct, premium look
@@ -147,6 +125,38 @@ export default function AdminSidebar({ closeMobileMenu }) {
     if (adminInfo.role === 'SuperAdmin') return true;
     return adminInfo.permissions?.includes(link.id);
   });
+
+  // --- Check if the menu can be scrolled ---
+  const checkScroll = useCallback(() => {
+    if (navRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = navRef.current;
+      // If there is more than 5px left to scroll, show the arrow
+      setCanScroll(scrollHeight - scrollTop > clientHeight + 5);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Check immediately
+    checkScroll(); 
+    
+    // Check again after a tiny delay to ensure CSS styles are fully painted
+    const timeoutId = setTimeout(() => {
+      checkScroll();
+    }, 150);
+
+    window.addEventListener('resize', checkScroll);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', checkScroll);
+    }
+  }, [filteredLinks.length, checkScroll]); // Re-run whenever links are loaded
+
+  const handleLogout = () => {
+    if (closeMobileMenu) closeMobileMenu(); 
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminInfo');
+    navigate('/admin/login');
+  };
 
   const formatBadge = (count) => {
     if (!count || count <= 0) return null;
