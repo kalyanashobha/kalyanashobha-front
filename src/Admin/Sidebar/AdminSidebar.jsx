@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, Users, Heart, LogOut, CheckCircle, 
   Briefcase, Store, Award, Layers, HelpCircle, Target, FileCheck, 
-  FileEdit, MessageSquare, UserPlus, Settings, Crown 
+  FileEdit, MessageSquare, UserPlus, Settings, Crown, ChevronDown
 } from "lucide-react";
 import axios from "axios";
 import "./AdminSidebar.css";
@@ -11,6 +11,7 @@ import "./AdminSidebar.css";
 export default function AdminSidebar({ closeMobileMenu }) {
   const navigate = useNavigate();
   const location = useLocation(); 
+  const navRef = useRef(null);
   
   const [stats, setStats] = useState({ 
     pendingReg: 0,
@@ -22,6 +23,7 @@ export default function AdminSidebar({ closeMobileMenu }) {
   });
 
   const [adminInfo, setAdminInfo] = useState(null);
+  const [canScroll, setCanScroll] = useState(true); // For scroll indicator
 
   useEffect(() => {
     const info = JSON.parse(localStorage.getItem('adminInfo'));
@@ -79,7 +81,6 @@ export default function AdminSidebar({ closeMobileMenu }) {
     window.addEventListener("dataUpdated", fetchCounts); 
     window.addEventListener("premiumUpdated", fetchCounts); 
     window.addEventListener("vendorLeadUpdated", fetchCounts); 
-
     window.addEventListener("focus", fetchCounts);
 
     const intervalId = setInterval(() => {
@@ -97,8 +98,23 @@ export default function AdminSidebar({ closeMobileMenu }) {
     }
   }, [fetchCounts, location.pathname]); 
 
+  // --- Check if the menu can be scrolled ---
+  const checkScroll = () => {
+    if (navRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = navRef.current;
+      // If there is more than 5px left to scroll, show the arrow
+      setCanScroll(scrollHeight - scrollTop > clientHeight + 5);
+    }
+  };
+
+  useEffect(() => {
+    checkScroll(); // Check on mount
+    window.addEventListener('resize', checkScroll);
+    return () => window.removeEventListener('resize', checkScroll);
+  }, []);
+
   const handleLogout = () => {
-    if (closeMobileMenu) closeMobileMenu(); // Also close sidebar on logout
+    if (closeMobileMenu) closeMobileMenu(); 
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminInfo');
     navigate('/admin/login');
@@ -106,23 +122,24 @@ export default function AdminSidebar({ closeMobileMenu }) {
 
   const totalPendingInterests = stats.newRequests + stats.acceptedMatches;
 
+  // Added iconColor to give each item a distinct, premium look
   const allLinks = [
-    { id: "dashboard", path: "/admin/dashboard", icon: <LayoutDashboard size={20} />, label: "Dashboard" },
-    { id: "users", path: "/admin/users", icon: <Users size={20} />, label: "User Registry" },
-    { id: "reg-approvals", path: "/admin/registration-approvals", icon: <CheckCircle size={20} />, label: "Reg. Approvals", badge: stats.pendingReg },
-    { id: "interest-approvals", path: "/admin/interest-approvals", icon: <Heart size={20} />, label: "Interest Approvals", badge: totalPendingInterests },
-    { id: "data-approval", path: "/admin/data-approval", icon: <FileCheck size={20} />, label: "Data Approval", badge: stats.pendingData },
-    { id: "premium-users", path: "/admin/premium-users", icon: <Crown size={20} />, label: "Premium Requests", badge: stats.pendingPremium },
-    { id: "vendor-leads", path: "/admin/vendor-leads", icon: <Target size={20} />, label: "Vendor Leads", badge: stats.pendingVendorLeads },
-    { id: "agents", path: "/admin/agents", icon: <Briefcase size={20} />, label: "Agents" },
-    { id: "vendors", path: "/admin/vendors", icon: <Store size={20} />, label: "Vendors" },
-    { id: "user-certificates", path: "/admin/user-certificates", icon: <Award size={20} />, label: "User Acceptance" },
-    { id: "add-data", path: "/admin/add-fields", icon: <Layers size={20} />, label: "Add Data" },
-    { id: "help-center", path: "/admin/help-center", icon: <HelpCircle size={20} />, label: "Help Center" },
-    { id: "manage-pages", path: "/admin/page-content", icon: <FileEdit size={20} />, label: "Manage Pages" },
-    { id: "testimonials", path: "/admin/add-testimonial", icon: <MessageSquare size={20} />, label: "Testimonials" },
-    { id: "fee-settings", path: "/admin/fee-settings", icon: <Settings size={20} />, label: "Fee Settings" },
-    { id: "create-moderator", path: "/admin/moderater", icon: <UserPlus size={20} />, label: "Create Moderator" }
+    { id: "dashboard", path: "/admin/dashboard", icon: <LayoutDashboard size={18} />, iconColor: "#3B82F6", label: "Dashboard" },
+    { id: "users", path: "/admin/users", icon: <Users size={18} />, iconColor: "#10B981", label: "User Registry" },
+    { id: "reg-approvals", path: "/admin/registration-approvals", icon: <CheckCircle size={18} />, iconColor: "#0EA5E9", label: "Reg. Approvals", badge: stats.pendingReg },
+    { id: "interest-approvals", path: "/admin/interest-approvals", icon: <Heart size={18} />, iconColor: "#EC4899", label: "Interest Approvals", badge: totalPendingInterests },
+    { id: "data-approval", path: "/admin/data-approval", icon: <FileCheck size={18} />, iconColor: "#8B5CF6", label: "Data Approval", badge: stats.pendingData },
+    { id: "premium-users", path: "/admin/premium-users", icon: <Crown size={18} />, iconColor: "#F59E0B", label: "Premium Requests", badge: stats.pendingPremium },
+    { id: "vendor-leads", path: "/admin/vendor-leads", icon: <Target size={18} />, iconColor: "#14B8A6", label: "Vendor Leads", badge: stats.pendingVendorLeads },
+    { id: "agents", path: "/admin/agents", icon: <Briefcase size={18} />, iconColor: "#64748B", label: "Agents" },
+    { id: "vendors", path: "/admin/vendors", icon: <Store size={18} />, iconColor: "#F97316", label: "Vendors" },
+    { id: "user-certificates", path: "/admin/user-certificates", icon: <Award size={18} />, iconColor: "#EAB308", label: "User Acceptance" },
+    { id: "add-data", path: "/admin/add-fields", icon: <Layers size={18} />, iconColor: "#6366F1", label: "Add Data" },
+    { id: "help-center", path: "/admin/help-center", icon: <HelpCircle size={18} />, iconColor: "#84CC16", label: "Help Center" },
+    { id: "manage-pages", path: "/admin/page-content", icon: <FileEdit size={18} />, iconColor: "#334155", label: "Manage Pages" },
+    { id: "testimonials", path: "/admin/add-testimonial", icon: <MessageSquare size={18} />, iconColor: "#A855F7", label: "Testimonials" },
+    { id: "fee-settings", path: "/admin/fee-settings", icon: <Settings size={18} />, iconColor: "#475569", label: "Fee Settings" },
+    { id: "create-moderator", path: "/admin/moderater", icon: <UserPlus size={18} />, iconColor: "#2DD4BF", label: "Create Moderator" }
   ];
 
   const filteredLinks = allLinks.filter(link => {
@@ -131,6 +148,11 @@ export default function AdminSidebar({ closeMobileMenu }) {
     return adminInfo.permissions?.includes(link.id);
   });
 
+  const formatBadge = (count) => {
+    if (!count || count <= 0) return null;
+    return count > 99 ? '99+' : count;
+  };
+
   return (
     <aside className="ks-sidebar-container">
       <div className="ks-sidebar-header">
@@ -138,33 +160,49 @@ export default function AdminSidebar({ closeMobileMenu }) {
         <span className="ks-sidebar-subtitle">Admin Portal</span>
       </div>
 
-      <nav className="ks-sidebar-nav">
-        <ul>
-          {filteredLinks.map((link) => (
-            <li key={link.id}>
-              {/* Trigger closeMobileMenu on click */}
-              <NavLink 
-                to={link.path} 
-                className={({ isActive }) => (isActive ? "ks-nav-link active" : "ks-nav-link")}
-                onClick={closeMobileMenu}
-              >
-                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                  {link.icon}
-                  {link.badge > 0 && (
-                    <span className="ks-notification-badge">{link.badge}</span>
+      <div className="ks-nav-wrapper">
+        <nav className="ks-sidebar-nav" ref={navRef} onScroll={checkScroll}>
+          <ul>
+            {filteredLinks.map((link) => (
+              <li key={link.id}>
+                <NavLink 
+                  to={link.path} 
+                  className={({ isActive }) => `ks-nav-link ${isActive ? "active" : ""}`}
+                  onClick={closeMobileMenu}
+                >
+                  {({ isActive }) => (
+                    <>
+                      {/* Set the color inline. If active, it overrides to white via CSS currentColor */}
+                      <div 
+                        className="ks-nav-icon-wrapper" 
+                        style={{ color: isActive ? '#FFFFFF' : link.iconColor }}
+                      >
+                        {link.icon}
+                        {link.badge > 0 && (
+                          <span className="ks-notification-badge">{formatBadge(link.badge)}</span>
+                        )}
+                      </div>
+                      <span className="ks-nav-label">{link.label}</span>
+                    </>
                   )}
-                </div>
-                <span>{link.label}</span>
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </nav>
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        
+        {/* Scroll Indicator */}
+        {canScroll && (
+          <div className="ks-scroll-indicator">
+            <ChevronDown size={20} color="#9CA3AF" />
+          </div>
+        )}
+      </div>
 
       <div className="ks-sidebar-footer">
         <button onClick={handleLogout} className="ks-logout-btn">
           <LogOut size={18} />
-          <span>Sign Out</span>
+          <span className="ks-nav-label">Sign Out</span>
         </button>
       </div>
     </aside>
