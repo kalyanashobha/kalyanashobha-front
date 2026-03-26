@@ -1,7 +1,7 @@
 .ks-sidebar-container {
   width: 100%;
-  height: 100vh; /* Fallback for older browsers */
-  height: 100dvh; /* Dynamic viewport height to fix mobile browser chrome issues */
+  height: 100vh;
+  height: 100dvh; 
   background-color: #FFFFFF;
   border-right: 1px solid #E5E7EB;
   display: flex;
@@ -13,11 +13,11 @@
 .ks-sidebar-header {
   margin-bottom: 40px;
   padding: 0 12px;
-  flex-shrink: 0; /* Prevents header from squishing */
+  flex-shrink: 0; 
 }
 
 .ks-sidebar-title {
-  color: #D32F2F; /* Brand Red */
+  color: #D32F2F; 
   font-size: 1.25rem;
   font-weight: 800;
   margin: 0;
@@ -26,32 +26,38 @@
 
 .ks-sidebar-subtitle {
   font-size: 0.75rem;
-  color: #C5A059; /* Brand Gold */
+  color: #C5A059; 
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
+/* --- NAV WRAPPER (To hold scroll indicator) --- */
+.ks-nav-wrapper {
+  flex-grow: 1;
+  position: relative; /* Allows absolute positioning of the arrow */
+  min-height: 0; 
+  display: flex;
+  flex-direction: column;
+}
+
 /* --- SCROLLABLE NAVIGATION AREA --- */
 .ks-sidebar-nav {
-  flex-grow: 1; /* Takes up remaining space */
-  overflow-y: auto; /* Enables vertical scrolling */
-  min-height: 0; /* CRUCIAL FIX: Allows flex child to shrink and scroll */
-  -webkit-overflow-scrolling: touch; /* Smooth momentum scrolling on iOS */
-  
-  /* Hide scrollbar for a cleaner look */
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  flex-grow: 1; 
+  overflow-y: auto; 
+  -webkit-overflow-scrolling: touch; 
+  -ms-overflow-style: none;  
+  scrollbar-width: none;  
 }
 
 .ks-sidebar-nav::-webkit-scrollbar {
-  display: none; /* Chrome, Safari and Opera */
+  display: none; 
 }
 
 .ks-sidebar-nav ul {
   list-style: none;
   padding: 0;
-  margin: 0 0 20px 0; /* Added bottom margin for spacing before footer */
+  margin: 0 0 20px 0; 
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -63,22 +69,29 @@
   gap: 12px;
   padding: 12px 16px;
   border-radius: 8px;
-  color: #6B7280; /* Gray text */
+  color: #4B5563; /* Slightly darker text for contrast */
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
   transition: all 0.2s ease;
+  border: 1px solid transparent; /* Prevents layout shift when border is applied on mobile */
 }
 
 .ks-nav-link:hover {
-  background-color: #FEF2F2; /* Very light red bg */
+  background-color: #FEF2F2; 
   color: #D32F2F;
 }
 
 .ks-nav-link.active {
   background-color: #D32F2F;
-  color: #FFFFFF;
+  color: #FFFFFF !important; /* Forces text to white */
   box-shadow: 0 4px 12px rgba(211, 47, 47, 0.2);
+  border-color: #D32F2F !important;
+}
+
+/* Ensure SVG inherits the color we pass in JS */
+.ks-nav-icon-wrapper svg {
+  color: inherit;
 }
 
 /* --- UPDATED NOTIFICATION BADGE --- */
@@ -86,7 +99,7 @@
   position: absolute;
   top: -6px;
   right: -6px;
-  background-color: #FF385C; /* Vibrant, attractive alert color */
+  background-color: #FF385C; 
   color: white;
   font-size: 10px;
   font-weight: 900;
@@ -99,11 +112,10 @@
   padding: 0 5px;
   border: 2px solid #FFFFFF;
   box-shadow: 0 2px 5px rgba(255, 56, 92, 0.4);
-  /* Added a pulse animation so you definitely know it's there */
   animation: notification-pulse 1.5s infinite; 
+  z-index: 2; 
 }
 
-/* Pulse Animation Keyframes */
 @keyframes notification-pulse {
   0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 56, 92, 0.7); }
   50% { transform: scale(1.1); box-shadow: 0 0 0 5px rgba(255, 56, 92, 0); }
@@ -114,7 +126,6 @@
   border-color: #D32F2F;
   background-color: #FFFFFF;
   color: #D32F2F;
-  /* Stops pulsing and scaling when the tab is highlighted */
   animation: none; 
   transform: scale(1);
   box-shadow: none;
@@ -125,7 +136,7 @@
   margin-top: auto;
   border-top: 1px solid #F3F4F6;
   padding-top: 20px;
-  flex-shrink: 0; /* Prevents footer from squishing */
+  flex-shrink: 0; 
 }
 
 .ks-logout-btn {
@@ -147,12 +158,75 @@
   background-color: #FEF2F2;
 }
 
-/* --- RESPONSIVE ADJUSTMENTS --- */
-@media (max-width: 768px) {
+.ks-nav-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ks-nav-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- SCROLL INDICATOR --- */
+.ks-scroll-indicator {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background: linear-gradient(to top, rgba(255,255,255,1), rgba(255,255,255,0)); /* Fades the bottom text slightly */
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none; /* Let clicks pass through to the menu items below */
+}
+
+.ks-scroll-indicator svg {
+  animation: bounce 2s infinite;
+  margin-bottom: 5px;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-8px); }
+  60% { transform: translateY(-4px); }
+}
+
+/* --- PREMIUM MOBILE CENTERING & BORDERS --- */
+@media (max-width: 1024px) {
   .ks-sidebar-container {
-    padding: 16px 12px; /* Slightly tighter padding on mobile */
-    /* Ensure no parent containers force it past viewport height */
-    max-height: 100vh;
-    max-height: 100dvh;
+    padding: 24px 20px;
+    height: calc(100vh - 60px); 
+    height: calc(100dvh - 60px); 
+    border-right: none;
+  }
+
+  .ks-sidebar-header {
+    display: none;
+  }
+
+  .ks-sidebar-nav {
+    margin-top: 5px;
+  }
+
+  .ks-nav-link {
+    justify-content: center; 
+    font-size: 0.85rem; 
+    padding: 10px;    
+    /* ADDED: Clean subtle border for mobile */
+    border: 1px solid #F3F4F6;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+    margin-bottom: 4px; /* Space between the bordered items */
+  }
+
+  .ks-logout-btn {
+    justify-content: center;
+    font-size: 0.85rem; 
+    padding: 10px;     
   }
 }
