@@ -13,7 +13,7 @@
 
 /* --- MOBILE HEADER --- */
 .admin-mobile-header {
-  display: none; /* Hidden on Desktop */
+  display: none; 
   position: fixed;
   top: 0;
   left: 0;
@@ -32,6 +32,9 @@
   border: none;
   color: #1F2937;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* --- SIDEBAR WRAPPER --- */
@@ -43,6 +46,7 @@
   bottom: 0;
   left: 0;
   z-index: 100;
+  background-color: #FFFFFF;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -53,10 +57,10 @@
 /* --- MAIN CONTENT --- */
 .admin-main-content {
   flex: 1;
-  margin-left: var(--admin-sidebar-width); /* Push content right */
+  margin-left: var(--admin-sidebar-width); 
   padding: 30px;
   width: 100%;
-  max-width: 100%; /* Prevent overflow */
+  max-width: 100%; 
   box-sizing: border-box;
 }
 
@@ -71,32 +75,26 @@
     padding-top: var(--admin-header-height);
   }
 
-  /* Hide Sidebar by default on mobile */
+  /* Full Screen Overlay for Mobile Menu */
   .sidebar-wrapper {
-    transform: translateX(-100%);
-    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+    width: 100%; /* Take up full width for premium centered look */
+    top: var(--admin-header-height); /* Start below the mobile header */
+    transform: translateY(-150%); /* Slide down instead of from the side */
+    box-shadow: none;
   }
 
   /* Show Sidebar when Open */
   .sidebar-wrapper.mobile-open {
-    transform: translateX(0);
+    transform: translateY(0);
   }
 
-  /* Content takes full width on mobile */
   .admin-main-content {
     margin-left: 0;
     padding: 20px;
   }
 
-  /* Dark Overlay when sidebar is open */
+  /* No overlay needed since the menu is full-width */
   .sidebar-wrapper.mobile-open .sidebar-overlay {
-    display: block;
-    position: fixed;
-    top: 0;
-    left: var(--admin-sidebar-width);
-    right: -100vw; /* Cover rest of screen */
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 99;
+    display: none; 
   }
 }
