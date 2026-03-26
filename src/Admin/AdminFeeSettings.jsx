@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
-// Assuming you have a general admin CSS file, or you can reuse your existing classes
 import './Login/AdminLogin.css'; 
 
 const AdminFeeSettings = () => {
     // State management
     const [maleFee, setMaleFee] = useState(0);
     const [femaleFee, setFemaleFee] = useState(0);
-    const [upiId, setUpiId] = useState(''); // <-- NEW STATE FOR UPI ID
+    const [upiId, setUpiId] = useState(''); 
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
 
-    // Live Vercel backend URL for settings 
-    // (Updated to match the general settings route from the previous backend step)
-    const API_BASE = "https://kalyanashobha-back.vercel.app/api/admin/settings";
+    // Separate URLs to perfectly match your backend routes
+    const GET_API_URL = "https://kalyanashobha-back.vercel.app/api/admin/settings/fees";
+    const PUT_API_URL = "https://kalyanashobha-back.vercel.app/api/admin/settings";
 
     // Fetch the current settings when the component loads
     useEffect(() => {
@@ -25,17 +23,18 @@ const AdminFeeSettings = () => {
         try {
             const token = localStorage.getItem('adminToken');
             
-            // If you have a separate GET route for admin settings, make sure it returns the upiId
-            const res = await axios.get(API_BASE, {
+            // Using the correct GET route
+            const res = await axios.get(GET_API_URL, {
                 headers: { Authorization: token }
             });
             
-            // Adjust these paths depending on how your GET route structures the response
             if (res.data.success) {
-                const settingsData = res.data.settings || res.data.data || {};
+                // Your backend returns the settings inside 'res.data.data' for the GET route
+                const settingsData = res.data.data || {};
+                
                 setMaleFee(settingsData.maleRegistrationFee || 0);
                 setFemaleFee(settingsData.femaleRegistrationFee || 0);
-                setUpiId(settingsData.upiId || ''); // <-- SET THE FETCHED UPI ID
+                setUpiId(settingsData.upiId || '8897714968@axl'); // Provide fallback if empty
             }
         } catch (err) {
             console.error("Error fetching settings:", err);
@@ -51,12 +50,11 @@ const AdminFeeSettings = () => {
         try {
             const token = localStorage.getItem('adminToken');
             
-            // Send the updated fees AND the UPI ID to the backend
-            // Using PUT to match the backend route provided earlier
-            const res = await axios.put(API_BASE, { 
+            // Using the correct PUT route
+            const res = await axios.put(PUT_API_URL, { 
                 maleRegistrationFee: Number(maleFee), 
                 femaleRegistrationFee: Number(femaleFee),
-                upiId: upiId // <-- ADDED TO PAYLOAD
+                upiId: upiId 
             }, {
                 headers: { Authorization: token }
             });
@@ -92,7 +90,6 @@ const AdminFeeSettings = () => {
 
                     <form onSubmit={handleUpdateSettings}>
                         
-                        {/* --- UPI ID INPUT --- */}
                         <div className="form-group">
                             <label>Payment UPI ID</label>
                             <input 
