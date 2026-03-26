@@ -8,35 +8,42 @@ const AdminFeeSettings = () => {
     // State management
     const [maleFee, setMaleFee] = useState(0);
     const [femaleFee, setFemaleFee] = useState(0);
+    const [upiId, setUpiId] = useState(''); // <-- NEW STATE FOR UPI ID
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
 
-    // Live Vercel backend URL for settings
-    const API_BASE = "https://kalyanashobha-back.vercel.app/api/admin/settings/fees";
+    // Live Vercel backend URL for settings 
+    // (Updated to match the general settings route from the previous backend step)
+    const API_BASE = "https://kalyanashobha-back.vercel.app/api/admin/settings";
 
-    // Fetch the current fees when the component loads
+    // Fetch the current settings when the component loads
     useEffect(() => {
-        fetchCurrentFees();
+        fetchCurrentSettings();
     }, []);
 
-    const fetchCurrentFees = async () => {
+    const fetchCurrentSettings = async () => {
         try {
             const token = localStorage.getItem('adminToken');
+            
+            // If you have a separate GET route for admin settings, make sure it returns the upiId
             const res = await axios.get(API_BASE, {
                 headers: { Authorization: token }
             });
             
+            // Adjust these paths depending on how your GET route structures the response
             if (res.data.success) {
-                setMaleFee(res.data.data.maleRegistrationFee || 0);
-                setFemaleFee(res.data.data.femaleRegistrationFee || 0);
+                const settingsData = res.data.settings || res.data.data || {};
+                setMaleFee(settingsData.maleRegistrationFee || 0);
+                setFemaleFee(settingsData.femaleRegistrationFee || 0);
+                setUpiId(settingsData.upiId || ''); // <-- SET THE FETCHED UPI ID
             }
         } catch (err) {
-            console.error("Error fetching fees:", err);
-            setMessage({ type: 'error', text: 'Failed to load current fee settings.' });
+            console.error("Error fetching settings:", err);
+            setMessage({ type: 'error', text: 'Failed to load current settings.' });
         }
     };
 
-    const handleUpdateFees = async (e) => {
+    const handleUpdateSettings = async (e) => {
         e.preventDefault();
         setIsLoading(true); 
         setMessage({ type: '', text: '' });
@@ -44,22 +51,24 @@ const AdminFeeSettings = () => {
         try {
             const token = localStorage.getItem('adminToken');
             
-            // Send the updated fees to the backend
-            const res = await axios.post(API_BASE, { 
-                maleFee: Number(maleFee), 
-                femaleFee: Number(femaleFee) 
+            // Send the updated fees AND the UPI ID to the backend
+            // Using PUT to match the backend route provided earlier
+            const res = await axios.put(API_BASE, { 
+                maleRegistrationFee: Number(maleFee), 
+                femaleRegistrationFee: Number(femaleFee),
+                upiId: upiId // <-- ADDED TO PAYLOAD
             }, {
                 headers: { Authorization: token }
             });
 
             if (res.data.success) {
-                setMessage({ type: 'success', text: 'Registration fees updated successfully!' });
+                setMessage({ type: 'success', text: 'Settings updated successfully!' });
                 
                 // Clear the success message after 3 seconds
                 setTimeout(() => setMessage({ type: '', text: '' }), 3000);
             }
         } catch (err) {
-            setMessage({ type: 'error', text: err.response?.data?.message || "Failed to update fees." });
+            setMessage({ type: 'error', text: err.response?.data?.message || "Failed to update settings." });
         } finally {
             setIsLoading(false);
         }
@@ -67,14 +76,12 @@ const AdminFeeSettings = () => {
 
     return (
         <>
-
-
             <div className="admin-login-container">
                 <div className="login-card">
                     
                     <div className="login-header">
-                        <h2>Fee Management</h2>
-                        <p>Set global registration fees for users</p>
+                        <h2>Platform Settings</h2>
+                        <p>Set global registration fees and payment details</p>
                     </div>
 
                     {message.text && (
@@ -83,7 +90,21 @@ const AdminFeeSettings = () => {
                         </div>
                     )}
 
-                    <form onSubmit={handleUpdateFees}>
+                    <form onSubmit={handleUpdateSettings}>
+                        
+                        {/* --- UPI ID INPUT --- */}
+                        <div className="form-group">
+                            <label>Payment UPI ID</label>
+                            <input 
+                                type="text" 
+                                className="form-control" 
+                                placeholder="e.g. 8897714968@axl" 
+                                value={upiId}
+                                onChange={(e) => setUpiId(e.target.value)} 
+                                required 
+                            />
+                        </div>
+
                         <div className="form-group">
                             <label>Male Registration Fee (₹)</label>
                             <input 
