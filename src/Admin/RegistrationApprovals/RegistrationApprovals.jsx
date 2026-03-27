@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Check, X, Eye, Clock, Filter } from "lucide-react";
+import { Check, X, Eye, Clock, Filter, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -13,6 +13,13 @@ export default function RegistrationApprovals() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [processingId, setProcessingId] = useState(null);
 
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  // Mobile Scroll Indicator State
+  const [showMainScroll, setShowMainScroll] = useState(false);
+
   const fetchPayments = async () => {
     setLoading(true);
     try {
@@ -23,6 +30,7 @@ export default function RegistrationApprovals() {
       );
       if (response.data.success) {
         setPayments(response.data.payments);
+        setCurrentPage(1); // Reset page on tab switch or data fetch
       }
     } catch (error) {
       console.error("Error fetching payments", error);
@@ -35,6 +43,31 @@ export default function RegistrationApprovals() {
   useEffect(() => {
     fetchPayments();
   }, [activeTab]);
+
+  // Scroll Indicator Logic
+  useEffect(() => {
+    const checkMainScroll = () => {
+        if (selectedImage) {
+            setShowMainScroll(false);
+            return;
+        }
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        
+        setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
+    };
+
+    const timer = setTimeout(checkMainScroll, 500); 
+    window.addEventListener('scroll', checkMainScroll);
+    window.addEventListener('resize', checkMainScroll);
+
+    return () => {
+        clearTimeout(timer);
+        window.removeEventListener('scroll', checkMainScroll);
+        window.removeEventListener('resize', checkMainScroll);
+    };
+  }, [payments, currentPage, selectedImage]);
 
   const handleAction = async (paymentId, action) => {
     setProcessingId(paymentId);
@@ -58,6 +91,14 @@ export default function RegistrationApprovals() {
       setProcessingId(null);
     }
   };
+
+  // Pagination Logic
+  const totalPages = Math.ceil(payments.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = payments.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="ra-layout">
@@ -103,7 +144,7 @@ export default function RegistrationApprovals() {
       <div className="ra-content">
         {loading ? (
            <div className="ra-skeleton-stack">
-              {[1, 2, 3, 4].map(i => (
+              {[1, 2, 3, 4, 5, 6].map(i => (
                   <div key={i} className="ra-skeleton-row">
                       <div className="sk-box sk-date"></div>
                       <div className="sk-box sk-user"></div>
@@ -119,99 +160,153 @@ export default function RegistrationApprovals() {
              <p>There are no {activeTab.toLowerCase()} requests at the moment.</p>
           </div>
         ) : (
-          <div className="ra-table-container">
-            <table className="ra-table">
-                <thead>
-                <tr>
-                    <th>Date & Time</th>
-                    <th>User Details</th>
-                    <th>Payment Info</th>
-                    <th>Proof Of Payment</th>
-                    <th>Status</th>
-                    {(activeTab === "PendingVerification" || activeTab === "Rejected") && <th className="ra-text-right">Actions</th>}
-                </tr>
-                </thead>
-                <tbody>
-                {payments.map((pay) => (
-                    <tr key={pay._id} className={processingId === pay._id ? "ra-row-processing" : ""}>
-                    <td data-label="Date">
-                        <div className="ra-date-cell">
-                            <Clock size={14} className="ra-icon-sub"/>
-                            <div className="ra-date-text">
-                                <span>{new Date(pay.date).toLocaleDateString()}</span>
-                                <small>{new Date(pay.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
-                            </div>
+          <>
+            <div className="ra-table-container">
+              <table className="ra-table">
+                  <thead>
+                  <tr>
+                      <th>Date & Time</th>
+                      <th>User Details</th>
+                      <th>Payment Info</th>
+                      <th>Proof Of Payment</th>
+                      <th>Status</th>
+                      {(activeTab === "PendingVerification" || activeTab === "Rejected") && <th className="ra-text-right">Actions</th>}
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {currentItems.map((pay) => (
+                      <tr key={pay._id} className={processingId === pay._id ? "ra-row-processing" : ""}>
+                      <td data-label="Date">
+                          <div className="ra-date-cell">
+                              <Clock size={14} className="ra-icon-sub"/>
+                              <div className="ra-date-text">
+                                  <span>{new Date(pay.date).toLocaleDateString()}</span>
+                                  <small>{new Date(pay.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
+                              </div>
+                          </div>
+                      </td>
+                      <td data-label="User">
+                          <div className="ra-user-cell">
+                             <div className="ra-avatar-initial">
+                                {pay.userId?.firstName?.[0] || "U"}
+                             </div>
+                             <div className="ra-user-info">
+                                  <strong>{pay.userId?.firstName} {pay.userId?.lastName}</strong>
+                                  <span className="ra-sub-id">{pay.userId?.uniqueId || "N/A"}</span>
+                                  <span className="ra-sub-phone">{pay.userId?.mobileNumber}</span>
+                             </div>
+                          </div>
+                      </td>
+                      <td data-label="Amount">
+                          <div className="ra-amount-badge">
+                             ₹{pay.amount?.toLocaleString()}
+                          </div>
+                      </td>
+                      <td data-label="Proof">
+                          <div className="ra-proof-group">
+                              <div className="ra-utr">
+                                  <span className="label">UTR:</span>
+                                  <span className="val">{pay.utrNumber}</span>
+                              </div>
+                              <button 
+                                  className="ra-view-screenshot-btn" 
+                                  onClick={() => setSelectedImage(pay.screenshotUrl)}
+                              >
+                                  <Eye size={14} /> View
+                              </button>
+                          </div>
+                      </td>
+                      <td data-label="Status">
+                          <span className={`ra-status-badge ${pay.status.toLowerCase()}`}>
+                             {pay.status === 'PendingVerification' ? 'Pending' : pay.status}
+                          </span>
+                      </td>
+                      
+                      {(activeTab === "PendingVerification" || activeTab === "Rejected") && (
+                          <td data-label="Actions" className="ra-text-right">
+                          <div className="ra-actions">
+                              <button 
+                                  className="ra-btn-approve" 
+                                  onClick={() => handleAction(pay._id, "approve")}
+                                  disabled={processingId === pay._id}
+                                  title="Approve Payment"
+                              >
+                                  {processingId === pay._id ? <div className="spinner-sm"></div> : <Check size={18} />}
+                              </button>
+                              
+                              {activeTab === "PendingVerification" && (
+                                  <button 
+                                      className="ra-btn-reject" 
+                                      onClick={() => handleAction(pay._id, "reject")}
+                                      disabled={processingId === pay._id}
+                                      title="Reject Payment"
+                                  >
+                                      {processingId === pay._id ? <div className="spinner-sm"></div> : <X size={18} />}
+                                  </button>
+                              )}
+                          </div>
+                          </td>
+                      )}
+                      </tr>
+                  ))}
+                  </tbody>
+              </table>
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="ra-pagination-container">
+                    <span className="ra-page-info">
+                        Showing <strong>{indexOfFirstItem + 1}</strong> to <strong>{Math.min(indexOfLastItem, payments.length)}</strong> of <strong>{payments.length}</strong>
+                    </span>
+                    <div className="ra-pagination-controls">
+                        <button 
+                            className="ra-page-btn" 
+                            onClick={() => paginate(currentPage - 1)} 
+                            disabled={currentPage === 1}
+                        >
+                            <ChevronLeft size={16} /> Prev
+                        </button>
+                        
+                        <div className="ra-page-numbers">
+                            {[...Array(totalPages)].map((_, index) => {
+                                if (totalPages > 5 && (index + 1 < currentPage - 1 || index + 1 > currentPage + 1) && index !== 0 && index !== totalPages - 1) {
+                                    if (index + 1 === currentPage - 2 || index + 1 === currentPage + 2) return <span key={index} className="ra-page-dots">...</span>;
+                                    return null;
+                                }
+                                return (
+                                    <button 
+                                        key={index + 1} 
+                                        className={`ra-page-number ${currentPage === index + 1 ? 'active' : ''}`}
+                                        onClick={() => paginate(index + 1)}
+                                    >
+                                        {index + 1}
+                                    </button>
+                                );
+                            })}
                         </div>
-                    </td>
-                    <td data-label="User">
-                        <div className="ra-user-cell">
-                           <div className="ra-avatar-initial">
-                              {pay.userId?.firstName?.[0] || "U"}
-                           </div>
-                           <div className="ra-user-info">
-                                <strong>{pay.userId?.firstName} {pay.userId?.lastName}</strong>
-                                <span className="ra-sub-id">{pay.userId?.uniqueId || "N/A"}</span>
-                                <span className="ra-sub-phone">{pay.userId?.mobileNumber}</span>
-                           </div>
-                        </div>
-                    </td>
-                    <td data-label="Amount">
-                        <div className="ra-amount-badge">
-                           ₹{pay.amount?.toLocaleString()}
-                        </div>
-                    </td>
-                    <td data-label="Proof">
-                        <div className="ra-proof-group">
-                            <div className="ra-utr">
-                                <span className="label">UTR:</span>
-                                <span className="val">{pay.utrNumber}</span>
-                            </div>
-                            <button 
-                                className="ra-view-screenshot-btn" 
-                                onClick={() => setSelectedImage(pay.screenshotUrl)}
-                            >
-                                <Eye size={14} /> View
-                            </button>
-                        </div>
-                    </td>
-                    <td data-label="Status">
-                        <span className={`ra-status-badge ${pay.status.toLowerCase()}`}>
-                           {pay.status === 'PendingVerification' ? 'Pending' : pay.status}
-                        </span>
-                    </td>
-                    
-                    {(activeTab === "PendingVerification" || activeTab === "Rejected") && (
-                        <td data-label="Actions" className="ra-text-right">
-                        <div className="ra-actions">
-                            <button 
-                                className="ra-btn-approve" 
-                                onClick={() => handleAction(pay._id, "approve")}
-                                disabled={processingId === pay._id}
-                                title="Approve Payment"
-                            >
-                                {processingId === pay._id ? <div className="spinner-sm"></div> : <Check size={18} />}
-                            </button>
-                            
-                            {activeTab === "PendingVerification" && (
-                                <button 
-                                    className="ra-btn-reject" 
-                                    onClick={() => handleAction(pay._id, "reject")}
-                                    disabled={processingId === pay._id}
-                                    title="Reject Payment"
-                                >
-                                    <X size={18} />
-                                </button>
-                            )}
-                        </div>
-                        </td>
-                    )}
-                    </tr>
-                ))}
-                </tbody>
-            </table>
-          </div>
+
+                        <button 
+                            className="ra-page-btn" 
+                            onClick={() => paginate(currentPage + 1)} 
+                            disabled={currentPage === totalPages}
+                        >
+                            Next <ChevronRight size={16} />
+                        </button>
+                    </div>
+                </div>
+            )}
+          </>
         )}
       </div>
+
+      {/* MOBILE SCROLL INDICATOR */}
+      {showMainScroll && (
+          <div className="ra-scroll-indicator">
+              <ChevronDown size={18} />
+              <span>Scroll for more</span>
+          </div>
+      )}
 
       {/* IMAGE MODAL */}
       {selectedImage && (
