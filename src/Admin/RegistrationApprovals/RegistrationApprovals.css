@@ -469,7 +469,7 @@
   .ra-actions { width: 100%; justify-content: flex-end; }
   .ra-btn-approve, .ra-btn-reject { width: 32px; height: 32px; border-radius: 6px; }
   
-  /* Mobile Pagination Stack */
+  /* --- REBUILT MOBILE PAGINATION --- */
   .ra-pagination-container {
       flex-direction: column;
       border-radius: 16px;
@@ -479,8 +479,19 @@
       gap: 16px;
       background: white;
   }
-  .ra-pagination-controls { width: 100%; justify-content: space-between; }
-  .ra-page-numbers { display: none; } /* Hide individual numbers on mobile to save space */
+  .ra-pagination-controls { 
+      width: 100%; 
+      justify-content: space-between; 
+      flex-wrap: wrap; /* Allows the numbers to stack above buttons */
+  }
+  .ra-page-numbers { 
+      display: flex; /* Override display: none */
+      width: 100%;
+      justify-content: center;
+      order: -1; /* Forces page numbers ABOVE prev/next buttons */
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+  } 
   .ra-page-btn { flex: 1; }
 
   /* Skeleton Mobile */
