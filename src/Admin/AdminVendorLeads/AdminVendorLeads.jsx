@@ -201,7 +201,7 @@ export default function AdminVendorLeads() {
                 [...Array(5)].map((_, index) => <SkeletonRow key={index} />)
               ) : currentLeads.length === 0 ? (
                 <tr>
-                  <td colSpan="5">
+                  <td colSpan="5" className="avl-empty-cell">
                     <div className="avl-state-view empty">
                         <Search size={48} />
                         <h3>No leads found</h3>
