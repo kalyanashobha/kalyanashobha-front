@@ -44,6 +44,7 @@ const AdminMasterDataManager = () => {
   const [subInput, setSubInput] = useState('');
   const [subItemsList, setSubItemsList] = useState([]);
 
+  // Parent Hierarchy State
   const [parentOptions, setParentOptions] = useState([]);
   const [selectedParent, setSelectedParent] = useState('');
 
@@ -58,6 +59,26 @@ const AdminMasterDataManager = () => {
     if (cat === 'City') return 'State';
     return null;
   };
+
+  // Scroll Indicator Logic
+  useEffect(() => {
+    const checkMainScroll = () => {
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
+    };
+
+    const timer = setTimeout(checkMainScroll, 500); 
+    window.addEventListener('scroll', checkMainScroll);
+    window.addEventListener('resize', checkMainScroll);
+
+    return () => {
+        clearTimeout(timer);
+        window.removeEventListener('scroll', checkMainScroll);
+        window.removeEventListener('resize', checkMainScroll);
+    };
+  }, [existingItems, currentPage, activeTab]);
 
   const fetchData = async () => {
     setFetching(true);
@@ -87,7 +108,7 @@ const AdminMasterDataManager = () => {
     setSubItemsList([]);
     setSubInput('');
     setCurrentPage(1); 
-    setSelectedParent('');
+    setSelectedParent(''); 
 
     if (selectedCategory !== 'Community') {
       setActiveTab('create');
@@ -112,27 +133,6 @@ const AdminMasterDataManager = () => {
       setCurrentPage(maxPage);
     }
   }, [existingItems.length, currentPage]);
-
-  // Scroll Indicator Logic
-  useEffect(() => {
-    const checkMainScroll = () => {
-        const scrollY = window.scrollY || document.documentElement.scrollTop;
-        const windowHeight = window.innerHeight;
-        const documentHeight = document.documentElement.scrollHeight;
-        
-        setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
-    };
-
-    const timer = setTimeout(checkMainScroll, 500); 
-    window.addEventListener('scroll', checkMainScroll);
-    window.addEventListener('resize', checkMainScroll);
-
-    return () => {
-        clearTimeout(timer);
-        window.removeEventListener('scroll', checkMainScroll);
-        window.removeEventListener('resize', checkMainScroll);
-    };
-  }, [existingItems, activeTab, currentPage]);
 
   const handleSubKeyDown = (e) => {
     if (e.key === 'Enter' || e.key === ',') {
@@ -264,7 +264,6 @@ const AdminMasterDataManager = () => {
       if (destination.droppableId === 'main-list') {
          absoluteDestIndex = indexOfFirstItem + destination.index;
       } else if (destination.droppableId.startsWith('page-')) {
-         
          if (destination.droppableId === 'page-next') {
             targetPage = currentPage < totalPages ? currentPage + 1 : currentPage;
          } else if (destination.droppableId === 'page-prev') {
@@ -272,7 +271,6 @@ const AdminMasterDataManager = () => {
          } else {
             targetPage = parseInt(destination.droppableId.split('-')[1], 10);
          }
-
          if (targetPage === currentPage) return; 
          absoluteDestIndex = (targetPage - 1) * ITEMS_PER_PAGE;
       } else {
@@ -297,17 +295,12 @@ const AdminMasterDataManager = () => {
           body: JSON.stringify({ orderedItems: payload })
         });
         toast.success('Order saved automatically');
-
-        if (targetPage !== currentPage) {
-           setCurrentPage(targetPage);
-        }
-
+        if (targetPage !== currentPage) setCurrentPage(targetPage);
       } catch (err) {
         toast.error('Failed to save new order');
         fetchData(); 
       }
     } 
-    
     else if (type === 'SUB') {
       const parentId = source.droppableId;
       const parentIndex = existingItems.findIndex(item => item._id === parentId);
@@ -366,6 +359,7 @@ const AdminMasterDataManager = () => {
             </div>
           </div>
         </div>
+        
         <div className="sys-cfg-separator"></div>
 
         {isCommunity && (
@@ -402,7 +396,14 @@ const AdminMasterDataManager = () => {
 
                 <div className="sys-cfg-field">
                   <label className="sys-cfg-label">{selectedCategory} Identifier(s)</label>
-                  <input type="text" className="sys-cfg-input" placeholder={`e.g. Value 1, Value 2`} value={mainInput} onChange={(e) => setMainInput(e.target.value)} autoComplete="off" />
+                  <input 
+                    type="text" 
+                    className="sys-cfg-input" 
+                    placeholder="e.g. Value 1, Value 2 (Comma separated for bulk)" 
+                    value={mainInput} 
+                    onChange={(e) => setMainInput(e.target.value)} 
+                    autoComplete="off" 
+                  />
                 </div>
               </>
             )}
@@ -422,7 +423,15 @@ const AdminMasterDataManager = () => {
                     {subItemsList.map((tag, index) => (
                       <span key={index} className="sys-cfg-chip">{tag} <FiX onClick={() => removeTag(tag)} className="sys-cfg-chip-close" /></span>
                     ))}
-                    <input type="text" className="sys-cfg-tag-input" placeholder={subItemsList.length > 0 ? "Add next..." : "Press Enter or comma to add"} value={subInput} onChange={(e) => setSubInput(e.target.value)} onKeyDown={handleSubKeyDown} disabled={!mainInput} />
+                    <input 
+                      type="text" 
+                      className="sys-cfg-tag-input" 
+                      placeholder={subItemsList.length > 0 ? "Type and press Enter..." : "Press Enter to add sub-community"} 
+                      value={subInput} 
+                      onChange={(e) => setSubInput(e.target.value)} 
+                      onKeyDown={handleSubKeyDown} 
+                      disabled={!mainInput} 
+                    />
                   </div>
                 </div>
               </>
@@ -443,6 +452,7 @@ const AdminMasterDataManager = () => {
               <span className="sys-cfg-page-indicator">Page {currentPage} of {totalPages}</span>
             )}
           </div>
+          
           <div className="sys-cfg-separator" style={{ marginTop: '16px' }}></div>
 
           {fetching ? (
@@ -542,7 +552,7 @@ const AdminMasterDataManager = () => {
                 )}
               </Droppable>
 
-              {/* --- SINGLE PAGE PAGINATION --- */}
+              {/* SINGLE PAGE PAGINATION */}
               {!fetching && totalPages > 1 && (
                 <div className="sys-cfg-pro-pagination">
                   <Droppable droppableId="page-prev" type="MAIN">
@@ -599,7 +609,7 @@ const AdminMasterDataManager = () => {
           )}
         </div>
       </div>
-      
+
       {/* MOBILE SCROLL INDICATOR */}
       {showMainScroll && (
           <div className="sys-cfg-scroll-indicator">
