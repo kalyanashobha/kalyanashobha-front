@@ -168,6 +168,37 @@ const AdminUserManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [referralFilter, setReferralFilter] = useState("all");
   const [advFilters, setAdvFilters] = useState(INITIAL_FILTERS);
+  
+  // --- MAIN PAGE SCROLL INDICATOR LOGIC ---
+  const [showMainScroll, setShowMainScroll] = useState(false);
+
+  useEffect(() => {
+    const checkMainScroll = () => {
+      // Don't show the main background scroll indicator if the modal popup is open
+      if (selectedUser) {
+        setShowMainScroll(false);
+        return;
+      }
+
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      
+      // If the page has scrolling room and we aren't near the bottom, show the indicator
+      setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
+    };
+
+    const timer = setTimeout(checkMainScroll, 500); // Allow content to load before checking
+    window.addEventListener('scroll', checkMainScroll);
+    window.addEventListener('resize', checkMainScroll);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', checkMainScroll);
+      window.removeEventListener('resize', checkMainScroll);
+    };
+  }, [users, showAdvanced, selectedUser]);
+  // ----------------------------------------
 
   useEffect(() => {
     const fetchInitialMasterData = async () => {
@@ -514,6 +545,15 @@ const AdminUserManagement = () => {
             }}
           />
         )}
+        
+        {/* NEW MAIN PAGE SCROLL INDICATOR */}
+        {showMainScroll && !selectedUser && (
+          <div className="um-scroll-indicator" style={{ position: 'fixed', zIndex: 40 }}>
+            <ChevronDown size={18} />
+            <span>Scroll for more users</span>
+          </div>
+        )}
+
       </div>
     </>
   );
@@ -630,7 +670,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
   const [editStates, setEditStates] = useState([]);
   const [editCities, setEditCities] = useState([]);
 
-  // --- SCROLL INDICATOR LOGIC ---
+  // --- MODAL SCROLL INDICATOR LOGIC ---
   const modalBodyRef = useRef(null);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
 
@@ -1260,7 +1300,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
           )}
         </div>
         
-        {/* NEW SCROLL INDICATOR UI */}
+        {/* NEW MODAL SCROLL INDICATOR */}
         {showScrollIndicator && (
           <div className="um-scroll-indicator">
             <ChevronDown size={18} />
