@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { ChevronDown, Shield, Edit2, Trash2 } from 'lucide-react';
 
 export default function CreateModerator() {
   const [formData, setFormData] = useState({
@@ -14,6 +15,9 @@ export default function CreateModerator() {
   
   const [moderators, setModerators] = useState([]);
   const [editingModId, setEditingModId] = useState(null);
+
+  // Mobile Scroll Indicator State
+  const [showMainScroll, setShowMainScroll] = useState(false);
 
   const availablePermissions = [
     { id: "dashboard", label: "Dashboard" },
@@ -34,6 +38,27 @@ export default function CreateModerator() {
   useEffect(() => {
     fetchModerators();
   }, []);
+
+  // Scroll Indicator Logic
+  useEffect(() => {
+    const checkMainScroll = () => {
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        
+        setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
+    };
+
+    const timer = setTimeout(checkMainScroll, 500); 
+    window.addEventListener('scroll', checkMainScroll);
+    window.addEventListener('resize', checkMainScroll);
+
+    return () => {
+        clearTimeout(timer);
+        window.removeEventListener('scroll', checkMainScroll);
+        window.removeEventListener('resize', checkMainScroll);
+    };
+  }, [moderators]);
 
   const fetchModerators = async () => {
     try {
@@ -89,7 +114,7 @@ export default function CreateModerator() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this moderator? This action cannot be undone.")) return;
+    if (!window.confirm("Are you sure you want to revoke access for this moderator? This action cannot be undone.")) return;
     
     try {
       const token = localStorage.getItem('adminToken');
@@ -98,7 +123,7 @@ export default function CreateModerator() {
       });
 
       if (response.data.success) {
-        setMessage({ type: 'success', text: 'Moderator deleted successfully.' });
+        setMessage({ type: 'success', text: 'Moderator access revoked successfully.' });
         fetchModerators(); 
         if (editingModId === id) handleCancelEdit(); 
       }
@@ -113,7 +138,7 @@ export default function CreateModerator() {
     setIsLoading(true);
 
     if (selectedPermissions.length === 0) {
-      setMessage({ type: 'error', text: 'Please select at least one permission.' });
+      setMessage({ type: 'error', text: 'Please assign at least one module permission.' });
       setIsLoading(false);
       return;
     }
@@ -144,7 +169,7 @@ export default function CreateModerator() {
       if (response.data.success) {
         setMessage({ 
           type: 'success', 
-          text: editingModId ? 'Moderator updated successfully.' : 'Moderator profile successfully created.' 
+          text: editingModId ? 'Moderator permissions updated successfully.' : 'Moderator profile successfully provisioned.' 
         });
         handleCancelEdit(); 
         fetchModerators();  
@@ -163,186 +188,163 @@ export default function CreateModerator() {
     <div className="ks-mod-admin-wrapper">
       <style>{`
         :root {
-          --ks-mod-primary: #8E1B1B;
-          --ks-mod-primary-hover: #7a1717;
-          --ks-mod-text-dark: #1e293b;
+          --ks-mod-primary: #4f46e5;
+          --ks-mod-primary-dark: #4338ca;
+          --ks-mod-text-main: #0f172a;
           --ks-mod-text-muted: #64748b;
           --ks-mod-border: #e2e8f0;
+          --ks-mod-border-hover: #cbd5e1;
           --ks-mod-bg-light: #f8fafc;
+          --ks-mod-card-bg: #ffffff;
           --ks-mod-danger: #ef4444;
-          --ks-mod-success-bg: #f0fdf4;
-          --ks-mod-success-text: #166534;
+          --ks-mod-danger-dark: #dc2626;
+          --ks-mod-success-bg: #dcfce7;
+          --ks-mod-success-text: #15803d;
           --ks-mod-error-bg: #fef2f2;
-          --ks-mod-error-text: #991b1b;
+          --ks-mod-error-text: #b91c1c;
+          --ks-mod-radius: 12px;
+          --ks-mod-radius-sm: 8px;
+          --ks-mod-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+          --ks-mod-shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+          --ks-mod-anim: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Essential fix for mobile overlapping */
+        .ks-mod-admin-wrapper {
+          padding: 32px;
+          font-family: 'Inter', system-ui, -apple-system, sans-serif;
+          color: var(--ks-mod-text-main);
+          background-color: var(--ks-mod-bg-light);
+          min-height: 100vh;
+          box-sizing: border-box;
+        }
+
         .ks-mod-admin-wrapper * {
           box-sizing: border-box;
         }
 
-        .ks-mod-admin-wrapper {
-          padding: 16px;
-          font-family: 'Inter', -apple-system, sans-serif;
-          color: var(--ks-mod-text-dark);
-          background-color: #ffffff;
-          min-height: 100vh;
-          width: 100%;
-          max-width: 100vw;
-          overflow-x: hidden;
-        }
-
+        /* --- CARDS --- */
         .ks-mod-card {
-          background: #ffffff;
-          border-radius: 12px;
-          padding: 20px;
+          background: var(--ks-mod-card-bg);
+          border-radius: var(--ks-mod-radius);
+          padding: 32px;
           border: 1px solid var(--ks-mod-border);
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-          margin-bottom: 24px;
+          box-shadow: var(--ks-mod-shadow-md);
+          margin-bottom: 32px;
         }
 
-        .ks-mod-header {
-          margin-bottom: 24px;
-        }
-
+        .ks-mod-header { margin-bottom: 24px; }
         .ks-mod-header h2 {
           font-size: 24px;
-          margin: 0 0 8px 0;
-          font-weight: 700;
-          color: var(--ks-mod-text-dark);
+          margin: 0 0 6px 0;
+          font-weight: 800;
+          letter-spacing: -0.5px;
+          color: var(--ks-mod-text-main);
         }
-
         .ks-mod-header p {
           margin: 0;
           color: var(--ks-mod-text-muted);
-          font-size: 14px;
+          font-size: 15px;
           line-height: 1.5;
         }
 
+        /* --- ALERTS --- */
         .ks-mod-alert {
-          padding: 12px 16px;
-          border-radius: 8px;
-          margin-bottom: 20px;
-          font-size: 14px;
-          font-weight: 500;
-        }
-
-        .ks-mod-alert-success {
-          background-color: var(--ks-mod-success-bg);
-          color: var(--ks-mod-success-text);
-          border: 1px solid #bbf7d0;
-        }
-
-        .ks-mod-alert-error {
-          background-color: var(--ks-mod-error-bg);
-          color: var(--ks-mod-error-text);
-          border: 1px solid #fecaca;
-        }
-
-        .ks-mod-form {
-          display: flex;
-          flex-direction: column;
-          gap: 20px; /* Consistent spacing between all form rows */
-        }
-
-        .ks-mod-input-grid {
-          display: flex;
-          flex-direction: column;
-          gap: 20px; /* Separates the username and email on mobile */
-        }
-
-        .ks-mod-form-group {
-          display: flex;
-          flex-direction: column;
-          width: 100%;
-        }
-
-        .ks-mod-label {
+          padding: 14px 16px;
+          border-radius: var(--ks-mod-radius-sm);
+          margin-bottom: 24px;
           font-size: 14px;
           font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .ks-mod-alert-success { background-color: var(--ks-mod-success-bg); color: var(--ks-mod-success-text); border: 1px solid #bbf7d0; }
+        .ks-mod-alert-error { background-color: var(--ks-mod-error-bg); color: var(--ks-mod-error-text); border: 1px solid #fecaca; }
+
+        /* --- FORM --- */
+        .ks-mod-form { display: flex; flex-direction: column; gap: 24px; }
+        .ks-mod-input-grid { display: flex; gap: 20px; }
+        .ks-mod-form-group { display: flex; flex-direction: column; width: 100%; }
+
+        .ks-mod-label {
+          font-size: 13px;
+          font-weight: 700;
           margin-bottom: 8px;
-          color: #475569;
+          color: var(--ks-mod-text-sub);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
         }
 
         .ks-mod-input {
           width: 100%;
-          padding: 12px 14px;
+          padding: 14px 16px;
           border: 1px solid var(--ks-mod-border);
-          border-radius: 8px;
+          border-radius: var(--ks-mod-radius-sm);
           font-size: 15px;
           outline: none;
-          transition: border-color 0.2s;
+          transition: var(--ks-mod-anim);
           background-color: #fff;
+          color: var(--ks-mod-text-main);
         }
-
         .ks-mod-input:focus {
           border-color: var(--ks-mod-primary);
-          box-shadow: 0 0 0 3px rgba(142, 27, 27, 0.1);
+          box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
         }
 
+        /* --- PERMISSIONS PANEL --- */
         .ks-mod-permissions-panel {
           background-color: var(--ks-mod-bg-light);
           border: 1px solid var(--ks-mod-border);
-          border-radius: 10px;
-          padding: 20px;
-          margin-top: 10px;
+          border-radius: var(--ks-mod-radius);
+          padding: 24px;
         }
-
         .ks-mod-perm-header-row {
           display: flex;
-          flex-direction: column;
-          gap: 16px;
+          justify-content: space-between;
+          align-items: center;
           margin-bottom: 20px;
+          flex-wrap: wrap;
+          gap: 16px;
         }
-
-        .ks-mod-perm-titles h3 {
-          margin: 0 0 4px 0;
-          font-size: 18px;
-        }
-
-        .ks-mod-perm-titles p {
-          margin: 0;
-          font-size: 13px;
-          color: var(--ks-mod-text-muted);
-        }
+        .ks-mod-perm-titles h3 { margin: 0 0 4px 0; font-size: 18px; font-weight: 700; color: var(--ks-mod-text-main); }
+        .ks-mod-perm-titles p { margin: 0; font-size: 14px; color: var(--ks-mod-text-muted); }
 
         .ks-mod-btn-outline {
-          background: transparent;
+          background: white;
           border: 1px solid var(--ks-mod-border);
           padding: 8px 16px;
-          border-radius: 6px;
+          border-radius: var(--ks-mod-radius-sm);
           font-size: 13px;
           font-weight: 600;
           cursor: pointer;
-          color: var(--ks-mod-text-dark);
-          transition: background 0.2s;
-          align-self: flex-start;
+          color: var(--ks-mod-text-main);
+          transition: var(--ks-mod-anim);
+          box-shadow: var(--ks-mod-shadow-sm);
         }
-
-        .ks-mod-btn-outline:hover {
-          background: #e2e8f0;
-        }
+        .ks-mod-btn-outline:hover { background: #f1f5f9; border-color: var(--ks-mod-border-hover); }
 
         .ks-mod-permissions-grid {
           display: grid;
-          grid-template-columns: 1fr;
-          gap: 12px;
+          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+          gap: 16px;
         }
 
         .ks-mod-checkbox-card {
           display: flex;
           align-items: center;
-          padding: 14px;
+          padding: 14px 16px;
           background: #fff;
           border: 1px solid var(--ks-mod-border);
-          border-radius: 8px;
+          border-radius: var(--ks-mod-radius-sm);
           cursor: pointer;
-          transition: all 0.2s;
+          transition: var(--ks-mod-anim);
+          box-shadow: var(--ks-mod-shadow-sm);
         }
-
+        .ks-mod-checkbox-card:hover { border-color: var(--ks-mod-border-hover); }
         .ks-mod-checkbox-card.is-active {
           border-color: var(--ks-mod-primary);
-          background-color: #fdf2f2;
+          background-color: #eff6ff;
+          box-shadow: 0 2px 4px rgba(79, 70, 229, 0.1);
         }
 
         .ks-mod-checkbox-card input[type="checkbox"] {
@@ -355,171 +357,235 @@ export default function CreateModerator() {
 
         .ks-mod-checkbox-text {
           font-size: 14px;
-          font-weight: 500;
-          color: var(--ks-mod-text-dark);
+          font-weight: 600;
+          color: var(--ks-mod-text-main);
         }
 
+        /* --- FORM ACTIONS --- */
         .ks-mod-form-actions {
           display: flex;
-          flex-direction: column;
-          gap: 12px;
-          margin-top: 10px;
+          gap: 16px;
+          margin-top: 8px;
+          justify-content: flex-end;
+          border-top: 1px solid var(--ks-mod-border);
+          padding-top: 24px;
         }
 
         .ks-mod-btn-primary {
           background-color: var(--ks-mod-primary);
           color: white;
           border: none;
-          padding: 14px;
-          border-radius: 8px;
-          font-size: 16px;
+          padding: 12px 24px;
+          border-radius: var(--ks-mod-radius-sm);
+          font-size: 15px;
           font-weight: 600;
           cursor: pointer;
-          transition: background 0.2s;
-          width: 100%;
+          transition: var(--ks-mod-anim);
+          box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
         }
-
-        .ks-mod-btn-primary:hover {
-          background-color: var(--ks-mod-primary-hover);
+        .ks-mod-btn-primary:hover:not(:disabled) {
+          background-color: var(--ks-mod-primary-dark);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 6px rgba(79, 70, 229, 0.3);
         }
-
-        .ks-mod-btn-primary:disabled {
-          background-color: #cbd5e1;
-          cursor: not-allowed;
-        }
+        .ks-mod-btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
 
         .ks-mod-btn-cancel {
-          background-color: transparent;
-          color: var(--ks-mod-text-muted);
+          background-color: white;
+          color: var(--ks-mod-text-main);
           border: 1px solid var(--ks-mod-border);
-          padding: 14px;
-          border-radius: 8px;
-          font-size: 16px;
+          padding: 12px 24px;
+          border-radius: var(--ks-mod-radius-sm);
+          font-size: 15px;
           font-weight: 600;
           cursor: pointer;
-          width: 100%;
+          transition: var(--ks-mod-anim);
+          box-shadow: var(--ks-mod-shadow-sm);
         }
+        .ks-mod-btn-cancel:hover { background: #f8fafc; border-color: var(--ks-mod-border-hover); }
 
-        /* Table Styles */
+        /* --- TABLE STYLES --- */
         .ks-mod-table-container {
           width: 100%;
-          overflow-x: auto; /* Enables horizontal scroll on small screens */
-          -webkit-overflow-scrolling: touch;
+          overflow-x: auto;
+          border: 1px solid var(--ks-mod-border);
+          border-radius: var(--ks-mod-radius-sm);
         }
 
         .ks-mod-table {
           width: 100%;
           border-collapse: collapse;
-          min-width: 600px; /* Forces scroll on mobile so layout doesn't break */
-        }
-
-        .ks-mod-table th, .ks-mod-table td {
-          padding: 16px;
-          text-align: left;
-          border-bottom: 1px solid var(--ks-mod-border);
-          font-size: 14px;
+          min-width: 800px;
         }
 
         .ks-mod-table th {
-          background-color: var(--ks-mod-bg-light);
-          font-weight: 600;
-          color: #475569;
+          background-color: #f8fafc;
+          padding: 16px 24px;
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 0.8px;
+          color: var(--ks-mod-text-sub);
+          font-weight: 700;
+          text-align: left;
+          border-bottom: 1px solid var(--ks-mod-border);
         }
 
-        .ks-mod-td-bold {
-          font-weight: 600;
-          color: var(--ks-mod-text-dark);
+        .ks-mod-table td {
+          padding: 20px 24px;
+          border-bottom: 1px solid #f1f5f9;
+          vertical-align: middle;
         }
+        .ks-mod-table tr:last-child td { border-bottom: none; }
+        .ks-mod-table tr:hover td { background-color: #f8fafc; }
+        
+        .ks-mod-text-right { text-align: right !important; }
 
-        .ks-mod-td-muted {
-          color: var(--ks-mod-text-muted);
-        }
+        /* Cell Content */
+        .ks-mod-info-stack { display: flex; flex-direction: column; gap: 4px; }
+        .ks-mod-info-stack strong { font-size: 15px; font-weight: 700; color: var(--ks-mod-text-main); }
+        .ks-mod-text-muted { color: var(--ks-mod-text-sub); font-size: 13px; }
 
         .ks-mod-badge {
-          background-color: #e0f2fe;
-          color: #0369a1;
-          padding: 4px 10px;
+          background-color: #eff6ff;
+          color: var(--ks-mod-primary-dark);
+          padding: 6px 12px;
           border-radius: 20px;
           font-size: 12px;
-          font-weight: 600;
+          font-weight: 700;
           display: inline-block;
+          border: 1px solid #dbeafe;
         }
 
         .ks-mod-actions-cell {
           display: flex;
           gap: 10px;
+          justify-content: flex-end;
         }
 
         .ks-mod-action-btn {
-          padding: 6px 12px;
-          border-radius: 6px;
+          display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+          padding: 8px 14px;
+          border-radius: var(--ks-mod-radius-sm);
           font-size: 13px;
           font-weight: 600;
           cursor: pointer;
-          border: none;
+          border: 1px solid transparent;
+          transition: var(--ks-mod-anim);
         }
 
-        .ks-mod-btn-edit {
-          background-color: #f1f5f9;
-          color: #334155;
-        }
-        .ks-mod-btn-edit:hover { background-color: #e2e8f0; }
+        .ks-mod-btn-edit { background-color: #f1f5f9; color: var(--ks-mod-text-main); border-color: var(--ks-mod-border); }
+        .ks-mod-btn-edit:hover { background-color: #e2e8f0; border-color: var(--ks-mod-border-hover); }
 
-        .ks-mod-btn-delete {
-          background-color: #fef2f2;
-          color: var(--ks-mod-danger);
-        }
-        .ks-mod-btn-delete:hover { background-color: #fecaca; }
+        .ks-mod-btn-delete { background-color: var(--ks-mod-error-bg); color: var(--ks-mod-danger); border-color: #fecaca; }
+        .ks-mod-btn-delete:hover { background-color: #fecaca; color: var(--ks-mod-danger-dark); }
 
-        .ks-mod-empty-state {
-          text-align: center;
-          padding: 30px !important;
-          color: var(--ks-mod-text-muted);
+        /* --- EMPTY STATE --- */
+        .ks-mod-empty-cell { padding: 0 !important; border: none !important; }
+        .ks-mod-state-view {
+            padding: 80px 24px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            color: var(--ks-mod-text-sub); gap: 16px;
+            text-align: center;
         }
+        .ks-mod-empty-icon { color: #cbd5e1; }
+        .ks-mod-state-view h3 { margin: 0; color: var(--ks-mod-text-main); font-size: 18px; }
+        .ks-mod-state-view p { max-width: 400px; margin: 0; font-size: 14px; line-height: 1.5; }
 
-        /* Desktop Media Queries */
-        @media (min-width: 768px) {
-          .ks-mod-admin-wrapper {
-            padding: clamp(20px, 5vw, 40px);
-          }
-          .ks-mod-card {
-            padding: 30px;
-          }
-          .ks-mod-input-grid {
-            flex-direction: row; /* Places Username and Email side-by-side */
-          }
-          .ks-mod-perm-header-row {
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-          }
-          .ks-mod-btn-outline {
-            align-self: center;
-          }
-          .ks-mod-permissions-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-          .ks-mod-form-actions {
-            flex-direction: row;
-          }
-          .ks-mod-btn-primary, .ks-mod-btn-cancel {
-            width: auto;
-            min-width: 200px;
-          }
+        /* --- SCROLL INDICATOR UI --- */
+        .ks-mod-scroll-indicator {
+          display: none; 
+          position: fixed;
+          bottom: 24px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(15, 23, 42, 0.9);
+          color: white;
+          padding: 8px 16px;
+          border-radius: 30px;
+          align-items: center;
+          gap: 6px;
+          font-size: 13px;
+          font-weight: 600;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+          pointer-events: none; 
+          z-index: 50;
+          animation: bounceSubtle 2s infinite ease-in-out;
+          backdrop-filter: blur(4px);
+        }
+        @keyframes bounceSubtle {
+          0%, 100% { transform: translate(-50%, 0); }
+          50% { transform: translate(-50%, 6px); }
         }
 
-        @media (min-width: 1024px) {
-          .ks-mod-permissions-grid {
-            grid-template-columns: repeat(3, 1fr);
+        /* =========================================================
+           MOBILE RESPONSIVENESS (FLEX-CARD NO SCROLLING LAYOUT)
+           ========================================================= */
+        @media (max-width: 768px) {
+          .ks-mod-admin-wrapper { padding: 16px; }
+          .ks-mod-card { padding: 20px; }
+          
+          .ks-mod-scroll-indicator { display: flex; }
+
+          /* Form Stacking */
+          .ks-mod-input-grid { flex-direction: column; gap: 24px; }
+          .ks-mod-perm-header-row { flex-direction: column; align-items: flex-start; }
+          .ks-mod-btn-outline { width: 100%; text-align: center; justify-content: center; }
+          
+          .ks-mod-form-actions { flex-direction: column; align-items: stretch; }
+          .ks-mod-btn-primary, .ks-mod-btn-cancel { width: 100%; }
+
+          /* TABLE -> CARDS TRANSFORMATION */
+          .ks-mod-table-container { border: none; overflow-x: hidden; }
+
+          .ks-mod-table thead { display: none; }
+          
+          .ks-mod-table, .ks-mod-table tbody, .ks-mod-table tr, .ks-mod-table td {
+              display: block; width: 100%; box-sizing: border-box; min-width: unset; 
           }
+          
+          .ks-mod-table tr {
+              margin-bottom: 16px; background: var(--ks-mod-card-bg);
+              border: 1px solid var(--ks-mod-border); border-radius: 12px;
+              padding: 16px; box-shadow: var(--ks-mod-shadow-sm);
+          }
+          
+          /* Flex alignment for Mobile Cells */
+          .ks-mod-table td {
+              display: flex; justify-content: space-between; align-items: flex-start;
+              padding: 12px 0; border-bottom: 1px dashed var(--ks-mod-border);
+              text-align: right; word-break: break-word; 
+          }
+          
+          .ks-mod-table td:last-child { border-bottom: none; padding-bottom: 0; }
+          .ks-mod-table td[data-label="Actions"] { padding-top: 16px; margin-top: 4px; align-items: center; justify-content: flex-end;}
+          
+          /* Inject Labels as the Left Flex Item */
+          .ks-mod-table td::before {
+              content: attr(data-label);
+              font-size: 11px; font-weight: 700; color: var(--ks-mod-text-sub);
+              text-transform: uppercase; letter-spacing: 0.5px;
+              margin-right: 12px; flex-shrink: 0; margin-top: 2px;
+              max-width: 100px; text-align: left;
+          }
+
+          /* Cell Content Overrides */
+          .ks-mod-info-stack { flex: 1; display: flex; flex-direction: column; align-items: flex-end; text-align: right; width: calc(100% - 110px);}
+          .ks-mod-info-stack strong { font-size: 14px; }
+          .ks-mod-text-muted { font-size: 12px; }
+
+          .ks-mod-badge { font-size: 11px; padding: 4px 10px; }
+          
+          .ks-mod-actions-cell { width: 100%; justify-content: flex-end; }
+          .ks-mod-action-btn { flex: 1; justify-content: center;}
         }
       `}</style>
 
       {/* FORM SECTION */}
       <div className="ks-mod-card">
         <div className="ks-mod-header">
-          <h2>{editingModId ? 'Edit Moderator Access' : 'Create Moderator Access'}</h2>
-          <p>{editingModId ? 'Update administrative roles and permissions.' : 'Assign administrative roles and configure dashboard permissions.'}</p>
+          <h2>{editingModId ? 'Edit Moderator Access' : 'Provision New Account'}</h2>
+          <p>{editingModId ? 'Update administrative roles and system permissions.' : 'Assign administrative roles and configure dashboard permissions securely.'}</p>
         </div>
         
         {message.text && (
@@ -582,7 +648,7 @@ export default function CreateModerator() {
                 <p>Select the areas this moderator can access.</p>
               </div>
               <button type="button" onClick={handleSelectAll} className="ks-mod-btn-outline">
-                {selectedPermissions.length === availablePermissions.length ? 'Deselect All' : 'Select All'}
+                {selectedPermissions.length === availablePermissions.length ? 'Deselect All' : 'Select All Modules'}
               </button>
             </div>
             
@@ -604,8 +670,8 @@ export default function CreateModerator() {
           <div className="ks-mod-form-actions">
             <button type="submit" disabled={isLoading} className="ks-mod-btn-primary">
               {isLoading 
-                ? (editingModId ? 'Updating...' : 'Provisioning Account...') 
-                : (editingModId ? 'Update Moderator' : 'Create Moderator Profile')}
+                ? (editingModId ? 'Updating Records...' : 'Provisioning Account...') 
+                : (editingModId ? 'Update Moderator' : 'Provision Moderator Profile')}
             </button>
             {editingModId && (
               <button type="button" onClick={handleCancelEdit} className="ks-mod-btn-cancel">
@@ -619,51 +685,60 @@ export default function CreateModerator() {
       {/* TABLE SECTION */}
       <div className="ks-mod-card">
         <div className="ks-mod-header">
-          <h2>Active Moderators</h2>
-          <p>Manage existing sub-admins and their permissions.</p>
+          <h2>Active Personnel</h2>
+          <p>Manage existing sub-admins and revoke system access.</p>
         </div>
 
         <div className="ks-mod-table-container">
           <table className="ks-mod-table">
             <thead>
               <tr>
-                <th>Username</th>
-                <th>Email</th>
+                <th>Moderator Info</th>
                 <th>Permissions</th>
-                <th>Actions</th>
+                <th className="ks-mod-text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {moderators.length > 0 ? (
                 moderators.map(mod => (
                   <tr key={mod._id}>
-                    <td className="ks-mod-td-bold">{mod.username}</td>
-                    <td className="ks-mod-td-muted">{mod.email}</td>
-                    <td>
+                    <td data-label="Moderator Info">
+                        <div className="ks-mod-info-stack">
+                            <strong>{mod.username}</strong>
+                            <span className="ks-mod-text-muted">{mod.email}</span>
+                        </div>
+                    </td>
+                    <td data-label="Permissions">
                       <span className="ks-mod-badge">
-                        {mod.permissions?.length || 0} Modules
+                        {mod.permissions?.length || 0} Modules Granted
                       </span>
                     </td>
-                    <td className="ks-mod-actions-cell">
-                      <button 
-                        onClick={() => handleEditClick(mod)}
-                        className="ks-mod-action-btn ks-mod-btn-edit"
-                      >
-                        Edit
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(mod._id)}
-                        className="ks-mod-action-btn ks-mod-btn-delete"
-                      >
-                        Delete
-                      </button>
+                    <td data-label="Actions" className="ks-mod-text-right">
+                        <div className="ks-mod-actions-cell">
+                            <button 
+                                onClick={() => handleEditClick(mod)}
+                                className="ks-mod-action-btn ks-mod-btn-edit"
+                            >
+                                <Edit2 size={14} /> Edit
+                            </button>
+                            <button 
+                                onClick={() => handleDelete(mod._id)}
+                                className="ks-mod-action-btn ks-mod-btn-delete"
+                            >
+                                <Trash2 size={14} /> Revoke
+                            </button>
+                        </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" className="ks-mod-empty-state">
-                    No moderators found.
+                  <td colSpan="3" className="ks-mod-empty-cell">
+                    <div className="ks-mod-state-view empty">
+                        <Shield size={48} className="ks-mod-empty-icon" />
+                        <h3>No administrative staff found</h3>
+                        <p>There are currently no active moderators assigned to the system. Provision a new account above to grant access.</p>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -672,6 +747,13 @@ export default function CreateModerator() {
         </div>
       </div>
 
+      {/* MOBILE SCROLL INDICATOR */}
+      {showMainScroll && (
+          <div className="ks-mod-scroll-indicator">
+              <ChevronDown size={18} />
+              <span>Scroll for more</span>
+          </div>
+      )}
     </div>
   );
 }
