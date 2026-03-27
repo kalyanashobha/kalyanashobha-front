@@ -30,7 +30,7 @@ const DataApproval = () => {
 
             if (res.data.success) {
                 setPendingItems(res.data.data);
-                setCurrentPage(1); // Reset to page 1 on fresh fetch
+                setCurrentPage(1); 
             }
         } catch (err) {
             toast.error(err.response?.data?.message || "Failed to load pending data.");
@@ -40,12 +40,9 @@ const DataApproval = () => {
     };
 
     const handleAction = async (pendingId, action) => {
-        // --- NEW LOGIC START ---
         if (action === 'approve') {
-            // Find the item being approved
             const currentItem = pendingItems.find(item => item._id === pendingId);
             
-            // Check if it has a parent AND if that parent is still in the pending list
             if (currentItem && currentItem.parentValue) {
                 const isParentStillPending = pendingItems.some(
                     pending => pending.value === currentItem.parentValue
@@ -53,11 +50,10 @@ const DataApproval = () => {
 
                 if (isParentStillPending) {
                     toast.warning(`Please approve the parent element "${currentItem.parentValue}" first!`);
-                    return; // Stop the function here so the API call doesn't run
+                    return; 
                 }
             }
         }
-        // --- NEW LOGIC END ---
 
         setActionLoading(pendingId);
         const toastId = toast.loading(`Processing ${action}...`);
@@ -75,7 +71,6 @@ const DataApproval = () => {
                 setPendingItems(prev => {
                     const updatedList = prev.filter(item => item._id !== pendingId);
                     
-                    // Adjust pagination if we delete the last item on the current page
                     const newTotalPages = Math.ceil(updatedList.length / itemsPerPage);
                     if (currentPage > newTotalPages && newTotalPages > 0) {
                         setCurrentPage(newTotalPages);
@@ -115,7 +110,7 @@ const DataApproval = () => {
             <div className="kda-content">
                 {isLoading ? (
                     <div className="kda-skeleton-stack">
-                        {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                        {[1, 2, 3, 4, 5, 6].map(i => (
                             <div key={i} className="kda-skeleton-row">
                                 <div className="kda-sk-box kda-sk-cat"></div>
                                 <div className="kda-sk-box kda-sk-val"></div>
@@ -141,7 +136,7 @@ const DataApproval = () => {
                                         <th>Parent Category</th>
                                         <th>Submitted By</th>
                                         <th>Date</th>
-                                        <th align="right">Actions</th>
+                                        <th className="kda-text-right">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -157,7 +152,7 @@ const DataApproval = () => {
                                                 {item.parentValue ? (
                                                     <span className="kda-text-muted">{item.parentValue}</span>
                                                 ) : (
-                                                    <span className="kda-text-muted">--</span>
+                                                    <span className="kda-text-muted">-- None --</span>
                                                 )}
                                             </td>
                                             <td data-label="Submitted By">
@@ -166,7 +161,7 @@ const DataApproval = () => {
                                                         {item.submittedBy ? `${item.submittedBy.firstName} ${item.submittedBy.lastName}` : "Unknown"}
                                                     </span>
                                                     {item.submittedBy?.uniqueId && (
-                                                        <span className="kda-user-id">({item.submittedBy.uniqueId})</span>
+                                                        <span className="kda-user-id">ID: {item.submittedBy.uniqueId}</span>
                                                     )}
                                                 </div>
                                             </td>
@@ -175,7 +170,7 @@ const DataApproval = () => {
                                                     {new Date(item.createdAt).toLocaleDateString()}
                                                 </span>
                                             </td>
-                                            <td data-label="Actions" align="right">
+                                            <td data-label="Actions" className="kda-text-right">
                                                 <div className="kda-actions">
                                                     <button 
                                                         className="kda-btn-approve"
@@ -183,7 +178,7 @@ const DataApproval = () => {
                                                         disabled={actionLoading === item._id}
                                                         title="Approve"
                                                     >
-                                                        {actionLoading === item._id ? <RefreshCw size={16} className="kda-spin" /> : <><Check size={16} /> Approve</>}
+                                                        {actionLoading === item._id ? <RefreshCw size={16} className="kda-spin" /> : <><Check size={16} strokeWidth={3} /> Approve</>}
                                                     </button>
                                                     <button 
                                                         className="kda-btn-reject"
@@ -191,7 +186,7 @@ const DataApproval = () => {
                                                         disabled={actionLoading === item._id}
                                                         title="Reject"
                                                     >
-                                                        {actionLoading === item._id ? <RefreshCw size={16} className="kda-spin" /> : <X size={16} />}
+                                                        {actionLoading === item._id ? <RefreshCw size={16} className="kda-spin" /> : <X size={18} />}
                                                     </button>
                                                 </div>
                                             </td>
@@ -205,7 +200,7 @@ const DataApproval = () => {
                         {totalPages > 1 && (
                             <div className="kda-pagination-container">
                                 <span className="kda-page-info">
-                                    Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, pendingItems.length)} of {pendingItems.length} entries
+                                    Showing <span style={{fontWeight: 700}}>{indexOfFirstItem + 1}</span> to <span style={{fontWeight: 700}}>{Math.min(indexOfLastItem, pendingItems.length)}</span> of <span style={{fontWeight: 700}}>{pendingItems.length}</span> entries
                                 </span>
                                 <div className="kda-pagination">
                                     <button 
@@ -217,15 +212,22 @@ const DataApproval = () => {
                                     </button>
                                     
                                     <div className="kda-page-numbers">
-                                        {[...Array(totalPages)].map((_, index) => (
-                                            <button 
-                                                key={index + 1} 
-                                                className={`kda-page-number ${currentPage === index + 1 ? 'active' : ''}`}
-                                                onClick={() => paginate(index + 1)}
-                                            >
-                                                {index + 1}
-                                            </button>
-                                        ))}
+                                        {[...Array(totalPages)].map((_, index) => {
+                                            // Simple logic to show limited page numbers (optional polish)
+                                            if (totalPages > 5 && (index + 1 < currentPage - 1 || index + 1 > currentPage + 1) && index !== 0 && index !== totalPages - 1) {
+                                                if (index + 1 === currentPage - 2 || index + 1 === currentPage + 2) return <span key={index} className="kda-page-dots">...</span>;
+                                                return null;
+                                            }
+                                            return (
+                                                <button 
+                                                    key={index + 1} 
+                                                    className={`kda-page-number ${currentPage === index + 1 ? 'active' : ''}`}
+                                                    onClick={() => paginate(index + 1)}
+                                                >
+                                                    {index + 1}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
 
                                     <button 
