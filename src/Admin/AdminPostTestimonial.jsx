@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Trash2, Image as ImageIcon, Video, ChevronDown, CheckCircle, AlertCircle } from 'lucide-react';
 
 const AdminPostTestimonial = () => {
     // Form State
@@ -17,12 +18,35 @@ const AdminPostTestimonial = () => {
     const [testimonials, setTestimonials] = useState([]);
     const [isFetching, setIsFetching] = useState(true);
 
+    // Mobile Scroll Indicator State
+    const [showMainScroll, setShowMainScroll] = useState(false);
+
     const API_URL = "https://kalyanashobha-back.vercel.app/api/admin/testimonials";
     const PUBLIC_API_URL = "https://kalyanashobha-back.vercel.app/api/testimonials";
 
     useEffect(() => {
         fetchTestimonials();
     }, []);
+
+    // Scroll Indicator Logic
+    useEffect(() => {
+        const checkMainScroll = () => {
+            const scrollY = window.scrollY || document.documentElement.scrollTop;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
+        };
+
+        const timer = setTimeout(checkMainScroll, 500); 
+        window.addEventListener('scroll', checkMainScroll);
+        window.addEventListener('resize', checkMainScroll);
+
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('scroll', checkMainScroll);
+            window.removeEventListener('resize', checkMainScroll);
+        };
+    }, [testimonials]);
 
     const fetchTestimonials = async () => {
         setIsFetching(true);
@@ -37,9 +61,7 @@ const AdminPostTestimonial = () => {
     };
 
     const handleFileChange = (e) => {
-        // FIXED: Added back to select the specific file.
-        // Without this, URL.createObjectURL will fail.
-        const file = e.target.files; 
+        const file = e.target.files[0]; 
         if (file) {
             setMedia(file);
             setMediaPreview(URL.createObjectURL(file));
@@ -91,6 +113,10 @@ const AdminPostTestimonial = () => {
                 setMedia(null);
                 setVideoUrl('');
                 setMediaPreview(null);
+                // Clear file input specifically
+                const fileInput = document.getElementById('ks-media-upload');
+                if(fileInput) fileInput.value = '';
+                
                 fetchTestimonials();
             }
         } catch (err) {
@@ -109,10 +135,10 @@ const AdminPostTestimonial = () => {
             });
             if (res.data.success) {
                 setTestimonials(testimonials.filter(item => item._id !== id));
-                setMessage({ type: 'success', text: 'Item removed.' });
+                setMessage({ type: 'success', text: 'Success story removed from gallery.' });
             }
         } catch (err) {
-            setMessage({ type: 'error', text: 'Deletion failed.' });
+            setMessage({ type: 'error', text: 'Deletion failed. Please try again.' });
         }
     };
 
@@ -120,162 +146,199 @@ const AdminPostTestimonial = () => {
         <div className="ks-story-panel">
             <style>{`
                 :root {
-                    --ks-primary-gold: #D4AF37;
-                    --ks-premium-red: #8E1B1B;
-                    --ks-dark-slate: #1e293b;
-                    --ks-light-gray: #f8fafc;
-                    --ks-border-color: #e2e8f0;
+                    --ks-primary: #8E1B1B;
+                    --ks-primary-hover: #7a1717;
+                    --ks-text-dark: #0f172a;
+                    --ks-text-muted: #64748b;
+                    --ks-border: #e2e8f0;
+                    --ks-border-hover: #cbd5e1;
+                    --ks-bg-light: #f8fafc;
+                    --ks-card-bg: #ffffff;
+                    --ks-danger: #ef4444;
+                    --ks-danger-hover: #dc2626;
+                    --ks-success-bg: #f0fdf4;
+                    --ks-success-text: #166534;
+                    --ks-error-bg: #fef2f2;
+                    --ks-error-text: #991b1b;
+                    --ks-radius: 12px;
+                    --ks-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+                    --ks-anim: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
                 }
 
-                /* NEW: Force all elements to respect padding within their width */
                 .ks-story-panel * {
                     box-sizing: border-box;
                 }
 
                 .ks-story-panel {
-                    padding: 16px; /* Optimized for mobile */
-                    background: #ffffff;
+                    padding: 32px;
+                    background: var(--ks-bg-light);
                     min-height: 100vh;
-                    font-family: 'Inter', -apple-system, sans-serif;
-                    color: var(--ks-dark-slate);
+                    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+                    color: var(--ks-text-dark);
                     width: 100%;
-                    max-width: 100vw;
                     overflow-x: hidden;
                 }
 
                 .ks-panel-header {
                     margin-bottom: 24px;
-                    border-left: 4px solid var(--ks-premium-red);
-                    padding-left: 12px;
                 }
 
                 .ks-panel-header h2 {
-                    font-size: 24px;
-                    margin: 0;
-                    font-weight: 700;
+                    font-size: 26px;
+                    margin: 0 0 6px 0;
+                    font-weight: 800;
                     letter-spacing: -0.5px;
+                    color: var(--ks-text-dark);
                 }
 
                 .ks-panel-header p {
-                    color: #64748b;
-                    margin: 6px 0 0;
-                    font-size: 14px;
+                    color: var(--ks-text-muted);
+                    margin: 0;
+                    font-size: 15px;
                 }
+
+                .ks-notification {
+                    padding: 14px 16px;
+                    border-radius: 8px;
+                    margin-bottom: 24px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                .ks-notify-good { background: var(--ks-success-bg); color: var(--ks-success-text); border: 1px solid #bbf7d0; }
+                .ks-notify-bad { background: var(--ks-error-bg); color: var(--ks-error-text); border: 1px solid #fecaca; }
 
                 .ks-layout-grid {
                     display: grid;
                     grid-template-columns: 1fr;
-                    gap: 20px;
+                    gap: 24px;
                     align-items: start;
                 }
 
                 .ks-content-box {
-                    background: #ffffff;
-                    border-radius: 12px;
-                    padding: 16px; /* Reduced for mobile space */
-                    border: 1px solid var(--ks-border-color);
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+                    background: var(--ks-card-bg);
+                    border-radius: var(--ks-radius);
+                    padding: 24px;
+                    border: 1px solid var(--ks-border);
+                    box-shadow: var(--ks-shadow);
                     width: 100%;
                 }
 
                 .ks-box-heading {
                     font-size: 18px;
-                    color: var(--ks-dark-slate);
-                    margin: 0 0 16px 0;
-                    font-weight: 600;
-                    border-bottom: 1px solid var(--ks-border-color);
+                    color: var(--ks-text-dark);
+                    margin: 0 0 20px 0;
+                    font-weight: 700;
+                    border-bottom: 1px solid var(--ks-border);
                     padding-bottom: 12px;
                 }
 
                 .ks-upload-toggles {
                     display: flex;
                     gap: 8px;
-                    margin-bottom: 20px;
-                    background: var(--ks-light-gray);
+                    margin-bottom: 24px;
+                    background: #f1f5f9;
                     padding: 6px;
-                    border-radius: 8px;
-                    border: 1px solid var(--ks-border-color);
+                    border-radius: 10px;
                 }
 
                 .ks-toggle-action {
                     flex: 1;
-                    padding: 8px 4px; /* Reduced side padding so text doesn't break into two lines */
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 6px;
+                    padding: 10px 12px;
                     border: none;
-                    border-radius: 6px;
+                    border-radius: 8px;
                     cursor: pointer;
-                    font-weight: 500;
-                    font-size: 13px; /* Slightly smaller for mobile */
-                    color: #64748b;
+                    font-weight: 600;
+                    font-size: 14px;
+                    color: var(--ks-text-muted);
                     background: transparent;
-                    transition: all 0.2s ease;
-                    text-align: center;
+                    transition: var(--ks-anim);
                     white-space: nowrap;
                 }
 
+                .ks-toggle-action:hover:not(.is-selected) {
+                    color: var(--ks-text-dark);
+                }
+
                 .ks-toggle-action.is-selected {
-                    background: #ffffff;
-                    color: var(--ks-premium-red);
+                    background: var(--ks-card-bg);
+                    color: var(--ks-primary);
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-                    font-weight: 600;
                 }
 
                 .ks-field-label {
-                    font-weight: 500;
-                    font-size: 14px;
-                    color: #475569;
-                    margin-bottom: 6px;
+                    font-weight: 700;
+                    font-size: 13px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    color: var(--ks-text-muted);
+                    margin-bottom: 8px;
                     display: block;
                 }
 
                 .ks-text-input {
                     width: 100%;
-                    padding: 12px;
-                    border: 1px solid var(--ks-border-color);
+                    padding: 14px 16px;
+                    border: 1px solid var(--ks-border);
                     border-radius: 8px;
-                    margin-bottom: 16px;
+                    margin-bottom: 20px;
                     font-size: 14px;
-                    transition: border-color 0.2s;
+                    color: var(--ks-text-dark);
+                    transition: var(--ks-anim);
+                    background-color: var(--ks-card-bg);
                 }
 
                 .ks-text-input:focus {
-                    border-color: var(--ks-premium-red);
+                    border-color: var(--ks-primary);
                     outline: none;
-                    box-shadow: 0 0 0 3px rgba(142, 27, 27, 0.1);
+                    box-shadow: 0 0 0 4px rgba(142, 27, 27, 0.1);
                 }
 
                 .ks-action-button {
                     width: 100%;
                     padding: 14px;
-                    background: var(--ks-premium-red);
+                    background: var(--ks-primary);
                     color: white;
                     border: none;
                     border-radius: 8px;
                     font-size: 15px;
                     font-weight: 600;
                     cursor: pointer;
-                    transition: background 0.2s ease;
+                    transition: var(--ks-anim);
                     margin-top: 10px;
+                    box-shadow: 0 2px 4px rgba(142, 27, 27, 0.2);
                 }
 
-                .ks-action-button:hover {
-                    background: #7a1717;
+                .ks-action-button:hover:not(:disabled) {
+                    background: var(--ks-primary-hover);
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 6px rgba(142, 27, 27, 0.3);
                 }
 
                 .ks-action-button:disabled {
                     background: #cbd5e1;
                     cursor: not-allowed;
+                    box-shadow: none;
+                    transform: none;
                 }
 
                 .ks-media-preview-box {
-                    margin-bottom: 20px;
+                    margin-bottom: 24px;
                     border-radius: 8px;
                     overflow: hidden;
-                    background: var(--ks-light-gray);
-                    border: 1px dashed var(--ks-border-color);
+                    background: var(--ks-text-dark);
+                    border: 1px solid var(--ks-border);
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    padding: 10px;
+                    padding: 16px;
                 }
 
                 .ks-media-preview-box img, .ks-media-preview-box video {
@@ -285,41 +348,47 @@ const AdminPostTestimonial = () => {
                     object-fit: contain;
                 }
 
+                /* Custom Scrollbar for Feed */
                 .ks-feed-scroll-area {
-                    max-height: 500px;
+                    max-height: 550px;
                     overflow-y: auto;
-                    padding-right: 4px;
+                    padding-right: 8px;
                 }
-
-                /* Custom Scrollbar */
-                .ks-feed-scroll-area::-webkit-scrollbar { width: 4px; }
-                .ks-feed-scroll-area::-webkit-scrollbar-track { background: var(--ks-light-gray); border-radius: 4px; }
-                .ks-feed-scroll-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+                .ks-feed-scroll-area::-webkit-scrollbar { width: 6px; }
+                .ks-feed-scroll-area::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 8px; }
+                .ks-feed-scroll-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
                 .ks-feed-scroll-area::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
                 .ks-story-feed {
                     display: flex;
                     flex-direction: column;
-                    gap: 12px;
+                    gap: 16px;
                 }
 
                 .ks-feed-item {
                     display: flex;
                     align-items: center;
-                    background: #ffffff;
-                    padding: 10px;
-                    border-radius: 8px;
-                    border: 1px solid var(--ks-border-color);
+                    background: var(--ks-card-bg);
+                    padding: 12px;
+                    border-radius: 10px;
+                    border: 1px solid var(--ks-border);
+                    transition: var(--ks-anim);
+                }
+
+                .ks-feed-item:hover {
+                    border-color: var(--ks-border-hover);
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
                 }
 
                 .ks-item-thumbnail {
-                    width: 50px;
-                    height: 50px;
-                    border-radius: 6px;
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 8px;
                     object-fit: cover;
-                    margin-right: 12px;
-                    background: var(--ks-light-gray);
+                    margin-right: 16px;
+                    background: var(--ks-bg-light);
                     flex-shrink: 0;
+                    border: 1px solid var(--ks-border);
                 }
 
                 .ks-item-details { 
@@ -328,9 +397,10 @@ const AdminPostTestimonial = () => {
                 }
                 
                 .ks-item-details h4 { 
-                    margin: 0 0 4px 0; 
-                    color: var(--ks-dark-slate); 
-                    font-size: 14px;
+                    margin: 0 0 6px 0; 
+                    color: var(--ks-text-dark); 
+                    font-size: 15px;
+                    font-weight: 700;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -338,9 +408,9 @@ const AdminPostTestimonial = () => {
                 
                 .ks-item-details p { 
                     margin: 0; 
-                    font-size: 12px; 
-                    color: #64748b; 
-                    line-height: 1.4;
+                    font-size: 13px; 
+                    color: var(--ks-text-sub); 
+                    line-height: 1.5;
                     display: -webkit-box;
                     -webkit-line-clamp: 2;
                     -webkit-box-orient: vertical;
@@ -348,57 +418,108 @@ const AdminPostTestimonial = () => {
                 }
 
                 .ks-remove-action {
-                    background: transparent;
-                    color: #ef4444;
-                    border: 1px solid transparent;
-                    padding: 6px;
-                    border-radius: 6px;
+                    background: #fef2f2;
+                    color: var(--ks-danger);
+                    border: 1px solid #fecaca;
+                    padding: 8px;
+                    border-radius: 8px;
                     cursor: pointer;
-                    margin-left: 8px;
+                    margin-left: 12px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
+                    transition: var(--ks-anim);
+                }
+                
+                .ks-remove-action:hover {
+                    background: var(--ks-danger);
+                    color: white;
+                    border-color: var(--ks-danger-hover);
                 }
 
-                .ks-notification {
-                    padding: 12px;
-                    border-radius: 8px;
-                    margin-bottom: 20px;
+                .ks-empty-gallery {
+                    text-align: center;
+                    padding: 40px 20px;
+                    color: var(--ks-text-sub);
                     font-size: 14px;
-                    font-weight: 500;
-                    display: flex;
-                    align-items: center;
+                    background: #f8fafc;
+                    border-radius: 8px;
+                    border: 1px dashed var(--ks-border);
                 }
 
-                .ks-notify-good { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
-                .ks-notify-bad { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+                /* --- SCROLL INDICATOR UI --- */
+                .ks-mod-scroll-indicator {
+                  display: none; 
+                  position: fixed;
+                  bottom: 24px;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  background: rgba(15, 23, 42, 0.9);
+                  color: white;
+                  padding: 8px 16px;
+                  border-radius: 30px;
+                  align-items: center;
+                  gap: 6px;
+                  font-size: 13px;
+                  font-weight: 600;
+                  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                  pointer-events: none; 
+                  z-index: 50;
+                  animation: bounceSubtle 2s infinite ease-in-out;
+                  backdrop-filter: blur(4px);
+                }
+                @keyframes bounceSubtle {
+                  0%, 100% { transform: translate(-50%, 0); }
+                  50% { transform: translate(-50%, 6px); }
+                }
 
                 /* =========================================
-                   DESKTOP MEDIA QUERIES (Over 768px) 
+                   DESKTOP MEDIA QUERIES 
                    ========================================= */
                 @media (min-width: 768px) {
-                    .ks-story-panel {
-                        padding: clamp(20px, 5vw, 40px);
-                    }
                     .ks-layout-grid {
                         grid-template-columns: 1fr 1.2fr;
-                        gap: 30px;
+                        gap: 32px;
                     }
                     .ks-content-box {
-                        padding: 24px;
-                    }
-                    .ks-toggle-action {
-                        padding: 8px 12px;
-                        font-size: 14px;
+                        padding: 32px;
                     }
                     .ks-item-thumbnail {
-                        width: 64px;
-                        height: 64px;
-                        margin-right: 16px;
+                        width: 72px;
+                        height: 72px;
                     }
-                    .ks-item-details h4 { font-size: 15px; }
-                    .ks-item-details p { font-size: 13px; }
-                    .ks-panel-header h2 { font-size: 28px; }
+                }
+
+                /* =========================================
+                   MOBILE RESPONSIVENESS
+                   ========================================= */
+                @media (max-width: 767px) {
+                    .ks-story-panel { padding: 16px; }
+                    .ks-content-box { padding: 20px; border-radius: 16px;}
+                    
+                    .ks-mod-scroll-indicator { display: flex; }
+                    
+                    .ks-panel-header h2 { font-size: 22px; }
+                    .ks-panel-header p { font-size: 13px; }
+
+                    .ks-box-heading { font-size: 16px; margin-bottom: 16px;}
+                    
+                    .ks-toggle-action { padding: 8px; font-size: 13px; }
+                    
+                    .ks-text-input { padding: 12px 14px; font-size: 14px;}
+                    
+                    /* Feed Mobile Adjustments */
+                    .ks-feed-item {
+                        padding: 12px;
+                        align-items: flex-start; /* Aligns items to top so long text flows better */
+                    }
+                    .ks-item-thumbnail {
+                        width: 50px; height: 50px; margin-right: 12px;
+                    }
+                    .ks-item-details h4 { font-size: 14px; }
+                    .ks-item-details p { font-size: 12px; }
+                    
+                    .ks-remove-action { padding: 6px; align-self: center;}
                 }
             `}</style>
 
@@ -409,6 +530,7 @@ const AdminPostTestimonial = () => {
 
             {message.text && (
                 <div className={`ks-notification ${message.type === 'success' ? 'ks-notify-good' : 'ks-notify-bad'}`}>
+                    {message.type === 'success' ? <CheckCircle size={18}/> : <AlertCircle size={18}/>}
                     {message.text}
                 </div>
             )}
@@ -418,8 +540,20 @@ const AdminPostTestimonial = () => {
                     <h3 className="ks-box-heading">Create Testimonial</h3>
                     
                     <div className="ks-upload-toggles">
-                        <button type="button" className={`ks-toggle-action ${uploadMode === 'image' ? 'is-selected' : ''}`} onClick={() => setUploadMode('image')}>📷 Image Upload</button>
-                        <button type="button" className={`ks-toggle-action ${uploadMode === 'video' ? 'is-selected' : ''}`} onClick={() => setUploadMode('video')}>🔗 Video URL</button>
+                        <button 
+                            type="button" 
+                            className={`ks-toggle-action ${uploadMode === 'image' ? 'is-selected' : ''}`} 
+                            onClick={() => setUploadMode('image')}
+                        >
+                            <ImageIcon size={16}/> Image Upload
+                        </button>
+                        <button 
+                            type="button" 
+                            className={`ks-toggle-action ${uploadMode === 'video' ? 'is-selected' : ''}`} 
+                            onClick={() => setUploadMode('video')}
+                        >
+                            <Video size={16}/> Video URL
+                        </button>
                     </div>
 
                     <form onSubmit={handleSubmit}>
@@ -432,7 +566,7 @@ const AdminPostTestimonial = () => {
                         {uploadMode === 'image' ? (
                             <>
                                 <label className="ks-field-label">Upload Image</label>
-                                <input type="file" className="ks-text-input" accept="image/*" onChange={handleFileChange} required={!mediaPreview} />
+                                <input type="file" id="ks-media-upload" className="ks-text-input" accept="image/*" onChange={handleFileChange} required={!mediaPreview} />
                             </>
                         ) : (
                             <>
@@ -462,9 +596,9 @@ const AdminPostTestimonial = () => {
                     <div className="ks-feed-scroll-area">
                         <div className="ks-story-feed">
                             {isFetching ? (
-                                <p style={{color: '#64748b', fontSize: '14px'}}>Refreshing gallery...</p>
+                                <p className="ks-empty-gallery">Refreshing gallery...</p>
                             ) : testimonials.length === 0 ? (
-                                <p style={{color: '#64748b', fontSize: '14px'}}>No success stories found.</p>
+                                <p className="ks-empty-gallery">No success stories found. Publish one to get started.</p>
                             ) : (
                                 testimonials.map((item) => (
                                     <div className="ks-feed-item" key={item._id}>
@@ -478,7 +612,7 @@ const AdminPostTestimonial = () => {
                                             <p>{item.content}</p>
                                         </div>
                                         <button type="button" className="ks-remove-action" onClick={() => handleDelete(item._id)} title="Delete Story">
-                                            🗑️
+                                            <Trash2 size={16} />
                                         </button>
                                     </div>
                                 ))
@@ -487,6 +621,15 @@ const AdminPostTestimonial = () => {
                     </div>
                 </div>
             </div>
+
+            {/* MOBILE SCROLL INDICATOR */}
+            {showMainScroll && (
+                <div className="ks-mod-scroll-indicator">
+                    <ChevronDown size={18} />
+                    <span>Scroll for more</span>
+                </div>
+            )}
+
         </div>
     );
 };
