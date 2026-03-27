@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Plus, Trash2, Phone, Tag, X, Image as ImageIcon, Search, Mail, CheckCircle, XCircle } from "lucide-react";
+import { Plus, Trash2, Phone, Tag, X, Image as ImageIcon, Search, Mail, CheckCircle, XCircle, ChevronDown } from "lucide-react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import imageCompression from 'browser-image-compression';
 import "./VendorManagement.css";
 
 export default function VendorManagement() {
-  // --- STATE FOR VENDORS & TABS ---
   const [activeVendors, setActiveVendors] = useState([]);
   const [pendingVendors, setPendingVendors] = useState([]);
-  const [activeTab, setActiveTab] = useState("active"); // 'active' or 'pending'
+  const [activeTab, setActiveTab] = useState("active"); 
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Form State 
+  // Mobile Scroll Indicator State
+  const [showMainScroll, setShowMainScroll] = useState(false);
+
   const [formData, setFormData] = useState({
     businessName: "",
     email: "",
@@ -26,7 +26,6 @@ export default function VendorManagement() {
     description: "",
   });
   const [files, setFiles] = useState([]);
-  
   const [isCompressing, setIsCompressing] = useState(false);
 
   const categories = [
@@ -34,7 +33,6 @@ export default function VendorManagement() {
     'Mehendi artists', 'Makeup', 'Event management', 'Travel', 'Pandit'
   ];
 
-  // 1. Fetch Vendors and Split into Active/Pending
   const fetchVendors = async () => {
     setLoading(true);
     try {
@@ -44,7 +42,6 @@ export default function VendorManagement() {
       });
       if (res.data.success) {
         const allVendors = res.data.vendors || [];
-        // Filter based on isApproved flag
         setActiveVendors(allVendors.filter(v => v.isApproved));
         setPendingVendors(allVendors.filter(v => !v.isApproved));
       }
@@ -59,12 +56,36 @@ export default function VendorManagement() {
     fetchVendors();
   }, []);
 
-  // 2. Handle Inputs
+  // Scroll Indicator Logic
+  useEffect(() => {
+    const checkMainScroll = () => {
+        // Hide scroll if modal is open
+        if (showModal) {
+            setShowMainScroll(false);
+            return;
+        }
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        
+        setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
+    };
+
+    const timer = setTimeout(checkMainScroll, 500); 
+    window.addEventListener('scroll', checkMainScroll);
+    window.addEventListener('resize', checkMainScroll);
+
+    return () => {
+        clearTimeout(timer);
+        window.removeEventListener('scroll', checkMainScroll);
+        window.removeEventListener('resize', checkMainScroll);
+    };
+  }, [activeVendors, pendingVendors, activeTab, showModal]);
+
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // 3. Handle file change with compression
   const handleFileChange = async (e) => {
     const selectedFiles = Array.from(e.target.files);
     if (selectedFiles.length === 0) return;
@@ -104,7 +125,6 @@ export default function VendorManagement() {
     }
   };
 
-  // 4. Submit Vendor (Manual Add by Admin)
   const handleSubmit = async (e) => {
     e.preventDefault();
     const toastId = toast.loading("Adding vendor...");
@@ -145,7 +165,6 @@ export default function VendorManagement() {
     }
   };
 
-  // 5. Delete Active Vendor
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this vendor?")) return;
     const toastId = toast.loading("Deleting...");
@@ -161,13 +180,12 @@ export default function VendorManagement() {
     }
   };
 
-  // 6. --- NEW: Approve or Reject Pending Request ---
   const handleAction = async (vendorId, actionType) => {
     let rejectionReason = "";
     
     if (actionType === 'reject') {
       rejectionReason = window.prompt("Optional: Enter reason for rejection (this will be sent to the vendor via email):");
-      if (rejectionReason === null) return; // Admin cancelled the prompt
+      if (rejectionReason === null) return; 
     }
 
     const toastId = toast.loading(`${actionType === 'approve' ? 'Approving' : 'Rejecting'} vendor...`);
@@ -183,13 +201,12 @@ export default function VendorManagement() {
       });
       
       toast.update(toastId, { render: `Vendor ${actionType}d successfully!`, type: "success", isLoading: false, autoClose: 2000 });
-      fetchVendors(); // Refresh lists
+      fetchVendors(); 
     } catch (err) {
       toast.update(toastId, { render: `Failed to ${actionType} vendor`, type: "error", isLoading: false, autoClose: 2000 });
     }
   };
 
-  // Determine which list to display
   const currentList = activeTab === "active" ? activeVendors : pendingVendors;
 
   const filteredVendors = currentList.filter((vendor) => {
@@ -203,6 +220,7 @@ export default function VendorManagement() {
     <div className="vm-container">
       <ToastContainer position="top-right" theme="colored" />
 
+      {/* HEADER */}
       <div className="vm-header">
         <div className="vm-title-section">
           <h2>Vendor Management</h2>
@@ -226,43 +244,40 @@ export default function VendorManagement() {
         </div>
       </div>
 
-      {/* --- NEW: TABS SECTION --- */}
-      <div style={{ display: 'flex', gap: '20px', padding: '0 20px', marginBottom: '20px', borderBottom: '1px solid #ddd' }}>
-        <button 
-          onClick={() => setActiveTab('active')}
-          style={{
-            padding: '10px 5px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold',
-            color: activeTab === 'active' ? '#D32F2F' : '#666',
-            borderBottom: activeTab === 'active' ? '3px solid #D32F2F' : '3px solid transparent'
-          }}
-        >
-          Active Vendors ({activeVendors.length})
-        </button>
-        <button 
-          onClick={() => setActiveTab('pending')}
-          style={{
-            padding: '10px 5px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold',
-            color: activeTab === 'pending' ? '#D32F2F' : '#666',
-            borderBottom: activeTab === 'pending' ? '3px solid #D32F2F' : '3px solid transparent',
-            display: 'flex', alignItems: 'center', gap: '6px'
-          }}
-        >
-          Pending Requests 
-          {pendingVendors.length > 0 && (
-            <span style={{ background: '#D32F2F', color: 'white', fontSize: '12px', padding: '2px 8px', borderRadius: '12px' }}>
-              {pendingVendors.length}
-            </span>
-          )}
-        </button>
+      {/* PREMIUM TABS */}
+      <div className="vm-tabs-wrapper">
+          <button 
+              className={`vm-tab-button ${activeTab === 'active' ? 'active' : ''}`}
+              onClick={() => setActiveTab('active')}
+          >
+              Active Vendors
+              <span className="vm-tab-count">{activeVendors.length}</span>
+          </button>
+          <button 
+              className={`vm-tab-button ${activeTab === 'pending' ? 'active' : ''}`}
+              onClick={() => setActiveTab('pending')}
+          >
+              Pending Requests
+              {pendingVendors.length > 0 && (
+                  <span className="vm-tab-count vm-pulse-badge">
+                      {pendingVendors.length}
+                  </span>
+              )}
+          </button>
       </div>
 
       {/* VENDOR GRID */}
       <div className="vm-grid">
         {loading ? (
-          <div className="vm-loading">Loading vendors...</div>
+          <div className="vm-state-view">
+              <span className="vm-spinner"></span>
+              Loading vendors...
+          </div>
         ) : filteredVendors.length === 0 ? (
-          <div className="vm-no-data">
-            {searchTerm ? "No vendors match your search." : activeTab === 'active' ? "No active vendors found." : "No pending registration requests."}
+          <div className="vm-state-view empty">
+            <ImageIcon size={48} />
+            <h3>No vendors found</h3>
+            <p>{searchTerm ? "No vendors match your search." : activeTab === 'active' ? "No active vendors found." : "No pending registration requests."}</p>
           </div>
         ) : (
           filteredVendors.map((vendor) => (
@@ -293,7 +308,7 @@ export default function VendorManagement() {
 
                 <div className="vm-detail-row">
                   <Tag size={14} className="icon-gold" />
-                  <span>{vendor.priceRange || "Price on Request"}</span>
+                  <span className="vm-price-tag">{vendor.priceRange || "Price on Request"}</span>
                 </div>
                 
                 <p className="vm-desc">
@@ -307,17 +322,11 @@ export default function VendorManagement() {
                     <Trash2 size={16} /> Remove
                   </button>
                 ) : (
-                  <div style={{ display: 'flex', gap: '10px', width: '100%', padding: '0 10px 10px 10px' }}>
-                    <button 
-                      onClick={() => handleAction(vendor._id, 'approve')}
-                      style={{ flex: 1, padding: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px', background: '#2e7d32', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-                    >
+                  <div className="vm-action-split">
+                    <button className="vm-btn-approve" onClick={() => handleAction(vendor._id, 'approve')}>
                       <CheckCircle size={16} /> Approve
                     </button>
-                    <button 
-                      onClick={() => handleAction(vendor._id, 'reject')}
-                      style={{ flex: 1, padding: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px', background: '#d32f2f', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-                    >
+                    <button className="vm-btn-reject" onClick={() => handleAction(vendor._id, 'reject')}>
                       <XCircle size={16} /> Reject
                     </button>
                   </div>
@@ -328,13 +337,21 @@ export default function VendorManagement() {
         )}
       </div>
 
+      {/* MOBILE SCROLL INDICATOR */}
+      {showMainScroll && (
+          <div className="vm-scroll-indicator">
+              <ChevronDown size={18} />
+              <span>Scroll for more</span>
+          </div>
+      )}
+
       {/* MODAL: ADD VENDOR */}
       {showModal && (
         <div className="vm-modal-overlay">
           <div className="vm-modal-content">
             <div className="vm-modal-header">
               <h3>Register New Vendor</h3>
-              <button onClick={() => setShowModal(false)}><X size={20} /></button>
+              <button onClick={() => setShowModal(false)} className="vm-close-btn"><X size={20} /></button>
             </div>
 
             <form onSubmit={handleSubmit} className="vm-form">
@@ -375,12 +392,12 @@ export default function VendorManagement() {
 
               <div className="vm-form-group">
                 <label>Upload Image</label>
-                <div className="file-input-wrapper">
+                <div className="vm-file-input-wrapper">
                   <input type="file" multiple accept="image/*" onChange={handleFileChange} disabled={isCompressing} />
-                  <div className="file-dummy" style={{ opacity: isCompressing ? 0.6 : 1 }}>
+                  <div className="vm-file-dummy" style={{ opacity: isCompressing ? 0.6 : 1 }}>
                     <ImageIcon size={18} />
                     <span>
-                       {isCompressing ? "Compressing images..." : files.length > 0 ? `${files.length} files compressed & selected` : "Choose files..."}
+                       {isCompressing ? "Compressing images..." : files.length > 0 ? `${files.length} files compressed & selected` : "Click or drag to choose files..."}
                     </span>
                   </div>
                 </div>
@@ -395,5 +412,4 @@ export default function VendorManagement() {
       )}
     </div>
   );
-            }
-                  
+}
