@@ -5,7 +5,7 @@
   /* Core Colors */
   --primary: #D32F2F;        
   --primary-hover: #B71C1C;
-  --secondary: #4F46E5;      
+  --secondary: #b92b24;      
   --secondary-light: #EEF2FF;
   
   /* Semantic Colors */
@@ -15,8 +15,8 @@
   --info-light: #F0F9FF;
   --success: #10B981;
   --success-light: #D1FAE5;
-  --purple: #8B5CF6;
-  --purple-light: #F5F3FF;
+  --purple: #b92b24;
+  --purple-light: white;
   --danger: #EF4444;
   --danger-light: #FEE2E2;
 
@@ -861,84 +861,8 @@
 }
 
 /* =========================================
-   SKELETON LOADING ANIMATION
-========================================= */
-.skeleton {
-  background-color: var(--bg-alt);
-  background-image: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0),
-    rgba(255, 255, 255, 0.6),
-    rgba(255, 255, 255, 0)
-  );
-  background-size: 200% 100%;
-  background-repeat: no-repeat;
-  animation: shimmer 1.5s infinite linear;
-  border-radius: var(--radius-sm);
-  color: transparent !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  pointer-events: none;
-}
-
-.skeleton * {
-  visibility: hidden; /* hides internal content if wrapping existing text */
-}
-
-/* Specific Skeleton Shapes for the Profile Card */
-.skeleton-text {
-  height: 14px;
-  margin-bottom: 8px;
-  width: 100%;
-}
-
-.skeleton-text.short { width: 40%; }
-.skeleton-text.medium { width: 70%; }
-.skeleton-text.title { height: 20px; width: 60%; margin-bottom: 12px; }
-
-.skeleton-avatar {
-  border-radius: 50%;
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-.skeleton-badge {
-  height: 24px;
-  width: 60px;
-  border-radius: 20px;
-}
-
-.skeleton-btn {
-  height: 36px;
-  border-radius: 20px;
-  width: 90px;
-}
-
-.skeleton-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-}
-
-.skeleton-tag {
-  height: 32px;
-  width: 120px;
-  border-radius: var(--radius-sm);
-}
-
-/* =========================================
    ANIMATIONS
 ========================================= */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-15px); }
   to { opacity: 1; transform: translateY(0); }
@@ -953,6 +877,98 @@
   0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
 }
+
+/* =========================================
+   SKELETON LOADING ANIMATION
+========================================= */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: var(--bg-alt);
+  background-image: linear-gradient(
+    90deg, 
+    var(--bg-alt) 0px, 
+    var(--border-light) 40px, 
+    var(--bg-alt) 80px
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  color: transparent !important;
+  border-color: transparent !important;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Hide children so actual text/icons don't peek through */
+.skeleton * {
+  visibility: hidden;
+}
+
+/* Utility classes for specific skeleton shapes inside cards */
+.skeleton-text {
+  width: 100%;
+  height: 1rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+}
+
+.skeleton-text.short { width: 40%; }
+.skeleton-text.medium { width: 70%; }
+
+.skeleton-avatar {
+  border-radius: 50%;
+}
+
+.skeleton-badge {
+  width: 60px;
+  height: 24px;
+  border-radius: 20px;
+}
+
+.skeleton-btn {
+  width: 80px;
+  height: 36px;
+  border-radius: 20px;
+}
+
+/* Apply skeleton styles directly to card elements if a parent has .is-loading */
+.user-card.is-loading .uc-id,
+.user-card.is-loading .badge-free,
+.user-card.is-loading .uc-avatar-wrap,
+.user-card.is-loading .uc-name,
+.user-card.is-loading .uc-meta-row,
+.user-card.is-loading .uc-location,
+.user-card.is-loading .uc-agent-tag,
+.user-card.is-loading .uc-btn-view,
+.user-card.is-loading .uc-icon-btn {
+  @extend .skeleton;
+  background-image: linear-gradient(
+    90deg, 
+    var(--bg-alt) 0px, 
+    var(--border-light) 40px, 
+    var(--bg-alt) 80px
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  color: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.user-card.is-loading .uc-avatar-wrap {
+  background: var(--bg-alt);
+}
+
+.user-card.is-loading .uc-name { width: 60%; height: 1.5rem; border-radius: var(--radius-sm); }
+.user-card.is-loading .uc-meta-row { width: 80%; height: 1rem; border-radius: var(--radius-sm); }
+.user-card.is-loading .uc-location { width: 50%; height: 1rem; border-radius: var(--radius-sm); }
 
 /* =========================================
    RESPONSIVE DESIGN (MOBILE & TABLET)
