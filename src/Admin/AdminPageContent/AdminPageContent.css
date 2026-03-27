@@ -6,6 +6,11 @@
     justify-content: center;
     align-items: flex-start;
     font-family: 'Inter', sans-serif;
+    box-sizing: border-box; /* Ensures padding doesn't break width */
+}
+
+.apc-container * {
+    box-sizing: border-box;
 }
 
 .apc-card {
@@ -39,30 +44,10 @@
     font-size: 0.95rem;
 }
 
-/* --- Alerts --- */
-.apc-alert {
-    padding: 16px;
-    border-radius: 8px;
-    margin-bottom: 24px;
-    font-size: 0.95rem;
-    font-weight: 500;
-}
-
-.apc-alert-error {
-    background-color: #FEF2F2;
-    color: #991B1B;
-    border: 1px solid #F87171;
-}
-
-.apc-alert-success {
-    background-color: #F0FDF4;
-    color: #166534;
-    border: 1px solid #4ADE80;
-}
-
 /* --- Form Controls --- */
 .apc-form-group {
     margin-bottom: 24px;
+    width: 100%;
 }
 
 .apc-form-group label {
@@ -77,6 +62,7 @@
     font-weight: 400;
     color: #9CA3AF;
     font-size: 0.85rem;
+    display: inline-block;
 }
 
 .apc-control {
@@ -157,15 +143,36 @@
     cursor: not-allowed;
 }
 
-/* Responsive */
+/* --- Proper Mobile Responsiveness --- */
 @media (max-width: 768px) {
-    .apc-card {
-        padding: 24px;
+    .apc-container {
+        padding: 20px 12px; /* Reduced outer padding */
     }
+    
+    .apc-card {
+        padding: 20px; /* Reduced inner padding */
+        border-radius: 12px;
+    }
+
+    .apc-header h2 {
+        font-size: 1.25rem; /* Slightly smaller heading */
+    }
+
+    .apc-hint {
+        display: block; /* Drops hint to next line on small screens */
+        margin-top: 4px;
+    }
+
+    .apc-textarea {
+        min-height: 200px; /* Reduced textarea height for mobile viewports */
+    }
+
     .apc-footer {
         justify-content: center;
     }
+
     .apc-btn-primary {
-        width: 100%;
+        width: 100%; /* Full width button for easier tapping */
+        padding: 14px 24px;
     }
 }
