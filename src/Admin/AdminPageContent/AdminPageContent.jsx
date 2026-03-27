@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import toast, { Toaster } from 'react-hot-toast';
 import './AdminPageContent.css';
 
 const AdminPageContent = () => {
@@ -7,7 +8,6 @@ const AdminPageContent = () => {
     const [content, setContent] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isFetching, setIsFetching] = useState(false);
-    const [message, setMessage] = useState({ type: '', text: '' });
 
     const API_BASE = "https://kalyanashobha-back.vercel.app/api";
 
@@ -18,7 +18,6 @@ const AdminPageContent = () => {
 
     const fetchExistingContent = async (selectedPage) => {
         setIsFetching(true);
-        setMessage({ type: '', text: '' });
         
         try {
             const res = await axios.get(`${API_BASE}/pages/${selectedPage}`);
@@ -28,7 +27,7 @@ const AdminPageContent = () => {
             }
         } catch (err) {
             console.error("Error fetching content:", err);
-            setMessage({ type: 'error', text: 'Failed to load existing content.' });
+            toast.error('Failed to load existing content.');
         } finally {
             setIsFetching(false);
         }
@@ -37,15 +36,17 @@ const AdminPageContent = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        setMessage({ type: '', text: '' });
 
         const adminToken = localStorage.getItem('adminToken');
 
         if (!adminToken) {
-            setMessage({ type: 'error', text: 'Admin authentication missing. Please log in again.' });
+            toast.error('Admin authentication missing. Please log in again.');
             setIsLoading(false);
             return;
         }
+
+        // Trigger loading toast
+        const toastId = toast.loading('Saving content...');
 
         try {
             const res = await axios.post(
@@ -55,11 +56,13 @@ const AdminPageContent = () => {
             );
 
             if (res.data.success) {
-                setMessage({ type: 'success', text: res.data.message });
+                // Replace loading with success toast
+                toast.success(res.data.message || 'Page content updated!', { id: toastId });
             }
         } catch (err) {
             const errMsg = err.response?.data?.message || "Failed to update page content.";
-            setMessage({ type: 'error', text: errMsg });
+            // Replace loading with error toast
+            toast.error(errMsg, { id: toastId });
         } finally {
             setIsLoading(false);
         }
@@ -67,18 +70,15 @@ const AdminPageContent = () => {
 
     return (
         <div className="apc-container">
+            {/* Toaster placed here to render the notifications */}
+            <Toaster position="top-center" reverseOrder={false} />
+            
             <div className="apc-card">
                 
                 <div className="apc-header">
                     <h2>Manage Page Content</h2>
                     <p>Update the text/HTML for public-facing pages.</p>
                 </div>
-
-                {message.text && (
-                    <div className={`apc-alert apc-alert-${message.type}`}>
-                        {message.text}
-                    </div>
-                )}
 
                 <form onSubmit={handleSubmit} className="apc-form">
                     
@@ -93,7 +93,6 @@ const AdminPageContent = () => {
                             <option value="terms">Terms & Conditions</option>
                             <option value="refund">Refund Policy</option>
                             <option value="about">About Us</option>
-                            {/* ADDED FAQ OPTION HERE */}
                             <option value="faq">FAQ (Frequently Asked Questions)</option>
                         </select>
                     </div>
@@ -108,7 +107,6 @@ const AdminPageContent = () => {
                         ) : (
                             <textarea 
                                 className="apc-control apc-textarea" 
-                                rows="15" 
                                 placeholder="Enter the page content here..."
                                 value={content}
                                 onChange={(e) => setContent(e.target.value)}
