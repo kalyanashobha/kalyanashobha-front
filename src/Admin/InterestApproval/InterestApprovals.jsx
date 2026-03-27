@@ -17,6 +17,7 @@ export default function InterestApprovals() {
 
   // --- PAGINATION & SCROLL STATES ---
   const [currentPage, setCurrentPage] = useState(1);
+  // Automatically switch: 3 items on mobile, 5 on desktop
   const [itemsPerPage, setItemsPerPage] = useState(window.innerWidth < 768 ? 3 : 5);
   const [showMainScroll, setShowMainScroll] = useState(false);
 
@@ -73,10 +74,9 @@ export default function InterestApprovals() {
     fetchCounts();
   }, [activeTab]);
 
-  // Scroll Indicator Logic
+  // Universal Scroll Indicator Logic (Desktop & Mobile)
   useEffect(() => {
     const checkMainScroll = () => {
-        // Strict check: Hide if there are no items
         if (requests.length === 0) {
             setShowMainScroll(false);
             return;
@@ -85,7 +85,8 @@ export default function InterestApprovals() {
         const windowHeight = window.innerHeight;
         const documentHeight = document.documentElement.scrollHeight;
         
-        setShowMainScroll(documentHeight > windowHeight + 50 && scrollY + windowHeight < documentHeight - 60);
+        // Show if document is taller than window, and we haven't scrolled to the very bottom
+        setShowMainScroll(documentHeight > windowHeight + 20 && scrollY + windowHeight < documentHeight - 30);
     };
 
     const timer = setTimeout(checkMainScroll, 500); 
@@ -123,7 +124,7 @@ export default function InterestApprovals() {
   };
 
   // Pagination Logic
-  const totalPages = Math.ceil(requests.length / itemsPerPage);
+  const totalPages = Math.ceil(requests.length / itemsPerPage) || 1;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = requests.slice(indexOfFirstItem, indexOfLastItem);
@@ -315,8 +316,8 @@ export default function InterestApprovals() {
               </table>
             </div>
 
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
+            {/* Pagination Controls - Visible even if 1 page to show data boundaries */}
+            {requests.length > 0 && (
                 <div className="ksa-pagination-container">
                     <span className="ksa-page-info">
                         Showing <strong>{indexOfFirstItem + 1}</strong> to <strong>{Math.min(indexOfLastItem, requests.length)}</strong> of <strong>{requests.length}</strong>
@@ -362,7 +363,7 @@ export default function InterestApprovals() {
         )}
       </div>
 
-      {/* MOBILE SCROLL INDICATOR */}
+      {/* UNIVERSAL SCROLL INDICATOR */}
       {showMainScroll && (
           <div className="ksa-scroll-indicator">
               <ChevronDown size={18} />
