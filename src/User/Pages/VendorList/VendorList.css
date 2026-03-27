@@ -271,14 +271,14 @@
   flex-grow: 1;
 }
 
-/* --- 6. PREMIUM BUTTON --- */
+/* --- 6. BUTTONS (PREMIUM STYLING) --- */
 .v-contact-btn {
   width: 100%;
   padding: 14px;
   margin-top: auto;
-  background-color: var(--vp-amber); /* Changed to premium color */
-  color: var(--vp-text-main);        /* Changed to black text */
-  border: none;
+  background-color: #1e2330; /* Dark premium slate */
+  color: var(--vp-amber); /* Gold text */
+  border: 1px solid rgba(255, 202, 40, 0.3); /* Subtle gold border */
   border-radius: 10px;
   font-weight: 600;
   font-size: 0.95rem;
@@ -288,8 +288,8 @@
 }
 
 .v-contact-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(255, 202, 40, 0.4);
+  background-color: #0f172a;
+  box-shadow: 0 6px 16px rgba(255, 202, 40, 0.15);
 }
 
 /* --- 7. MODALS --- */
@@ -319,6 +319,7 @@
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   max-height: 90dvh; 
   overflow-y: auto;
+  margin: auto; /* Ensures strict centering */
 }
 
 .v-modal-large {
@@ -410,9 +411,10 @@
   background: #fff;
 }
 
+/* Modal specific submit button styling (Keeps it sleek inside form) */
 .v-submit-btn {
   padding: 16px;
-  background-color: var(--vp-text-main);
+  background-color: #1e2330;
   color: white;
   border: none;
   border-radius: 10px;
@@ -425,7 +427,7 @@
 }
 
 .v-submit-btn:hover:not(:disabled) {
-  background-color: #374151;
+  background-color: #0f172a;
   box-shadow: 0 6px 16px rgba(17, 24, 39, 0.2);
 }
 
@@ -506,14 +508,14 @@
     margin-top: 75px;
   }
   
-  /* --- HORIZONTAL COMPACT BANNER --- */
+  /* --- HORIZONTAL INLINE BANNER --- */
   .v-dark-banner {
     flex-direction: row; 
-    padding: 10px 12px; 
-    gap: 10px;
+    padding: 12px; 
+    gap: 12px;
     top: 70px;
     align-items: center;
-    border-radius: 12px;
+    border-radius: 10px;
   }
 
   .v-banner-left {
@@ -525,8 +527,8 @@
   }
 
   .v-banner-icon-box {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     padding: 6px;
     border-radius: 8px;
   }
@@ -539,27 +541,26 @@
   }
 
   .v-banner-text-col h3 {
-    font-size: 0.85rem; /* Shrunk down */
+    font-size: 0.85rem; 
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .v-banner-text-col p {
-    font-size: 0.65rem; /* Shrunk down */
+    font-size: 0.65rem; 
     line-height: 1.2;
     margin-top: 2px;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis; 
   }
 
   .v-banner-action-btn {
     width: auto;
     justify-content: center;
-    padding: 6px 12px; 
+    padding: 8px 12px; 
     font-size: 0.75rem;
-    border-radius: 6px;
     gap: 4px;
     flex-shrink: 0; 
   }
@@ -569,7 +570,7 @@
     height: 14px;
   }
 
-  /* --- HEADER & CARD FONT REDUCTIONS --- */
+  /* Shrink text across the board */
   .v-premium-header h1 {
     font-size: 1.2rem; 
   }
@@ -587,15 +588,9 @@
   .v-card-content {
     padding: 16px; 
   }
-
-  .v-badge-category {
-    font-size: 0.65rem;
-    padding: 4px 10px;
-  }
   
   .v-card-title {
-    font-size: 1rem; 
-    margin-bottom: 6px;
+    font-size: 0.95rem; 
   }
 
   .v-card-desc {
@@ -609,11 +604,11 @@
     border-radius: 8px;
   }
 
-  /* --- PERFECTLY CENTERED MODAL FIX --- */
+  /* --- STRICT CENTERED MODAL --- */
   .v-modal-overlay {
     padding: 16px; 
-    align-items: center; /* Locks to center vertically */
-    justify-content: center; /* Locks to center horizontally */
+    align-items: center; /* STRICT center */
+    justify-content: center;
   }
 
   .v-modal-content {
@@ -622,16 +617,16 @@
     max-height: 85dvh; 
     border-radius: 12px; 
     overflow-y: auto;
-    margin: auto; /* Fallback absolute center guarantee */
+    margin: 0; /* Ensures no push from the top */
   }
 
   .v-modal-content h2 {
-    font-size: 1.1rem; 
+    font-size: 1.05rem; 
     margin-right: 20px; 
   }
   
   .v-modal-content p {
-    font-size: 0.75rem; 
+    font-size: 0.7rem; 
     margin-bottom: 12px;
   }
 
@@ -643,28 +638,28 @@
 
   .v-form-grid {
     grid-template-columns: 1fr; 
-    gap: 10px; 
+    gap: 8px; 
   }
 
   .v-lead-form {
-    gap: 10px; 
+    gap: 8px; 
   }
 
   .v-lead-form input,
   .v-lead-form textarea,
   .v-lead-form select {
-    font-size: 0.8rem; 
-    padding: 10px 12px; 
+    font-size: 0.75rem; 
+    padding: 8px 10px; 
     border-radius: 8px;
   }
 
   .v-file-upload {
     padding: 10px; 
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 
   .v-submit-btn {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     padding: 12px;
     margin-top: 4px;
     border-radius: 8px;
