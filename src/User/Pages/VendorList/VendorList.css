@@ -39,60 +39,76 @@
   min-height: 80vh;
 }
 
-/* --- TOP STICKY BANNER --- */
-.v-sticky-banner {
-  position: sticky;
-  top: 70px; /* Safely sticks just under navbar when scrolling */
-  z-index: 90;
-  background: var(--vp-text-main);
-  color: white;
+/* --- DARK PREMIUM STICKY BANNER --- */
+.v-dark-banner {
+  background: #1e2330;
   border-radius: 12px;
-  padding: 16px 24px;
+  padding: 20px 24px;
+  margin-bottom: 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
-  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.25);
-  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: sticky;
+  top: 85px; /* Adjust based on your actual navbar height */
+  z-index: 90;
 }
 
-.v-banner-text {
+.v-banner-left {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
-.v-banner-title {
+.v-banner-icon-box {
+  width: 48px;
+  height: 48px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #F59E0B;
+  flex-shrink: 0;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.v-banner-text-col h3 {
   margin: 0;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--vp-amber);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #ffffff;
 }
 
-.v-banner-subtitle {
+.v-banner-text-col p {
   margin: 4px 0 0 0;
-  font-size: 0.95rem;
-  color: #e5e7eb;
+  font-size: 0.85rem;
+  color: #94a3b8;
 }
 
-.v-banner-btn {
-  background: var(--vp-amber);
-  color: #000;
+.v-banner-action-btn {
+  background: #ffffff;
+  color: #0f172a;
   border: none;
   border-radius: 8px;
   padding: 12px 20px;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 0.95rem;
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  transition: var(--vp-transition);
+  transition: all 0.2s ease;
   white-space: nowrap;
 }
 
-.v-banner-btn:hover {
+.v-banner-action-btn:hover {
+  background: #f1f5f9;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(255, 202, 40, 0.3);
+  box-shadow: 0 4px 12px rgba(255,255,255,0.15);
 }
 
 /* --- 3. HEADER --- */
@@ -272,11 +288,11 @@
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
-  background-color: rgba(17, 24, 39, 0.6);
+  height: 100dvh; /* Dynamic viewport height */
+  background-color: rgba(17, 24, 39, 0.7);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: center; /* PERFECTLY CENTERS THE MODAL ON DESKTOP AND MOBILE */
   z-index: 1000;
   backdrop-filter: blur(8px);
   padding: 20px;
@@ -291,7 +307,7 @@
   border-radius: 20px;
   position: relative;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  max-height: 90vh; 
+  max-height: 90dvh; 
   overflow-y: auto;
 }
 
@@ -477,29 +493,41 @@
 @media (max-width: 768px) {
   .v-premium-container {
     padding: 20px 16px !important;
-    margin-top: 75px;
+    margin-top: 80px;
   }
   
-  /* Top Banner Mobile Tweaks */
-  .v-sticky-banner {
+  /* Top Dark Banner Mobile Adjustments */
+  .v-dark-banner {
+    flex-direction: column;
+    padding: 16px;
+    gap: 16px;
+    top: 70px; /* Adjust if your navbar height is different on mobile */
+  }
+
+  .v-banner-left {
     flex-direction: column;
     text-align: center;
     gap: 12px;
-    padding: 16px;
-    top: 60px; /* Adjust if your navbar height is smaller on mobile */
   }
 
-  .v-banner-title {
+  .v-banner-icon-box {
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+  }
+
+  .v-banner-text-col h3 {
     font-size: 1.1rem;
   }
 
-  .v-banner-subtitle {
+  .v-banner-text-col p {
     font-size: 0.85rem;
   }
 
-  .v-banner-btn {
+  .v-banner-action-btn {
     width: 100%;
     justify-content: center;
+    padding: 14px;
   }
 
   .v-premium-header h1 {
@@ -534,17 +562,16 @@
     padding: 12px;
   }
 
-  /* --- MODAL MOBILE REFINEMENTS FIX --- */
+  /* --- STRICT CENTERED MODAL MOBILE FIX --- */
   .v-modal-overlay {
-    padding: 12px; 
-    align-items: flex-start; /* Pushes the modal to the top instead of centering, avoiding keyboard/nav bar hiding it */
+    padding: 16px; 
   }
 
   .v-modal-content {
-    padding: 24px 16px; 
+    padding: 24px 20px; 
     width: 100%;
-    margin-top: 5vh; /* Gives a tiny bit of breathing room at the top */
-    max-height: 85vh; /* Strictly caps the height so it must scroll */
+    /* Keep it shorter than 100% so browser UI doesn't clip the bottom */
+    max-height: 85dvh; 
     border-radius: 16px; 
     overflow-y: auto;
   }
@@ -560,25 +587,25 @@
   }
 
   .v-modal-close {
-    top: 12px;
-    right: 12px;
+    top: 16px;
+    right: 16px;
     padding: 6px; 
   }
 
   .v-form-grid {
     grid-template-columns: 1fr; 
-    gap: 10px; /* Tighter gaps to save vertical space */
+    gap: 12px; 
   }
 
   .v-lead-form {
-    gap: 10px;
+    gap: 12px;
   }
 
   .v-lead-form input,
   .v-lead-form textarea,
   .v-lead-form select {
     font-size: 0.85rem; 
-    padding: 10px 12px; /* Slimmer inputs */
+    padding: 12px 14px; /* Slim inputs for more space */
   }
 
   .v-file-upload {
@@ -587,7 +614,7 @@
 
   .v-submit-btn {
     font-size: 0.9rem;
-    padding: 12px;
+    padding: 14px;
     margin-top: 4px;
   }
 }
