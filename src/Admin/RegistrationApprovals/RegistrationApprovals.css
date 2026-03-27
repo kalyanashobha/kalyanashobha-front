@@ -248,6 +248,60 @@
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* --- PAGINATION --- */
+.ra-pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-top: 1px solid var(--ra-border);
+    background: #f8fafc;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.ra-page-info {
+    font-size: 13px;
+    color: var(--ra-text-sub);
+}
+
+.ra-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ra-page-btn {
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    padding: 6px 16px;
+    border: 1px solid var(--ra-border);
+    background: white;
+    border-radius: var(--ra-radius-sm);
+    color: var(--ra-text-main);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    transition: var(--ra-anim);
+}
+.ra-page-btn:hover:not(:disabled) { background: #f1f5f9; border-color: var(--ra-border-hover); }
+.ra-page-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #f8fafc; }
+
+.ra-page-numbers { display: flex; gap: 4px; }
+.ra-page-number {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    background: white;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ra-text-sub);
+    cursor: pointer;
+    transition: var(--ra-anim);
+}
+.ra-page-number:hover { background: #f1f5f9; color: var(--ra-text-main); }
+.ra-page-number.active { background: var(--ra-primary); color: white; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2); }
+.ra-page-dots { padding: 0 4px; color: var(--ra-text-sub); font-weight: 700; align-self: flex-end;}
+
 /* --- SKELETON LOADING --- */
 .ra-skeleton-stack { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
 .ra-skeleton-row { display: flex; gap: 24px; align-items: center; }
@@ -268,6 +322,32 @@
 .ra-empty-state { text-align: center; padding: 80px 20px; color: var(--ra-text-sub); }
 .ra-empty-icon { color: #cbd5e1; margin-bottom: 16px; }
 .ra-empty-state h3 { color: var(--ra-text-main); margin: 0 0 8px 0; font-size: 18px;}
+
+/* --- SCROLL INDICATOR UI --- */
+.ra-scroll-indicator {
+  display: none; 
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.9);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 30px;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  pointer-events: none; 
+  z-index: 50;
+  animation: bounceSubtle 2s infinite ease-in-out;
+  backdrop-filter: blur(4px);
+}
+@keyframes bounceSubtle {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, 6px); }
+}
 
 /* --- MODAL --- */
 .ra-modal-overlay {
@@ -304,6 +384,8 @@
 @media (max-width: 768px) {
   .ra-layout { padding: 16px; }
   
+  .ra-scroll-indicator { display: flex; }
+
   /* Shrink Header elements */
   .ra-title-group h2 { font-size: 20px; }
   .ra-title-group p { font-size: 13px; }
@@ -313,17 +395,20 @@
   .ra-tab { padding: 6px 14px; font-size: 12px; }
 
   /* Hide standard table headers */
+  .ra-table-wrapper { overflow-x: hidden; }
   .ra-table thead { display: none; }
   
   /* Make Table transparent so TR cards stand out */
   .ra-content { background: transparent; border: none; box-shadow: none; }
-  .ra-table { min-width: unset; display: flex; flex-direction: column; gap: 16px;}
   
+  .ra-table, .ra-table tbody, .ra-table tr, .ra-table td {
+    display: block; width: 100%; box-sizing: border-box; min-width: unset; 
+  }
+
   .ra-table tbody { display: flex; flex-direction: column; gap: 16px; }
 
   /* Turn TR into Premium Cards */
   .ra-table tr {
-    display: block;
     background: var(--ra-card-bg);
     border: 1px solid var(--ra-border);
     border-radius: 16px;
@@ -335,14 +420,15 @@
   .ra-table td {
     display: flex;
     justify-content: space-between;
-    align-items: center; /* Aligns Label and Data perfectly */
+    align-items: flex-start; /* Aligns Label and Data perfectly */
     padding: 12px 0;
     border-bottom: 1px dashed var(--ra-border);
     text-align: right; /* Forces data content to align right */
+    word-break: break-word;
   }
   
   .ra-table td:last-child { border-bottom: none; padding-bottom: 0; }
-  .ra-table td[data-label="Actions"] { padding-top: 16px; margin-top: 4px; }
+  .ra-table td[data-label="Actions"] { padding-top: 16px; margin-top: 4px; align-items: center;}
 
   /* Inject Labels as the Left Flex Item */
   .ra-table td::before {
@@ -353,6 +439,10 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-right: 12px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    max-width: 90px;
+    text-align: left;
   }
 
   /* Specific Font Reductions & Content Adjustments for Mobile */
@@ -379,6 +469,20 @@
   .ra-actions { width: 100%; justify-content: flex-end; }
   .ra-btn-approve, .ra-btn-reject { width: 32px; height: 32px; border-radius: 6px; }
   
+  /* Mobile Pagination Stack */
+  .ra-pagination-container {
+      flex-direction: column;
+      border-radius: 16px;
+      border: 1px solid var(--ra-border);
+      padding: 16px;
+      box-shadow: var(--ra-shadow-sm);
+      gap: 16px;
+      background: white;
+  }
+  .ra-pagination-controls { width: 100%; justify-content: space-between; }
+  .ra-page-numbers { display: none; } /* Hide individual numbers on mobile to save space */
+  .ra-page-btn { flex: 1; }
+
   /* Skeleton Mobile */
   .ra-skeleton-stack { padding: 0; }
   .ra-skeleton-row { 
