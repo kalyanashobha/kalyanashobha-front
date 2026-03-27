@@ -18,7 +18,7 @@ const AdminPremiumRequests = () => {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('All');
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState(''); 
     const [processingId, setProcessingId] = useState(null);
 
     // Pagination States
