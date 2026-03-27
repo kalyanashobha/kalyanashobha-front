@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Check, X, Clock, ArrowRight, Filter, RefreshCw, Phone } from "lucide-react";
+import { Check, X, Clock, ArrowRight, Filter, RefreshCw, Phone, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -13,9 +13,22 @@ export default function InterestApprovals() {
   // Tabs: 'PendingAdminPhase1' (New), 'PendingAdminPhase2' (Accepted), 'Finalized' (Completed)
   const [activeTab, setActiveTab] = useState("PendingAdminPhase1"); 
   const [processingId, setProcessingId] = useState(null);
-  
-  // State to track actual pending counts for the notification dots
   const [tabCounts, setTabCounts] = useState({ phase1: 0, phase2: 0 });
+
+  // --- PAGINATION & SCROLL STATES ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(window.innerWidth < 768 ? 3 : 5);
+  const [showMainScroll, setShowMainScroll] = useState(false);
+
+  // Resize listener for dynamic items per page
+  useEffect(() => {
+    const handleResize = () => {
+      setItemsPerPage(window.innerWidth < 768 ? 3 : 5);
+      setCurrentPage(1);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Fetch Data for the active tab
   const fetchRequests = async () => {
@@ -28,6 +41,7 @@ export default function InterestApprovals() {
       );
       if (response.data.success) {
         setRequests(response.data.data);
+        setCurrentPage(1); // Reset page on data fetch
       }
     } catch (error) {
       console.error("Error fetching interests", error);
@@ -37,7 +51,6 @@ export default function InterestApprovals() {
     }
   };
 
-  // Fetch counts for the notification dots in the background
   const fetchCounts = async () => {
     try {
       const token = localStorage.getItem("adminToken");
@@ -59,6 +72,32 @@ export default function InterestApprovals() {
     fetchRequests();
     fetchCounts();
   }, [activeTab]);
+
+  // Scroll Indicator Logic
+  useEffect(() => {
+    const checkMainScroll = () => {
+        // Strict check: Hide if there are no items
+        if (requests.length === 0) {
+            setShowMainScroll(false);
+            return;
+        }
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        
+        setShowMainScroll(documentHeight > windowHeight + 50 && scrollY + windowHeight < documentHeight - 60);
+    };
+
+    const timer = setTimeout(checkMainScroll, 500); 
+    window.addEventListener('scroll', checkMainScroll);
+    window.addEventListener('resize', checkMainScroll);
+
+    return () => {
+        clearTimeout(timer);
+        window.removeEventListener('scroll', checkMainScroll);
+        window.removeEventListener('resize', checkMainScroll);
+    };
+  }, [requests, currentPage]);
 
   // Handle Actions
   const handleAction = async (interestId, action, phase) => {
@@ -82,6 +121,14 @@ export default function InterestApprovals() {
       setProcessingId(null);
     }
   };
+
+  // Pagination Logic
+  const totalPages = Math.ceil(requests.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = requests.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="ksa-layout">
@@ -144,131 +191,184 @@ export default function InterestApprovals() {
              <p>There are no requests in this stage right now.</p>
           </div>
         ) : (
-          <div className="ksa-table-container">
-            <table className="ksa-table">
-                <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Match Flow</th>
-                    <th>Connection Details</th>
-                    <th>Status</th>
-                    {activeTab !== "Finalized" && <th className="ksa-text-right">Actions</th>}
-                </tr>
-                </thead>
-                <tbody>
-                {requests.map((req) => (
-                    <tr key={req._id} className={processingId === req._id ? "ksa-row-processing" : ""}>
-                    
-                    {/* DATE */}
-                    <td data-label="Date">
-                        <div className="ksa-date-cell">
-                            <Clock size={14} className="ksa-icon-sub"/>
-                            <div className="ksa-date-text">
-                                <span>{new Date(req.date).toLocaleDateString()}</span>
-                                <small>{new Date(req.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
-                            </div>
-                        </div>
-                    </td>
-                    
-                    {/* FLOW */}
-                    <td data-label="Match Flow">
-                        <div className="ksa-flow-cell">
-                             <div className="ksa-user-mini">
-                                <div className="ksa-avatar-xs">{req.senderId?.firstName?.[0] || "S"}</div>
-                                <div className="ksa-user-text">
-                                    <span className="name">{req.senderId?.firstName}</span>
-                                </div>
-                             </div>
-                             <div className="ksa-flow-arrow"><ArrowRight size={14}/></div>
-                             <div className="ksa-user-mini">
-                                <div className="ksa-avatar-xs receiver">{req.receiverId?.firstName?.[0] || "R"}</div>
-                                <div className="ksa-user-text">
-                                    <span className="name">{req.receiverId?.firstName}</span>
-                                </div>
-                             </div>
-                        </div>
-                    </td>
+          <>
+            <div className="ksa-table-container">
+              <table className="ksa-table">
+                  <thead>
+                  <tr>
+                      <th>Date</th>
+                      <th>Match Flow</th>
+                      <th>Connection Details</th>
+                      <th>Status</th>
+                      {activeTab !== "Finalized" && <th className="ksa-text-right">Actions</th>}
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {currentItems.map((req) => (
+                      <tr key={req._id} className={processingId === req._id ? "ksa-row-processing" : ""}>
+                      
+                      {/* DATE */}
+                      <td data-label="Date">
+                          <div className="ksa-date-cell">
+                              <Clock size={14} className="ksa-icon-sub"/>
+                              <div className="ksa-date-text">
+                                  <span>{new Date(req.date).toLocaleDateString()}</span>
+                                  <small>{new Date(req.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
+                              </div>
+                          </div>
+                      </td>
+                      
+                      {/* FLOW */}
+                      <td data-label="Match Flow">
+                          <div className="ksa-flow-cell">
+                              <div className="ksa-user-mini">
+                                  <div className="ksa-avatar-xs">{req.senderId?.firstName?.[0] || "S"}</div>
+                                  <div className="ksa-user-text">
+                                      <span className="name">{req.senderId?.firstName}</span>
+                                  </div>
+                              </div>
+                              <div className="ksa-flow-arrow"><ArrowRight size={14}/></div>
+                              <div className="ksa-user-mini">
+                                  <div className="ksa-avatar-xs receiver">{req.receiverId?.firstName?.[0] || "R"}</div>
+                                  <div className="ksa-user-text">
+                                      <span className="name">{req.receiverId?.firstName}</span>
+                                  </div>
+                              </div>
+                          </div>
+                      </td>
 
-                    {/* CONNECTION DETAILS */}
-                    <td data-label="Connection Details">
-                        <div className="ksa-contact-box">
-                            {/* SENDER BLOCK */}
-                            <div className="ksa-contact-person">
-                                <span className="ksa-contact-label">Sent By (Initiator)</span>
-                                <span className="ksa-contact-name">
-                                    {req.senderId?.firstName} {req.senderId?.lastName} 
-                                    <span className="ksa-contact-id">({req.senderId?.uniqueId})</span>
-                                </span>
-                                <span className="ksa-contact-number">
-                                    <Phone size={12}/> {req.senderId?.mobileNumber || "N/A"}
-                                </span>
-                            </div>
+                      {/* CONNECTION DETAILS */}
+                      <td data-label="Connection Details">
+                          <div className="ksa-contact-box">
+                              {/* SENDER BLOCK */}
+                              <div className="ksa-contact-person">
+                                  <span className="ksa-contact-label">Sent By (Initiator)</span>
+                                  <span className="ksa-contact-name">
+                                      {req.senderId?.firstName} {req.senderId?.lastName} 
+                                      <span className="ksa-contact-id">({req.senderId?.uniqueId})</span>
+                                  </span>
+                                  <span className="ksa-contact-number">
+                                      <Phone size={12}/> {req.senderId?.mobileNumber || "N/A"}
+                                  </span>
+                              </div>
 
-                            {/* RECEIVER BLOCK */}
-                            <div className="ksa-contact-person receiver-block">
-                                <span className={`ksa-contact-label ${activeTab === 'PendingAdminPhase2' ? 'accepted' : 'pending'}`}>
-                                    {activeTab === 'PendingAdminPhase2' ? "✓ Accepted By (Receiver)" : "To Receiver"}
-                                </span>
-                                <span className="ksa-contact-name">
-                                    {req.receiverId?.firstName} {req.receiverId?.lastName} 
-                                    <span className="ksa-contact-id">({req.receiverId?.uniqueId})</span>
-                                </span>
-                                <span className="ksa-contact-number">
-                                    <Phone size={12}/> {req.receiverId?.mobileNumber || "N/A"}
-                                </span>
-                            </div>
+                              {/* RECEIVER BLOCK */}
+                              <div className="ksa-contact-person receiver-block">
+                                  <span className={`ksa-contact-label ${activeTab === 'PendingAdminPhase2' ? 'accepted' : 'pending'}`}>
+                                      {activeTab === 'PendingAdminPhase2' ? "✓ Accepted By (Receiver)" : "To Receiver"}
+                                  </span>
+                                  <span className="ksa-contact-name">
+                                      {req.receiverId?.firstName} {req.receiverId?.lastName} 
+                                      <span className="ksa-contact-id">({req.receiverId?.uniqueId})</span>
+                                  </span>
+                                  <span className="ksa-contact-number">
+                                      <Phone size={12}/> {req.receiverId?.mobileNumber || "N/A"}
+                                  </span>
+                              </div>
+                          </div>
+                      </td>
+
+                      {/* STATUS */}
+                      <td data-label="Status">
+                          <span className={`ksa-status-badge ${req.status}`}>
+                            {req.status === 'PendingAdminPhase1' ? 'Awaiting Review' : 
+                              req.status === 'PendingAdminPhase2' ? 'Action Required' : 
+                              req.status === 'Finalized' ? 'Completed' :
+                              req.status}
+                          </span>
+                      </td>
+
+                      {/* ACTIONS */}
+                      {activeTab === "PendingAdminPhase1" && (
+                          <td data-label="Actions" className="ksa-text-right">
+                          <div className="ksa-actions">
+                              <button 
+                                  className="ksa-btn-outline-primary" 
+                                  onClick={() => handleAction(req._id, 'approve', 1)} 
+                                  disabled={processingId === req._id}
+                              >
+                                  Forward Request
+                              </button>
+                              <button className="ksa-btn-reject" onClick={() => handleAction(req._id, 'reject', 1)} disabled={processingId === req._id} title="Reject Request">
+                                  {processingId === req._id ? <div className="spinner-sm"></div> : <X size={18} />}
+                              </button>
+                          </div>
+                          </td>
+                      )}
+
+                      {activeTab === "PendingAdminPhase2" && (
+                          <td data-label="Actions" className="ksa-text-right">
+                          <div className="ksa-actions">
+                              <button 
+                                  className="ksa-btn-success"
+                                  onClick={() => handleAction(req._id, 'finalize', 2)} 
+                                  disabled={processingId === req._id}
+                              >
+                                  {processingId === req._id ? <div className="spinner-sm"></div> : <><Check size={16} strokeWidth={3}/> Finalize Match</>}
+                              </button>
+                          </div>
+                          </td>
+                      )}
+                      </tr>
+                  ))}
+                  </tbody>
+              </table>
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="ksa-pagination-container">
+                    <span className="ksa-page-info">
+                        Showing <strong>{indexOfFirstItem + 1}</strong> to <strong>{Math.min(indexOfLastItem, requests.length)}</strong> of <strong>{requests.length}</strong>
+                    </span>
+                    <div className="ksa-pagination-controls">
+                        <button 
+                            className="ksa-page-btn" 
+                            onClick={() => paginate(currentPage - 1)} 
+                            disabled={currentPage === 1}
+                        >
+                            <ChevronLeft size={16} /> Prev
+                        </button>
+                        
+                        <div className="ksa-page-numbers">
+                            {[...Array(totalPages)].map((_, index) => {
+                                if (totalPages > 5 && (index + 1 < currentPage - 1 || index + 1 > currentPage + 1) && index !== 0 && index !== totalPages - 1) {
+                                    if (index + 1 === currentPage - 2 || index + 1 === currentPage + 2) return <span key={index} className="ksa-page-dots">...</span>;
+                                    return null;
+                                }
+                                return (
+                                    <button 
+                                        key={index + 1} 
+                                        className={`ksa-page-number ${currentPage === index + 1 ? 'active' : ''}`}
+                                        onClick={() => paginate(index + 1)}
+                                    >
+                                        {index + 1}
+                                    </button>
+                                );
+                            })}
                         </div>
-                    </td>
 
-                    {/* STATUS */}
-                    <td data-label="Status">
-                        <span className={`ksa-status-badge ${req.status}`}>
-                           {req.status === 'PendingAdminPhase1' ? 'Awaiting Review' : 
-                            req.status === 'PendingAdminPhase2' ? 'Action Required' : 
-                            req.status === 'Finalized' ? 'Completed' :
-                            req.status}
-                        </span>
-                    </td>
-
-                    {/* ACTIONS - NEW REQUESTS (Phase 1) */}
-                    {activeTab === "PendingAdminPhase1" && (
-                        <td data-label="Actions" className="ksa-text-right">
-                        <div className="ksa-actions">
-                            <button 
-                                className="ksa-btn-outline-primary" 
-                                onClick={() => handleAction(req._id, 'approve', 1)} 
-                                disabled={processingId === req._id}
-                            >
-                                Forward Request
-                            </button>
-                            <button className="ksa-btn-reject" onClick={() => handleAction(req._id, 'reject', 1)} disabled={processingId === req._id} title="Reject Request">
-                                {processingId === req._id ? <div className="spinner-sm"></div> : <X size={18} />}
-                            </button>
-                        </div>
-                        </td>
-                    )}
-
-                    {/* ACTIONS - ACCEPTED MATCHES (Phase 2) */}
-                    {activeTab === "PendingAdminPhase2" && (
-                        <td data-label="Actions" className="ksa-text-right">
-                        <div className="ksa-actions">
-                            <button 
-                                className="ksa-btn-success"
-                                onClick={() => handleAction(req._id, 'finalize', 2)} 
-                                disabled={processingId === req._id}
-                            >
-                                {processingId === req._id ? <div className="spinner-sm"></div> : <><Check size={16} strokeWidth={3}/> Finalize Match</>}
-                            </button>
-                        </div>
-                        </td>
-                    )}
-                    </tr>
-                ))}
-                </tbody>
-            </table>
-          </div>
+                        <button 
+                            className="ksa-page-btn" 
+                            onClick={() => paginate(currentPage + 1)} 
+                            disabled={currentPage === totalPages}
+                        >
+                            Next <ChevronRight size={16} />
+                        </button>
+                    </div>
+                </div>
+            )}
+          </>
         )}
       </div>
+
+      {/* MOBILE SCROLL INDICATOR */}
+      {showMainScroll && (
+          <div className="ksa-scroll-indicator">
+              <ChevronDown size={18} />
+              <span>Scroll for more</span>
+          </div>
+      )}
     </div>
   );
 }
