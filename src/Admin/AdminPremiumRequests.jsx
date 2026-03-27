@@ -124,412 +124,369 @@ const AdminPremiumRequests = () => {
 
         switch(status) {
             case 'Pending':
-                style = { bg: '#fef3c7', text: '#92400e', border: '#fde68a' };
+                style = { bg: '#fffbeb', text: '#b45309', border: '#fde68a' };
                 Icon = Icons.Clock;
                 break;
             case 'Contacted':
-                style = { bg: '#e0f2fe', text: '#1e40af', border: '#bfdbfe' };
+                style = { bg: '#eff6ff', text: '#1e40af', border: '#dbeafe' };
                 Icon = Icons.Phone;
                 break;
             case 'Resolved':
-                style = { bg: '#d1fae5', text: '#065f46', border: '#a7f3d0' };
+                style = { bg: '#dcfce7', text: '#15803d', border: '#bbf7d0' };
                 Icon = Icons.Check;
                 break;
             default:
-                style = { bg: '#f1f5f9', text: '#475569', border: '#e2e8f0' };
+                style = { bg: '#f8fafc', text: '#64748b', border: '#e2e8f0' };
         }
 
         return (
-            <span className="admin-status-badge" style={{
-                backgroundColor: style.bg, color: style.text, border: `1px solid ${style.border}`
-            }}>
-                {Icon && <span className="admin-badge-icon"><Icon /></span>}
+            <span className="apr-status-badge" style={{ backgroundColor: style.bg, color: style.text, border: `1px solid ${style.border}` }}>
+                {Icon && <span className="apr-badge-icon"><Icon /></span>}
                 {status}
             </span>
         );
     };
 
     return (
-        <div className="admin-layout-container" id="premium-requests-root">
+        <div className="apr-layout">
             <Toaster position="top-right" />
             
-            {/* INTERNAL CSS */}
+            {/* INTERNAL CSS FOR PREMIUM STYLING */}
             <style>{`
-                .admin-layout-container {
-                    padding: 24px !important;
-                    max-width: 1400px !important;
-                    margin: 0 auto !important;
-                    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
-                    color: #334155 !important;
-                    box-sizing: border-box !important;
-                    background-color: #ffffff !important; /* Added pure white background */
+                /* --- VARIABLES --- */
+                .apr-layout {
+                    --apr-primary: #4f46e5;
+                    --apr-primary-dark: #4338ca;
+                    --apr-bg: #f8fafc;
+                    --apr-card-bg: #ffffff;
+                    --apr-text-main: #0f172a;
+                    --apr-text-sub: #64748b;
+                    --apr-border: #e2e8f0;
+                    --apr-border-hover: #cbd5e1;
+                    --apr-radius: 12px;
+                    --apr-radius-sm: 8px;
+                    --apr-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+                    --apr-shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+                    --apr-anim: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+                    padding: 32px;
+                    background-color: var(--apr-bg);
+                    min-height: 100vh;
+                    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+                    color: var(--apr-text-main);
+                    box-sizing: border-box;
                 }
 
-                /* Header Styles */
-                .admin-header {
-                    display: flex !important;
-                    flex-direction: column !important;
-                    gap: 20px !important;
-                    margin-bottom: 24px !important;
+                /* --- HEADER --- */
+                .apr-header {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 20px;
+                    margin-bottom: 24px;
                 }
-                .admin-header-title-group {
-                    display: flex !important;
-                    align-items: center !important;
-                    gap: 16px !important;
+                .apr-title-group h2 {
+                    font-size: 26px;
+                    font-weight: 800;
+                    letter-spacing: -0.5px;
+                    margin: 0 0 4px 0;
+                    color: var(--apr-text-main);
                 }
-                .admin-header-text h2 {
-                    margin: 0 0 4px 0 !important;
-                    font-size: 1.5rem !important;
-                    color: #0f172a !important;
-                }
-                .admin-header-text p {
-                    margin: 0 !important;
-                    color: #64748b !important;
-                    font-size: 0.95rem !important;
+                .apr-title-group p {
+                    color: var(--apr-text-sub);
+                    margin: 0;
+                    font-size: 15px;
                 }
 
-                /* Controls (Search & Tabs) */
-                .admin-controls-group {
-                    display: flex !important;
-                    flex-wrap: wrap !important;
-                    gap: 16px !important;
-                    justify-content: space-between !important;
-                    align-items: center !important;
+                /* --- CONTROLS --- */
+                .apr-controls-group {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 16px;
+                    justify-content: space-between;
+                    align-items: center;
                 }
-                .admin-search-group {
-                    position: relative !important;
-                    display: flex !important;
-                    align-items: center !important;
-                    flex: 1 !important;
-                    min-width: 250px !important;
-                    max-width: 400px !important;
+                .apr-search-group {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    flex: 1;
+                    min-width: 250px;
+                    max-width: 400px;
                 }
-                .admin-search-group svg {
-                    position: absolute !important;
-                    left: 12px !important;
-                    color: #94a3b8 !important;
+                .apr-search-group svg {
+                    position: absolute;
+                    left: 14px;
+                    color: #94a3b8;
                 }
-                .admin-search-input {
-                    width: 100% !important;
-                    padding: 10px 12px 10px 36px !important;
-                    border: 1px solid #cbd5e1 !important;
-                    border-radius: 8px !important;
-                    outline: none !important;
-                    font-size: 0.95rem !important;
-                    transition: border-color 0.2s !important;
-                    box-sizing: border-box !important;
+                .apr-search-input {
+                    width: 100%;
+                    padding: 12px 16px 12px 40px;
+                    border: 1px solid var(--apr-border);
+                    border-radius: var(--apr-radius-sm);
+                    outline: none;
+                    font-size: 14px;
+                    box-shadow: var(--apr-shadow-sm);
+                    transition: var(--apr-anim);
+                    box-sizing: border-box;
                 }
-                .admin-search-input:focus {
-                    border-color: #3b82f6 !important;
-                    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
-                }
-
-                /* TABS SCROLLING */
-                .admin-tabs-wrapper {
-                    display: flex !important;
-                    background: #f1f5f9 !important;
-                    padding: 4px !important;
-                    border-radius: 8px !important;
-                    gap: 4px !important;
-                    overflow-x: auto !important;
-                    width: 100% !important;
-                    max-width: 100% !important;
-                    box-sizing: border-box !important;
-                    -webkit-overflow-scrolling: touch !important;
-                }
-                
-                /* Hide scrollbar for cleaner UI */
-                .admin-tabs-wrapper::-webkit-scrollbar {
-                    display: none !important;
-                }
-                
-                .admin-tab-button {
-                    flex-shrink: 0 !important;
-                    background: transparent !important;
-                    border: none !important;
-                    padding: 8px 16px !important;
-                    border-radius: 6px !important;
-                    font-size: 0.9rem !important;
-                    font-weight: 500 !important;
-                    color: #64748b !important;
-                    cursor: pointer !important;
-                    display: flex !important;
-                    align-items: center !important;
-                    gap: 8px !important;
-                    white-space: nowrap !important;
-                    transition: all 0.2s !important;
-                }
-                .admin-tab-button.active {
-                    background: #ffffff !important;
-                    color: #0f172a !important;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
-                }
-                .admin-tab-count {
-                    background: #e2e8f0 !important;
-                    padding: 2px 6px !important;
-                    border-radius: 12px !important;
-                    font-size: 0.75rem !important;
-                }
-                .admin-tab-button.active .admin-tab-count {
-                    background: #dbeafe !important;
-                    color: #1e40af !important;
+                .apr-search-input:focus {
+                    border-color: var(--apr-primary);
+                    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
                 }
 
-                /* Table Styles */
-                .admin-data-card {
-                    background: #ffffff !important;
-                    border: 1px solid #e2e8f0 !important;
-                    border-radius: 12px !important;
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
-                    overflow: hidden !important;
+                /* --- TABS --- */
+                .apr-tabs-wrapper {
+                    display: flex;
+                    background: #f1f5f9;
+                    padding: 4px;
+                    border-radius: 10px;
+                    gap: 4px;
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
                 }
-                .admin-table-wrapper {
-                    width: 100% !important;
-                    overflow-x: auto !important;
+                .apr-tabs-wrapper::-webkit-scrollbar { display: none; }
+                .apr-tab-button {
+                    flex-shrink: 0;
+                    background: transparent;
+                    border: none;
+                    padding: 8px 24px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: var(--apr-text-sub);
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    white-space: nowrap;
+                    transition: var(--apr-anim);
                 }
-                .admin-data-table {
-                    width: 100% !important;
-                    border-collapse: collapse !important;
-                    text-align: left !important;
+                .apr-tab-button:hover { color: var(--apr-text-main); }
+                .apr-tab-button.active {
+                    background: var(--apr-card-bg);
+                    color: var(--apr-text-main);
+                    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
                 }
-                .admin-data-table th {
-                    background: #f8fafc !important;
-                    padding: 16px !important;
-                    font-size: 0.85rem !important;
-                    text-transform: uppercase !important;
-                    color: #64748b !important;
-                    font-weight: 600 !important;
-                    border-bottom: 1px solid #e2e8f0 !important;
+                .apr-tab-count {
+                    background: #e2e8f0;
+                    padding: 2px 8px;
+                    border-radius: 12px;
+                    font-size: 11px;
                 }
-                .admin-data-table td {
-                    padding: 16px !important;
-                    border-bottom: 1px solid #f1f5f9 !important;
-                    vertical-align: middle !important;
-                }
-                .admin-data-table tr:last-child td {
-                    border-bottom: none !important;
-                }
-                .admin-data-table tr:hover td {
-                    background: #f8fafc !important;
-                }
-                .admin-info-stack {
-                    display: flex !important;
-                    flex-direction: column !important;
-                    gap: 4px !important;
-                }
-                .admin-text-muted {
-                    font-size: 0.85rem !important;
-                    color: #64748b !important;
-                }
-                .admin-text-small {
-                    font-size: 0.9rem !important;
-                }
-                .admin-text-right {
-                    text-align: right !important;
+                .apr-tab-button.active .apr-tab-count {
+                    background: #dbeafe;
+                    color: #1e40af;
                 }
 
-                /* Badges & Buttons */
-                .admin-status-badge {
-                    display: inline-flex !important;
-                    align-items: center !important;
-                    gap: 6px !important;
-                    padding: 4px 10px !important;
-                    border-radius: 20px !important;
-                    font-size: 0.8rem !important;
-                    font-weight: 600 !important;
+                /* --- DATA TABLE --- */
+                .apr-data-card {
+                    background: var(--apr-card-bg);
+                    border: 1px solid var(--apr-border);
+                    border-radius: var(--apr-radius);
+                    box-shadow: var(--apr-shadow-md);
+                    overflow: hidden;
                 }
-                .admin-badge-icon {
-                    display: flex !important;
+                .apr-table-wrapper { width: 100%; overflow-x: auto; }
+                .apr-data-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    text-align: left;
+                    min-width: 850px;
                 }
-                .admin-action-group {
-                    display: flex !important;
-                    justify-content: flex-end !important;
-                    gap: 8px !important;
+                .apr-data-table th {
+                    background: #f8fafc;
+                    padding: 16px 24px;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.8px;
+                    color: var(--apr-text-sub);
+                    font-weight: 700;
+                    border-bottom: 1px solid var(--apr-border);
                 }
-                .admin-btn {
-                    padding: 8px 16px !important;
-                    border-radius: 6px !important;
-                    font-size: 0.85rem !important;
-                    font-weight: 500 !important;
-                    cursor: pointer !important;
-                    border: none !important;
-                    transition: background 0.2s !important;
+                .apr-data-table td {
+                    padding: 20px 24px;
+                    border-bottom: 1px solid #f1f5f9;
+                    vertical-align: middle;
                 }
-                .admin-btn:disabled {
-                    opacity: 0.6 !important;
-                    cursor: not-allowed !important;
-                }
-                .admin-btn-primary {
-                    background: #eff6ff !important;
-                    color: #2563eb !important;
-                }
-                .admin-btn-primary:hover:not(:disabled) { background: #dbeafe !important; }
-                .admin-btn-success {
-                    background: #f0fdf4 !important;
-                    color: #16a34a !important;
-                }
-                .admin-btn-success:hover:not(:disabled) { background: #dcfce7 !important; }
-                .admin-status-done {
-                    color: #94a3b8 !important;
-                    font-size: 0.9rem !important;
-                    font-weight: 500 !important;
-                    padding-right: 8px !important;
-                }
+                .apr-data-table tr:last-child td { border-bottom: none; }
+                .apr-data-table tr:hover td { background: #f8fafc; }
 
-                /* Pagination */
-                .admin-pagination-bar {
-                    display: flex !important;
-                    justify-content: space-between !important;
-                    align-items: center !important;
-                    padding: 16px !important;
-                    border-top: 1px solid #e2e8f0 !important;
-                    background: #f8fafc !important;
-                    flex-wrap: wrap !important;
-                    gap: 16px !important;
-                }
-                .admin-pagination-text {
-                    font-size: 0.9rem !important;
-                    color: #64748b !important;
-                }
-                .admin-pagination-controls {
-                    display: flex !important;
-                    gap: 6px !important;
-                }
-                .admin-page-btn {
-                    display: flex !important;
-                    align-items: center !important;
-                    justify-content: center !important;
-                    min-width: 32px !important;
-                    height: 32px !important;
-                    border: 1px solid #e2e8f0 !important;
-                    background: #ffffff !important;
-                    border-radius: 6px !important;
-                    color: #475569 !important;
-                    font-size: 0.9rem !important;
-                    cursor: pointer !important;
-                    transition: all 0.2s !important;
-                }
-                .admin-page-btn:hover:not(:disabled) {
-                    background: #f1f5f9 !important;
-                    border-color: #cbd5e1 !important;
-                }
-                .admin-page-btn.active {
-                    background: #3b82f6 !important;
-                    color: #ffffff !important;
-                    border-color: #3b82f6 !important;
-                }
-                .admin-page-btn:disabled {
-                    opacity: 0.5 !important;
-                    cursor: not-allowed !important;
-                    background: #f8fafc !important;
-                }
+                /* Cell Text */
+                .apr-info-stack { display: flex; flex-direction: column; gap: 4px; }
+                .apr-info-stack strong { font-size: 14px; font-weight: 600; color: var(--apr-text-main); }
+                .apr-text-muted { font-size: 13px; color: var(--apr-text-sub); font-family: 'Monaco', monospace;}
+                .apr-text-small { font-size: 14px; color: var(--apr-text-main); font-weight: 500;}
 
-                /* Loading & Empty States */
-                .admin-state-view {
-                    padding: 48px 24px !important;
-                    display: flex !important;
-                    flex-direction: column !important;
-                    align-items: center !important;
-                    justify-content: center !important;
-                    color: #64748b !important;
-                    gap: 12px !important;
+                /* Badges */
+                .apr-status-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 6px 12px;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
                 }
-                .admin-state-view.empty svg {
-                    width: 48px !important;
-                    height: 48px !important;
-                    color: #cbd5e1 !important;
-                }
-                .admin-state-view h3 {
-                    margin: 0 !important;
-                    color: #1e293b !important;
-                    font-size: 1.2rem !important;
-                }
-                .admin-spinner {
-                    width: 24px !important;
-                    height: 24px !important;
-                    border: 3px solid #e2e8f0 !important;
-                    border-top-color: #3b82f6 !important;
-                    border-radius: 50% !important;
-                    animation: spin 1s linear infinite !important;
-                }
-                @keyframes spin {
-                    to { transform: rotate(360deg) !important; }
-                }
+                .apr-badge-icon svg { width: 14px; height: 14px; }
 
-                /* =========================================
-                   RESPONSIVE DESIGN (Mobile Table to Cards)
-                   ========================================= */
-                @media (max-width: 850px) {
-                    .admin-header, .admin-controls-group {
-                        flex-direction: column !important;
-                        align-items: stretch !important;
+                /* Actions */
+                .apr-action-group { display: flex; justify-content: flex-end; gap: 10px; }
+                .apr-btn {
+                    padding: 8px 16px;
+                    border-radius: var(--apr-radius-sm);
+                    font-size: 13px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    border: none;
+                    transition: var(--apr-anim);
+                    white-space: nowrap;
+                }
+                .apr-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+                .apr-btn-primary { background: #eff6ff; color: var(--apr-primary-dark); }
+                .apr-btn-primary:hover:not(:disabled) { background: #dbeafe; transform: translateY(-1px); }
+                .apr-btn-success { background: #059669; color: #ffffff; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2); }
+                .apr-btn-success:hover:not(:disabled) { background: #047857; transform: translateY(-1px); box-shadow: 0 4px 6px rgba(5, 150, 105, 0.3); }
+                .apr-status-done { color: #94a3b8; font-size: 13px; font-weight: 600; padding-right: 8px; text-transform: uppercase;}
+
+                /* --- PAGINATION --- */
+                .apr-pagination-bar {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 16px 24px;
+                    border-top: 1px solid var(--apr-border);
+                    background: #f8fafc;
+                    flex-wrap: wrap;
+                    gap: 16px;
+                }
+                .apr-pagination-text { font-size: 13px; color: var(--apr-text-sub); }
+                .apr-pagination-controls { display: flex; gap: 8px; }
+                .apr-page-btn {
+                    display: flex; align-items: center; justify-content: center;
+                    min-width: 36px; height: 36px;
+                    border: 1px solid transparent;
+                    background: white;
+                    border-radius: 6px;
+                    color: var(--apr-text-sub);
+                    font-size: 13px; font-weight: 600;
+                    cursor: pointer;
+                    transition: var(--apr-anim);
+                }
+                .apr-page-btn:hover:not(:disabled) { background: #f1f5f9; color: var(--apr-text-main); }
+                .apr-page-btn.active { background: var(--apr-primary); color: white; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2); }
+                .apr-page-btn:disabled { opacity: 0.5; cursor: not-allowed; background: transparent; }
+
+                /* --- STATE VIEWS --- */
+                .apr-state-view {
+                    padding: 60px 24px;
+                    display: flex; flex-direction: column;
+                    align-items: center; justify-content: center;
+                    color: var(--apr-text-sub); gap: 16px;
+                }
+                .apr-state-view.empty svg { width: 48px; height: 48px; color: #cbd5e1; }
+                .apr-state-view h3 { margin: 0; color: var(--apr-text-main); font-size: 18px; }
+                .apr-spinner {
+                    width: 32px; height: 32px;
+                    border: 3px solid var(--apr-border);
+                    border-top-color: var(--apr-primary);
+                    border-radius: 50%;
+                    animation: apr-spin 1s linear infinite;
+                }
+                @keyframes apr-spin { to { transform: rotate(360deg); } }
+
+                /* =========================================================
+                   MOBILE RESPONSIVENESS (PERFECT ALIGNMENT & SMALLER FONTS)
+                   ========================================================= */
+                @media (max-width: 768px) {
+                    .apr-layout { padding: 16px; }
+                    
+                    /* Header & Controls */
+                    .apr-title-group h2 { font-size: 20px; }
+                    .apr-title-group p { font-size: 13px; }
+                    .apr-controls-group { flex-direction: column; align-items: stretch; }
+                    .apr-search-group { max-width: 100%; }
+                    .apr-tab-button { padding: 6px 16px; font-size: 12px; }
+
+                    /* Table to Cards */
+                    .apr-data-table thead { display: none; }
+                    .apr-data-card { background: transparent; border: none; box-shadow: none; }
+                    
+                    .apr-data-table, .apr-data-table tbody, .apr-data-table tr, .apr-data-table td {
+                        display: block; width: 100%; box-sizing: border-box;
                     }
-                    .admin-search-group {
-                        max-width: 100% !important;
+                    
+                    .apr-data-table tr {
+                        margin-bottom: 16px;
+                        background: var(--apr-card-bg);
+                        border: 1px solid var(--apr-border);
+                        border-radius: 16px;
+                        padding: 16px;
+                        box-shadow: var(--apr-shadow-sm);
                     }
-                    .admin-data-table thead {
-                        display: none !important;
+                    
+                    .apr-data-table td {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-start;
+                        padding: 12px 0;
+                        border-bottom: 1px dashed var(--apr-border);
+                        text-align: right;
+                        word-break: break-word;
                     }
-                    .admin-data-table, 
-                    .admin-data-table tbody, 
-                    .admin-data-table tr, 
-                    .admin-data-table td {
-                        display: block !important;
-                        width: 100% !important;
-                        box-sizing: border-box !important;
+                    
+                    .apr-data-table td:last-child { border-bottom: none; padding-bottom: 0; }
+                    .apr-data-table td[data-label="Actions"] { padding-top: 16px; margin-top: 4px; align-items: center; }
+                    
+                    .apr-data-table td::before {
+                        content: attr(data-label);
+                        font-size: 11px;
+                        font-weight: 700;
+                        color: var(--apr-text-sub);
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        margin-right: 12px;
+                        flex-shrink: 0;
+                        margin-top: 2px;
+                        max-width: 90px;
+                        text-align: left;
                     }
-                    .admin-data-table tr {
-                        margin-bottom: 16px !important;
-                        border: 1px solid #e2e8f0 !important;
-                        border-radius: 8px !important;
-                        background: #fff !important;
-                        padding: 8px 0 !important;
-                    }
-                    .admin-data-table td {
-                        display: flex !important;
-                        justify-content: space-between !important;
-                        align-items: center !important;
-                        text-align: right !important;
-                        padding: 12px 16px !important;
-                        border-bottom: 1px solid #f1f5f9 !important;
-                    }
-                    .admin-data-table td::before {
-                        content: attr(data-label) !important;
-                        font-weight: 600 !important;
-                        font-size: 0.85rem !important;
-                        color: #64748b !important;
-                        text-transform: uppercase !important;
-                        text-align: left !important;
-                        margin-right: 16px !important;
-                    }
-                    .admin-info-stack {
-                        align-items: flex-end !important; 
-                    }
-                    .admin-action-group {
-                        justify-content: flex-end !important;
-                        width: 100% !important;
-                    }
-                    .admin-pagination-bar {
-                        flex-direction: column !important;
-                        gap: 12px !important;
+
+                    /* Cell Alignment Adjustments */
+                    .apr-info-stack { align-items: flex-end; text-align: right; }
+                    .apr-info-stack strong { font-size: 13px; }
+                    .apr-text-muted { font-size: 11px; }
+                    .apr-text-small { font-size: 13px; }
+
+                    .apr-status-badge { font-size: 10px; padding: 4px 10px; }
+                    
+                    .apr-action-group { width: 100%; justify-content: flex-end; }
+                    .apr-btn { font-size: 12px; padding: 6px 12px; }
+                    
+                    /* Pagination Stack */
+                    .apr-pagination-bar {
+                        flex-direction: column;
+                        border-radius: 16px;
+                        border: 1px solid var(--apr-border);
+                        padding: 16px;
+                        box-shadow: var(--apr-shadow-sm);
+                        gap: 16px;
                     }
                 }
             `}</style>
 
-            <div className="admin-header">
-                <div className="admin-header-title-group">
-                    <div className="admin-header-text">
-                        <h2>Premium Upgrades</h2>
-                        <p>Manage users requesting personalized premium assistance.</p>
-                    </div>
+            <div className="apr-header">
+                <div className="apr-title-group">
+                    <h2>Premium Upgrades</h2>
+                    <p>Manage users requesting personalized premium assistance.</p>
                 </div>
 
-                <div className="admin-controls-group">
-                    <div className="admin-search-group">
+                <div className="apr-controls-group">
+                    <div className="apr-search-group">
                         <Icons.Search />
                         <input 
-                            id="premium-search-input"
-                            className="admin-search-input"
+                            className="apr-search-input"
                             type="text" 
                             placeholder="Search name, ID, or phone..."
                             value={searchTerm}
@@ -537,17 +494,16 @@ const AdminPremiumRequests = () => {
                         />
                     </div>
 
-                    <div className="admin-tabs-wrapper">
+                    <div className="apr-tabs-wrapper">
                         {['All', 'Pending', 'Contacted', 'Resolved'].map(tab => (
                             <button 
                                 key={tab}
-                                id={`filter-tab-${tab.toLowerCase()}`}
-                                className={`admin-tab-button ${activeTab === tab ? 'active' : ''}`}
+                                className={`apr-tab-button ${activeTab === tab ? 'active' : ''}`}
                                 onClick={() => setActiveTab(tab)}
                             >
                                 {tab}
                                 {tab !== 'All' && (
-                                    <span className="admin-tab-count">
+                                    <span className="apr-tab-count">
                                         {requests.filter(r => r.status === tab).length}
                                     </span>
                                 )}
@@ -557,14 +513,14 @@ const AdminPremiumRequests = () => {
                 </div>
             </div>
 
-            <div className="admin-data-card" id="premium-data-view">
+            <div className="apr-data-card">
                 {loading ? (
-                    <div className="admin-state-view">
-                        <span className="admin-spinner"></span>
+                    <div className="apr-state-view">
+                        <span className="apr-spinner"></span>
                         Loading requests...
                     </div>
                 ) : filteredRequests.length === 0 ? (
-                    <div className="admin-state-view empty">
+                    <div className="apr-state-view empty">
                         <Icons.Crown />
                         <h3>No requests found</h3>
                         <p>
@@ -576,8 +532,8 @@ const AdminPremiumRequests = () => {
                     </div>
                 ) : (
                     <>
-                        <div className="admin-table-wrapper">
-                            <table className="admin-data-table">
+                        <div className="apr-table-wrapper">
+                            <table className="apr-data-table">
                                 <thead>
                                     <tr>
                                         <th>User Details</th>
@@ -585,38 +541,38 @@ const AdminPremiumRequests = () => {
                                         <th>Location</th>
                                         <th>Request Date</th>
                                         <th>Status</th>
-                                        <th className="admin-text-right">Actions</th>
+                                        <th style={{textAlign: 'right'}}>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {currentItems.map((req) => (
                                         <tr key={req._id}>
                                             <td data-label="User Details">
-                                                <div className="admin-info-stack">
+                                                <div className="apr-info-stack">
                                                     <strong>{req.userId?.firstName} {req.userId?.lastName}</strong>
-                                                    <span className="admin-text-muted">{req.userId?.uniqueId}</span>
+                                                    <span className="apr-text-muted">{req.userId?.uniqueId}</span>
                                                 </div>
                                             </td>
                                             <td data-label="Contact Info">
-                                                <div className="admin-info-stack">
-                                                    <span>{req.userId?.mobileNumber}</span>
-                                                    <span className="admin-text-muted">{req.userId?.email}</span>
+                                                <div className="apr-info-stack">
+                                                    <span className="apr-text-small">{req.userId?.mobileNumber}</span>
+                                                    <span className="apr-text-muted">{req.userId?.email}</span>
                                                 </div>
                                             </td>
-                                            <td data-label="Location" className="admin-text-small">
-                                                {req.userId?.city}, {req.userId?.state}
+                                            <td data-label="Location">
+                                                <span className="apr-text-small">{req.userId?.city}, {req.userId?.state}</span>
                                             </td>
-                                            <td data-label="Request Date" className="admin-text-small">
-                                                {formatDate(req.requestDate)}
+                                            <td data-label="Request Date">
+                                                <span className="apr-text-small">{formatDate(req.requestDate)}</span>
                                             </td>
                                             <td data-label="Status">
                                                 <StatusBadge status={req.status} />
                                             </td>
-                                            <td data-label="Actions" className="admin-text-right">
-                                                <div className="admin-action-group">
+                                            <td data-label="Actions">
+                                                <div className="apr-action-group">
                                                     {req.status === 'Pending' && (
                                                         <button 
-                                                            className="admin-btn admin-btn-primary"
+                                                            className="apr-btn apr-btn-primary"
                                                             onClick={() => updateStatus(req._id, 'Contacted')}
                                                             disabled={processingId === req._id}
                                                         >
@@ -625,7 +581,7 @@ const AdminPremiumRequests = () => {
                                                     )}
                                                     {req.status === 'Contacted' && (
                                                         <button 
-                                                            className="admin-btn admin-btn-success"
+                                                            className="apr-btn apr-btn-success"
                                                             onClick={() => updateStatus(req._id, 'Resolved')}
                                                             disabled={processingId === req._id}
                                                         >
@@ -633,7 +589,7 @@ const AdminPremiumRequests = () => {
                                                         </button>
                                                     )}
                                                     {req.status === 'Resolved' && (
-                                                        <span className="admin-status-done">Done</span>
+                                                        <span className="apr-status-done">Done</span>
                                                     )}
                                                 </div>
                                             </td>
@@ -645,13 +601,13 @@ const AdminPremiumRequests = () => {
 
                         {/* Pagination Controls */}
                         {totalPages > 1 && (
-                            <div className="admin-pagination-bar">
-                                <span className="admin-pagination-text">
-                                    Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredRequests.length)} of {filteredRequests.length}
+                            <div className="apr-pagination-bar">
+                                <span className="apr-pagination-text">
+                                    Showing <strong>{indexOfFirstItem + 1}</strong> to <strong>{Math.min(indexOfLastItem, filteredRequests.length)}</strong> of <strong>{filteredRequests.length}</strong>
                                 </span>
-                                <div className="admin-pagination-controls">
+                                <div className="apr-pagination-controls">
                                     <button 
-                                        className="admin-page-btn" 
+                                        className="apr-page-btn" 
                                         onClick={() => handlePageChange(currentPage - 1)}
                                         disabled={currentPage === 1}
                                     >
@@ -661,7 +617,7 @@ const AdminPremiumRequests = () => {
                                     {[...Array(totalPages)].map((_, index) => (
                                         <button 
                                             key={index + 1}
-                                            className={`admin-page-btn ${currentPage === index + 1 ? 'active' : ''}`}
+                                            className={`apr-page-btn ${currentPage === index + 1 ? 'active' : ''}`}
                                             onClick={() => handlePageChange(index + 1)}
                                         >
                                             {index + 1}
@@ -669,7 +625,7 @@ const AdminPremiumRequests = () => {
                                     ))}
 
                                     <button 
-                                        className="admin-page-btn" 
+                                        className="apr-page-btn" 
                                         onClick={() => handlePageChange(currentPage + 1)}
                                         disabled={currentPage === totalPages}
                                     >
