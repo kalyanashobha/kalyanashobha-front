@@ -139,14 +139,25 @@ export default function VendorList() {
     setJoinFormData({ ...joinFormData, [e.target.name]: e.target.value });
   };
 
+  // FIXED LOGIC: Appends files instead of overwriting
   const handleJoinFileChange = async (e) => {
-    const selectedFiles = Array.from(e.target.files).slice(0, 2); 
+    const selectedFiles = Array.from(e.target.files); 
     if (selectedFiles.length === 0) return;
+
+    // Prevent adding more if already at 2
+    if (joinFiles.length >= 2) {
+      e.target.value = null; // Reset input
+      return;
+    }
+
+    // Only take enough files to reach the maximum of 2
+    const availableSlots = 2 - joinFiles.length;
+    const filesToProcess = selectedFiles.slice(0, availableSlots);
 
     setIsCompressing(true);
     const compressedImages = [];
 
-    for (let file of selectedFiles) {
+    for (let file of filesToProcess) {
       try {
         const options = {
           maxSizeMB: 1,
@@ -162,8 +173,17 @@ export default function VendorList() {
       }
     }
     
-    setJoinFiles(compressedImages);
+    // Append the new images to the existing ones
+    setJoinFiles(prev => [...prev, ...compressedImages]);
     setIsCompressing(false);
+    
+    // Reset the input value so the same file can be selected again if needed
+    e.target.value = null;
+  };
+
+  // Function to clear files if the user makes a mistake
+  const handleClearFiles = () => {
+    setJoinFiles([]);
   };
 
   const handleJoinSubmit = async (e) => {
@@ -349,12 +369,23 @@ export default function VendorList() {
                       type="file" multiple accept="image/*" 
                       onChange={handleJoinFileChange} 
                       className="v-file-upload"
-                      disabled={isCompressing || joinSubmitStatus.loading}
+                      disabled={isCompressing || joinSubmitStatus.loading || joinFiles.length >= 2}
                     />
+                    
+                    {/* Added UI to show current files and a button to clear them */}
                     {joinFiles.length > 0 && !isCompressing && (
-                      <small style={{ color: '#10b981', display: 'block', marginTop: '4px', fontWeight: '500', fontSize: '0.7rem' }}>
-                        ✓ {joinFiles.length} file(s) ready
-                      </small>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                        <small style={{ color: '#10b981', fontWeight: '500', fontSize: '0.7rem' }}>
+                          ✓ {joinFiles.length} file(s) ready
+                        </small>
+                        <button 
+                          type="button" 
+                          onClick={handleClearFiles} 
+                          style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '0.7rem', cursor: 'pointer', padding: 0, fontWeight: '500' }}
+                        >
+                          Clear
+                        </button>
+                      </div>
                     )}
                   </div>
 
