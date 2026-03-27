@@ -15,10 +15,21 @@ export default function RegistrationApprovals() {
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  // DYNAMIC ITEMS PER PAGE: 3 for mobile, 5 for desktop
+  const [itemsPerPage, setItemsPerPage] = useState(window.innerWidth < 768 ? 3 : 5);
 
   // Mobile Scroll Indicator State
   const [showMainScroll, setShowMainScroll] = useState(false);
+
+  // Resize listener to adjust items per page dynamically
+  useEffect(() => {
+    const handleResize = () => {
+      setItemsPerPage(window.innerWidth < 768 ? 3 : 5);
+      setCurrentPage(1); // Reset to page 1 to prevent out-of-bounds index
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const fetchPayments = async () => {
     setLoading(true);
@@ -44,10 +55,11 @@ export default function RegistrationApprovals() {
     fetchPayments();
   }, [activeTab]);
 
-  // Scroll Indicator Logic
+  // Scroll Indicator Logic - FIXED to not show when empty
   useEffect(() => {
     const checkMainScroll = () => {
-        if (selectedImage) {
+        // Strict check: Hide if modal is open OR if there are no items
+        if (selectedImage || payments.length === 0) {
             setShowMainScroll(false);
             return;
         }
@@ -55,7 +67,8 @@ export default function RegistrationApprovals() {
         const windowHeight = window.innerHeight;
         const documentHeight = document.documentElement.scrollHeight;
         
-        setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
+        // Increased threshold to 50 to prevent false triggers on short pages
+        setShowMainScroll(documentHeight > windowHeight + 50 && scrollY + windowHeight < documentHeight - 60);
     };
 
     const timer = setTimeout(checkMainScroll, 500); 
