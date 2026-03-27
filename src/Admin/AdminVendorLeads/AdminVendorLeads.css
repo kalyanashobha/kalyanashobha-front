@@ -150,7 +150,10 @@
   box-shadow: var(--avl-shadow-md);
   overflow: hidden;
 }
-.avl-table-wrapper { width: 100%; overflow-x: auto; }
+.avl-table-wrapper { 
+    width: 100%; 
+    overflow-x: auto; 
+}
 .avl-data-table {
   width: 100%;
   border-collapse: collapse;
@@ -182,7 +185,7 @@
 
 .avl-info-stack { display: flex; flex-direction: column; gap: 4px; }
 .avl-info-stack strong { font-size: 14px; font-weight: 700; color: var(--avl-text-main); }
-.avl-text-muted { font-size: 13px; color: var(--avl-text-sub); }
+.avl-text-muted { font-size: 13px; color: var(--avl-text-sub); word-break: break-word;}
 
 .avl-vendor-id {
   display: inline-block;
@@ -216,6 +219,7 @@
   color: var(--avl-text-main);
   line-height: 1.5;
   max-width: 350px;
+  word-wrap: break-word;
 }
 .avl-meta-tags { display: flex; gap: 8px; flex-wrap: wrap; }
 .avl-meta-tags span {
@@ -255,7 +259,6 @@
 .status-contacted { background-color: #fffbeb; color: #b45309; border-color: #fde68a; stroke: #b45309; }
 .status-forwarded { background-color: #dcfce7; color: #15803d; border-color: #bbf7d0; stroke: #15803d; }
 .status-closed { background-color: #f1f5f9; color: #475569; border-color: #e2e8f0; stroke: #475569; }
-
 
 /* --- PAGINATION --- */
 .avl-pagination-bar {
@@ -345,7 +348,7 @@
 
 
 /* =========================================================
-   MOBILE RESPONSIVENESS (FLEX-CARD NO SCROLLING LAYOUT)
+   MOBILE RESPONSIVENESS (NO HORIZONTAL SCROLLING)
    ========================================================= */
 @media (max-width: 768px) {
   .avl-layout { padding: 16px; }
@@ -358,36 +361,48 @@
   .avl-controls-group { flex-direction: column; align-items: stretch; }
   .avl-search-group { max-width: 100%; }
 
-  /* TABLE -> CARDS TRANSFORMATION */
+  /* TABLE -> CARDS (CRITICAL FIXES FOR HORIZONTAL OVERFLOW) */
+  .avl-table-wrapper {
+      overflow-x: hidden; /* Stop wrapper from scrolling horizontally */
+  }
+
   .avl-data-table thead { display: none; }
   .avl-data-card { background: transparent; border: none; box-shadow: none; }
   
+  /* Force all table elements to strict block/100% widths */
   .avl-data-table, .avl-data-table tbody, .avl-data-table tr, .avl-data-table td {
-      display: block; width: 100%; box-sizing: border-box;
+      display: block; 
+      width: 100%; 
+      box-sizing: border-box;
+      min-width: unset; /* Remove the 900px min width! */
   }
   
   .avl-data-table tr {
       margin-bottom: 16px;
       background: var(--avl-card-bg);
       border: 1px solid var(--avl-border);
-      border-radius: 16px;
-      padding: 16px;
+      border-radius: 12px;
+      padding: 12px; /* Slight padding reduction */
       box-shadow: var(--avl-shadow-sm);
   }
   
+  .avl-empty-cell {
+      padding: 0 !important;
+      border: none !important;
+  }
+
   /* Flex alignment for Mobile Cells */
   .avl-data-table td {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      padding: 12px 0;
+      padding: 10px 0;
       border-bottom: 1px dashed var(--avl-border);
       text-align: right;
-      word-break: break-word; 
   }
   
   .avl-data-table td:last-child { border-bottom: none; padding-bottom: 0; }
-  .avl-data-table td[data-label="Status Action"] { padding-top: 16px; margin-top: 4px; align-items: center; }
+  .avl-data-table td[data-label="Status Action"] { padding-top: 12px; margin-top: 4px; align-items: center; }
   
   /* Inject Labels as the Left Flex Item */
   .avl-data-table td::before {
@@ -397,29 +412,41 @@
       color: var(--avl-text-sub);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-right: 12px;
+      margin-right: 10px;
       flex-shrink: 0;
       margin-top: 2px;
-      max-width: 100px;
+      width: 90px; /* STRICT fixed width for the label */
       text-align: left;
   }
 
   /* Cell Content Overrides */
-  .avl-info-stack { align-items: flex-end; text-align: right; width: calc(100% - 110px);}
-  .avl-info-stack strong { font-size: 14px; }
+  .avl-info-stack, .avl-message-box, .avl-action-group { 
+      flex: 1; /* Take exactly the remaining space */
+      max-width: calc(100% - 100px); /* Strictly prevent content from pushing screen wide */
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end; 
+      text-align: right; 
+  }
+  
+  /* Force long text to wrap */
+  .avl-info-stack strong, .avl-text-muted, .avl-message-box p, .avl-vendor-id, .avl-vendor-contact {
+      word-break: break-word;
+      white-space: pre-wrap;
+  }
+
+  .avl-info-stack strong { font-size: 13px; }
   .avl-text-muted { font-size: 12px; }
 
-  .avl-message-box { width: calc(100% - 110px); display: flex; flex-direction: column; align-items: flex-end; text-align: right;}
-  .avl-message-box p { font-size: 13px; margin-bottom: 6px; }
+  .avl-message-box p { font-size: 13px; margin-bottom: 6px; text-align: right;}
   .avl-meta-tags { justify-content: flex-end; }
   
-  .avl-action-group { width: 100%; justify-content: flex-end; }
   .avl-status-select { font-size: 11px; padding: 6px 24px 6px 12px; background-position: right 8px center;}
   
   /* Pagination Stack */
   .avl-pagination-bar {
       flex-direction: column;
-      border-radius: 16px;
+      border-radius: 12px;
       border: 1px solid var(--avl-border);
       padding: 16px;
       box-shadow: var(--avl-shadow-sm);
@@ -431,4 +458,5 @@
   /* Skeletons on Mobile */
   .avl-skeleton-row td { display: flex; flex-direction: column; align-items: flex-end; }
   .avl-skel-status { margin-left: 0; }
+  .avl-skel-desc.half { width: 100%; }
 }
