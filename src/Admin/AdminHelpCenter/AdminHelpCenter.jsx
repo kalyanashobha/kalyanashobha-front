@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
-import { RefreshCw, Paperclip, X, CheckCircle, Clock } from 'lucide-react';
+import { RefreshCw, Paperclip, X, CheckCircle, Clock, ChevronDown } from 'lucide-react';
 import './AdminHelpCenter.css'; 
 
 const AdminHelpCenter = () => {
@@ -16,9 +16,37 @@ const AdminHelpCenter = () => {
   // State to toggle inline image viewing
   const [showImage, setShowImage] = useState(false);
 
+  // Mobile Scroll Indicator State
+  const [showMainScroll, setShowMainScroll] = useState(false);
+
   useEffect(() => {
     fetchIssues();
   }, []);
+
+  // Scroll Indicator Logic
+  useEffect(() => {
+    const checkMainScroll = () => {
+        if (selectedIssue) {
+            setShowMainScroll(false);
+            return;
+        }
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        
+        setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
+    };
+
+    const timer = setTimeout(checkMainScroll, 500); 
+    window.addEventListener('scroll', checkMainScroll);
+    window.addEventListener('resize', checkMainScroll);
+
+    return () => {
+        clearTimeout(timer);
+        window.removeEventListener('scroll', checkMainScroll);
+        window.removeEventListener('resize', checkMainScroll);
+    };
+  }, [issues, selectedIssue]);
 
   const fetchIssues = async () => {
     setLoading(true);
@@ -114,8 +142,8 @@ const AdminHelpCenter = () => {
       </div>
 
       {/* Issues Table Content */}
-      <div className="kah-content">
-        <div className="kah-table-container">
+      <div className="kah-data-card">
+        <div className="kah-table-wrapper">
           <table className="kah-table">
             <thead>
               <tr>
@@ -123,14 +151,14 @@ const AdminHelpCenter = () => {
                 <th>User Details</th>
                 <th>Subject</th>
                 <th>Status</th>
-                <th align="right">Action</th>
+                <th className="kah-text-right">Action</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 /* Skeleton Loading Rows */
                 <tr>
-                    <td colSpan="5" style={{ padding: 0, borderBottom: 'none' }}>
+                    <td colSpan="5" className="kah-empty-cell">
                         <div className="kah-skeleton-stack">
                             {[1, 2, 3, 4, 5].map((i) => (
                                 <div key={i} className="kah-skeleton-row">
@@ -147,11 +175,11 @@ const AdminHelpCenter = () => {
               ) : issues.length === 0 ? (
                 /* Empty State */
                 <tr>
-                  <td colSpan="5">
-                    <div className="kah-empty-state">
-                        <CheckCircle size={40} className="kah-empty-icon" />
-                        <h3>No support tickets</h3>
-                        <p>You're all caught up! There are no pending issues.</p>
+                  <td colSpan="5" className="kah-empty-cell">
+                    <div className="kah-state-view empty">
+                        <CheckCircle size={48} className="kah-empty-icon" />
+                        <h3>No active support tickets</h3>
+                        <p>All user inquiries have been successfully addressed. There are no pending issues at this time.</p>
                     </div>
                   </td>
                 </tr>
@@ -168,17 +196,19 @@ const AdminHelpCenter = () => {
                         </div>
                     </td>
                     <td data-label="User Details">
-                      <div className="kah-user-info">
-                        <span className="kah-user-name">
+                      <div className="kah-info-stack">
+                        <strong className="kah-user-name">
                             {issue.userId?.firstName} {issue.userId?.lastName}
-                        </span>
-                        <span className="kah-user-id">({issue.userId?.uniqueId})</span>
+                        </strong>
+                        <span className="kah-text-muted">ID: {issue.userId?.uniqueId || "N/A"}</span>
                       </div>
                     </td>
                     <td data-label="Subject">
-                      <div className="kah-subject-text">{issue.subject}</div>
-                      <div className="kah-summary-text" title={issue.summary}>
-                        {issue.summary}
+                      <div className="kah-info-stack">
+                        <strong className="kah-subject-text">{issue.subject}</strong>
+                        <span className="kah-summary-text" title={issue.summary}>
+                          {issue.summary}
+                        </span>
                       </div>
                     </td>
                     <td data-label="Status">
@@ -186,10 +216,12 @@ const AdminHelpCenter = () => {
                         {issue.status}
                       </span>
                     </td>
-                    <td data-label="Action" align="right">
-                      <button onClick={() => openModal(issue)} className="kah-btn-outline-primary">
-                        View & Reply
-                      </button>
+                    <td data-label="Action" className="kah-text-right">
+                      <div className="kah-action-group">
+                        <button onClick={() => openModal(issue)} className="kah-btn-outline-primary">
+                          View & Reply
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -198,6 +230,14 @@ const AdminHelpCenter = () => {
           </table>
         </div>
       </div>
+
+      {/* MOBILE SCROLL INDICATOR */}
+      {showMainScroll && (
+          <div className="kah-scroll-indicator">
+              <ChevronDown size={18} />
+              <span>Scroll for more</span>
+          </div>
+      )}
 
       {/* Resolution Modal */}
       {selectedIssue && (
@@ -227,7 +267,7 @@ const AdminHelpCenter = () => {
 
               <div className="kah-issue-details-box">
                 <h4 className="kah-issue-title">{selectedIssue.subject}</h4>
-                <p className="kah-issue-summary">{selectedIssue.summary}</p>
+                <p className="kah-issue-summary-full">{selectedIssue.summary}</p>
                 
                 {/* Inline Image Viewer Toggle */}
                 {selectedIssue.screenshotUrl && (
