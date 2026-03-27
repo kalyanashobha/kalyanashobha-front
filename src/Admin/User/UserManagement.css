@@ -790,3 +790,36 @@ select.um-input:disabled {
   
   .um-action-btn { width: 100%; justify-content: center; }
 }
+/* --- SCROLL DOWN INDICATOR --- */
+.um-scroll-indicator {
+  display: none; /* Hidden by default */
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.9);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 30px;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  pointer-events: none; /* Prevents it from blocking clicks on content underneath */
+  z-index: 50;
+  animation: bounceSubtle 2s infinite ease-in-out;
+  backdrop-filter: blur(4px);
+}
+
+@keyframes bounceSubtle {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, 6px); }
+}
+
+/* Only show the indicator on mobile screens (when there is actually scrolling needed) */
+@media (max-width: 768px) {
+  .um-scroll-indicator {
+    display: flex;
+  }
+}
