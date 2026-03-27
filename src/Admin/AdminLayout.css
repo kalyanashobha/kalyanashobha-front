@@ -19,9 +19,9 @@
   left: 0;
   right: 0;
   height: var(--admin-header-height);
-  background: white;
+  background-color: #FFFFFF !important; /* Forced white to block global background bleed */
   border-bottom: 1px solid #E5E7EB;
-  z-index: 110; /* Increased to stay on top of the full-width sidebar */
+  z-index: 110; 
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
@@ -38,7 +38,7 @@
 }
 
 .mobile-logo {
-  height: 40px; /* Increased logo size slightly (was 32px) */
+  height: 45px; 
   width: auto;
   object-fit: contain;
   display: block;
@@ -107,7 +107,7 @@
   bottom: 0;
   left: 0;
   z-index: 100;
-  background-color: #FFFFFF;
+  background-color: #FFFFFF !important; /* Forced white to block global background bleed */
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -139,17 +139,17 @@
 
   /* Full-width Sliding Sidebar */
   .sidebar-wrapper {
-    width: 100%; /* Now takes up the full width of the screen */
-    top: var(--admin-header-height); /* Starts directly below the header */
-    height: calc(100vh - var(--admin-header-height)); /* Prevents scrolling issues */
-    transform: translateX(-100%); /* Starts completely off-screen to the left */
-    box-shadow: none; /* Shadow removed since it spans the whole screen */
+    width: 100%; 
+    top: var(--admin-header-height); 
+    height: calc(100vh - var(--admin-header-height)); 
+    transform: translateX(-100%); 
+    box-shadow: none; 
     z-index: 100;
   }
 
   /* Show Sidebar when Open */
   .sidebar-wrapper.mobile-open {
-    transform: translateX(0); /* Slides smoothly into view */
+    transform: translateX(0); 
   }
 
   .admin-main-content {
