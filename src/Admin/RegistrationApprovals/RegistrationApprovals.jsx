@@ -70,34 +70,31 @@ export default function RegistrationApprovals() {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // --- UNIVERSAL SCROLL INDICATOR LOGIC (PERFECTED) ---
+  // --- UNIVERSAL SCROLL INDICATOR LOGIC (Exact match to InterestApprovals) ---
   useEffect(() => {
     const checkMainScroll = () => {
-        // 1. Safety net: If there are 2 or fewer items, or the modal is open, STRICTLY hide it.
-        // This fixes the mobile bug where it showed for just 1 item.
+        // 1. Safety net: If there are 2 or fewer items, or the modal is open, force it to hide.
         if (currentItems.length <= 2 || selectedImage) {
             setShowMainScroll(false);
             return;
         }
 
         const scrollY = window.scrollY || document.documentElement.scrollTop;
-        const windowHeight = window.innerHeight;
-        const documentHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollHeight = document.documentElement.scrollHeight;
 
-        // 2. Check if the document is actually taller than the screen.
-        // Using a tiny 10px buffer ensures it shows up on Desktop correctly.
-        const isScrollable = documentHeight > windowHeight + 10;
-        
-        // 3. Check if we haven't scrolled to the very bottom yet.
-        // Math.ceil fixes a bug where desktop displays use decimal pixels for scrolling.
-        const isNotAtBottom = Math.ceil(scrollY + windowHeight) < documentHeight - 20;
+        // 2. Check if the document is taller than the viewport with the 80px buffer
+        const isScrollable = scrollHeight > clientHeight + 80;
+
+        // 3. Check if we haven't scrolled to the very bottom yet (30px buffer)
+        const isNotAtBottom = scrollY + clientHeight < scrollHeight - 30;
 
         // 4. Only show the indicator if it's scrollable AND we aren't at the bottom
         setShowMainScroll(isScrollable && isNotAtBottom);
     };
 
-    const timer = setTimeout(checkMainScroll, 100); 
-    
+    const timer = setTimeout(checkMainScroll, 50); 
+
     window.addEventListener('scroll', checkMainScroll);
     window.addEventListener('resize', checkMainScroll);
 
