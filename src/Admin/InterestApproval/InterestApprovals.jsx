@@ -80,8 +80,8 @@ export default function InterestApprovals() {
             return;
         }
 
-        // 2. Hide if there are no items
-        if (currentItems.length === 0) {
+        // 2. Hide if there is 1 or fewer items
+        if (currentItems.length <= 1) {
             setShowMainScroll(false);
             return;
         }
