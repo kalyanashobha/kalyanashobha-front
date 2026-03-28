@@ -70,7 +70,7 @@ export default function RegistrationApprovals() {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // --- UNIVERSAL SCROLL INDICATOR LOGIC (Exact match to InterestApprovals) ---
+  // --- UNIVERSAL SCROLL INDICATOR LOGIC (BULLETPROOF) ---
   useEffect(() => {
     const checkMainScroll = () => {
         // 1. Safety net: If there are 2 or fewer items, or the modal is open, force it to hide.
@@ -79,21 +79,29 @@ export default function RegistrationApprovals() {
             return;
         }
 
-        const scrollY = window.scrollY || document.documentElement.scrollTop;
-        const clientHeight = document.documentElement.clientHeight;
-        const scrollHeight = document.documentElement.scrollHeight;
+        const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+        
+        // 2. The most robust way to get height on all devices and browsers
+        const documentHeight = Math.max(
+            document.body.scrollHeight, 
+            document.documentElement.scrollHeight,
+            document.body.offsetHeight, 
+            document.documentElement.offsetHeight
+        );
 
-        // 2. Check if the document is taller than the viewport with the 80px buffer
-        const isScrollable = scrollHeight > clientHeight + 80;
+        // 3. A tiny 5px buffer so it instantly appears when resizing the window
+        const isScrollable = documentHeight > (windowHeight + 5);
 
-        // 3. Check if we haven't scrolled to the very bottom yet (30px buffer)
-        const isNotAtBottom = scrollY + clientHeight < scrollHeight - 30;
+        // 4. Math.ceil stops decimal pixel rounding bugs on high-res monitors
+        const isNotAtBottom = Math.ceil(scrollY + windowHeight) < (documentHeight - 15);
 
-        // 4. Only show the indicator if it's scrollable AND we aren't at the bottom
+        // 5. Only show the indicator if it's scrollable AND we aren't at the bottom
         setShowMainScroll(isScrollable && isNotAtBottom);
     };
 
-    const timer = setTimeout(checkMainScroll, 50); 
+    // A 100ms delay gives the DOM enough time to paint the new items when switching tabs
+    const timer = setTimeout(checkMainScroll, 100); 
 
     window.addEventListener('scroll', checkMainScroll);
     window.addEventListener('resize', checkMainScroll);
@@ -103,7 +111,8 @@ export default function RegistrationApprovals() {
         window.removeEventListener('scroll', checkMainScroll);
         window.removeEventListener('resize', checkMainScroll);
     };
-  }, [currentItems, currentPage, selectedImage]); 
+  }, [currentItems, currentPage, selectedImage, activeTab]); 
+  // IMPORTANT: Added activeTab so it recalculates the moment you switch to "Approved History"
 
   const handleAction = async (paymentId, action) => {
     setProcessingId(paymentId);
