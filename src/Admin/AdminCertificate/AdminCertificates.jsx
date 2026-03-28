@@ -11,10 +11,10 @@ const AdminCertificates = () => {
   const [processingId, setProcessingId] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   // Fixed Pagination States
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 6; // Fixed 6 items for both Desktop and Mobile
+  const usersPerPage = 4; // Changed to 4 items for both Desktop and Mobile
 
   // Scroll Indicator State
   const [showMainScroll, setShowMainScroll] = useState(false);
@@ -26,31 +26,6 @@ const AdminCertificates = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
-
-  // Universal Scroll Indicator Logic (Desktop & Mobile)
-  useEffect(() => {
-    const checkMainScroll = () => {
-        if (users.length === 0) {
-            setShowMainScroll(false);
-            return;
-        }
-        const scrollY = window.scrollY || document.documentElement.scrollTop;
-        const windowHeight = window.innerHeight;
-        const documentHeight = document.documentElement.scrollHeight;
-        
-        setShowMainScroll(documentHeight > windowHeight + 20 && scrollY + windowHeight < documentHeight - 30);
-    };
-
-    const timer = setTimeout(checkMainScroll, 500); 
-    window.addEventListener('scroll', checkMainScroll);
-    window.addEventListener('resize', checkMainScroll);
-
-    return () => {
-        clearTimeout(timer);
-        window.removeEventListener('scroll', checkMainScroll);
-        window.removeEventListener('resize', checkMainScroll);
-    };
-  }, [users, currentPage]);
 
   const fetchUsers = async () => {
     try {
@@ -68,6 +43,68 @@ const AdminCertificates = () => {
       setLoading(false);
     }
   };
+
+  // --- FILTERING & PAGINATION LOGIC ---
+  const filteredUsers = users.filter((user) => {
+    const searchLower = searchTerm.toLowerCase();
+    const fullName = `${user.firstName || ""} ${user.lastName || ""}`.toLowerCase();
+    const uniqueId = (user.uniqueId || "").toLowerCase();
+
+    return fullName.includes(searchLower) || uniqueId.includes(searchLower);
+  });
+
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage) || 1;
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  // --- MOBILE ONLY SCROLL INDICATOR LOGIC ---
+  useEffect(() => {
+    const checkMainScroll = () => {
+        // 1. Hide on desktop entirely
+        if (window.innerWidth > 768) {
+            setShowMainScroll(false);
+            return;
+        }
+
+        // 2. Hide if there is 1 or fewer items
+        if (currentUsers.length <= 1) {
+            setShowMainScroll(false);
+            return;
+        }
+
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+
+        // 3. Check if the document is taller than the viewport.
+        const isScrollable = documentHeight > windowHeight + 80;
+
+        // 4. Check if we haven't scrolled to the very bottom yet
+        const isNotAtBottom = scrollY + windowHeight < documentHeight - 30;
+
+        // 5. Only show the indicator if it's scrollable AND we aren't at the bottom
+        setShowMainScroll(isScrollable && isNotAtBottom);
+    };
+
+    const timer = setTimeout(checkMainScroll, 50); 
+    window.addEventListener('scroll', checkMainScroll);
+    window.addEventListener('resize', checkMainScroll);
+
+    return () => {
+        clearTimeout(timer);
+        window.removeEventListener('scroll', checkMainScroll);
+        window.removeEventListener('resize', checkMainScroll);
+    };
+  }, [currentUsers, currentPage]);
 
   const downloadCertificate = async (userId, userName) => {
     setProcessingId(userId);
@@ -87,7 +124,7 @@ const AdminCertificates = () => {
       const element = document.createElement('div');
       element.innerHTML = response.data;
       element.style.width = '100%'; 
-      
+
       const options = {
         margin:       [10, 10],
         filename:     `${userName.replace(/\s+/g, '_')}_Certificate.pdf`,
@@ -108,37 +145,16 @@ const AdminCertificates = () => {
     }
   };
 
-  const filteredUsers = users.filter((user) => {
-    const searchLower = searchTerm.toLowerCase();
-    const fullName = `${user.firstName || ""} ${user.lastName || ""}`.toLowerCase();
-    const uniqueId = (user.uniqueId || "").toLowerCase();
-    
-    return fullName.includes(searchLower) || uniqueId.includes(searchLower);
-  });
-
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
-  const totalPages = Math.ceil(filteredUsers.length / usersPerPage) || 1;
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
-
   return (
     <div className="ac-layout">
       <Toaster position="top-right" />
-      
+
       <div className="ac-header">
         <div className="ac-title-group">
           <h2>User Certificates</h2>
           <p>Generate and manage digital signature certificates for users.</p>
         </div>
-        
+
         <div className="ac-search-group">
           <Search size={16} className="ac-search-icon" />
           <input
@@ -154,7 +170,8 @@ const AdminCertificates = () => {
       <div className="ac-data-card">
         {loading ? (
           <div className="ac-skeleton-stack">
-            {[1, 2, 3, 4, 5, 6].map(i => (
+            {/* Reduced to 4 skeleton rows */}
+            {[1, 2, 3, 4].map(i => (
               <div key={i} className="ac-skeleton-row">
                 <div className="ac-sk-box ac-sk-id"></div>
                 <div className="ac-sk-box ac-sk-name"></div>
@@ -190,7 +207,7 @@ const AdminCertificates = () => {
                         <td data-label="Email Address">
                           <span className="ac-text-muted">{user.email}</span>
                         </td>
-                        
+
                         <td data-label="Legal Status">
                           {user.digitalSignature ? (
                             <span className="ac-status-badge ac-signed">✓ Signed</span>
@@ -238,8 +255,8 @@ const AdminCertificates = () => {
               </table>
             </div>
 
-            {/* CIRCULAR PAGINATION DESIGN */}
-            {totalPages > 1 && (
+            {/* ALWAYS VISIBLE CIRCULAR PAGINATION DESIGN */}
+            {!loading && totalPages >= 1 && (
               <div className="ac-pagination-container">
                   <button 
                       className="ac-page-btn-circle" 
@@ -248,7 +265,7 @@ const AdminCertificates = () => {
                   >
                       <ChevronLeft size={20} />
                   </button>
-                  
+
                   <span className="ac-page-text">
                       Page {currentPage} of {totalPages}
                   </span>
@@ -266,7 +283,7 @@ const AdminCertificates = () => {
         )}
       </div>
 
-      {/* UNIVERSAL SCROLL INDICATOR */}
+      {/* MOBILE ONLY SCROLL INDICATOR */}
       {showMainScroll && (
           <div className="ac-scroll-indicator">
               <ChevronDown size={18} />
