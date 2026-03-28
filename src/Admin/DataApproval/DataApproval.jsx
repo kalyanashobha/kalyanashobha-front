@@ -22,6 +22,15 @@ const DataApproval = () => {
 
     const API_BASE = "https://kalyanashobha-back.vercel.app/api/admin/pending-data";
 
+    useEffect(() => {
+        fetchPendingData();
+    }, []);
+
+    // Reset pagination when search changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm]);
+
     const fetchPendingData = async () => {
         setIsLoading(true);
         try {
@@ -41,16 +50,7 @@ const DataApproval = () => {
         }
     };
 
-    useEffect(() => {
-        fetchPendingData();
-    }, []);
-
-    // Reset pagination when search changes
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm]);
-
-    // --- FILTER & PAGINATION LOGIC (Moved up for the scroll indicator) ---
+    // --- FILTER & PAGINATION LOGIC (Moved up for the scroll check) ---
     const filteredItems = pendingItems.filter(item => {
         const searchStr = searchTerm.toLowerCase();
         const val = (item.value || '').toLowerCase();
@@ -73,7 +73,7 @@ const DataApproval = () => {
     // --- UNIVERSAL SCROLL INDICATOR LOGIC (BULLETPROOF) ---
     useEffect(() => {
         const checkMainScroll = () => {
-            // Safety net: Hide if 2 or fewer items
+            // 1. Safety net: If there are 2 or fewer items, force it to hide.
             if (currentItems.length <= 2) {
                 setShowMainScroll(false);
                 return;
@@ -82,6 +82,7 @@ const DataApproval = () => {
             const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
             const windowHeight = window.innerHeight || document.documentElement.clientHeight;
             
+            // 2. The most robust way to get height on all devices and browsers
             const documentHeight = Math.max(
                 document.body.scrollHeight, 
                 document.documentElement.scrollHeight,
@@ -89,15 +90,17 @@ const DataApproval = () => {
                 document.documentElement.offsetHeight
             );
 
-            // A tiny 5px buffer so it instantly appears when resizing the window
+            // 3. A tiny 5px buffer so it instantly appears when resizing the window
             const isScrollable = documentHeight > (windowHeight + 5);
 
-            // Math.ceil stops decimal pixel rounding bugs on high-res monitors
+            // 4. Math.ceil stops decimal pixel rounding bugs on high-res monitors
             const isNotAtBottom = Math.ceil(scrollY + windowHeight) < (documentHeight - 15);
 
+            // 5. Only show the indicator if it's scrollable AND we aren't at the bottom
             setShowMainScroll(isScrollable && isNotAtBottom);
         };
 
+        // A 100ms delay gives the DOM enough time to paint the new items
         const timer = setTimeout(checkMainScroll, 100); 
 
         window.addEventListener('scroll', checkMainScroll);
@@ -108,9 +111,8 @@ const DataApproval = () => {
             window.removeEventListener('scroll', checkMainScroll);
             window.removeEventListener('resize', checkMainScroll);
         };
-    }, [currentItems, currentPage, searchTerm]); 
+    }, [currentItems, currentPage]); 
 
-    // --- ACTION LOGIC ---
     const handleAction = async (pendingId, action) => {
         if (action === 'approve') {
             const currentItem = pendingItems.find(item => item._id === pendingId);
