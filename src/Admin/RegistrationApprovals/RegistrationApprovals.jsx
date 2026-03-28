@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Check, X, Eye, Clock, Filter, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
+import { Check, X, Eye, Clock, Filter, ChevronLeft, ChevronRight, ChevronDown, Search } from "lucide-react";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -13,7 +13,8 @@ export default function RegistrationApprovals() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [processingId, setProcessingId] = useState(null);
 
-  // Pagination State - Fixed 6 items for both Desktop and Mobile
+  // --- SEARCH & PAGINATION STATES ---
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6; 
 
@@ -30,7 +31,8 @@ export default function RegistrationApprovals() {
       );
       if (response.data.success) {
         setPayments(response.data.payments);
-        setCurrentPage(1); // Reset page on tab switch or data fetch
+        setCurrentPage(1); 
+        setSearchQuery(""); // Clear search when switching tabs
       }
     } catch (error) {
       console.error("Error fetching payments", error);
@@ -44,21 +46,53 @@ export default function RegistrationApprovals() {
     fetchPayments();
   }, [activeTab]);
 
-  // Scroll Indicator Logic
+  // Reset to page 1 whenever the search query changes
+  useEffect(() => {
+      setCurrentPage(1);
+  }, [searchQuery]);
+
+  // --- FILTERING LOGIC ---
+  const filteredPayments = payments.filter((pay) => {
+      const query = searchQuery.toLowerCase();
+      const name = `${pay.userId?.firstName || ""} ${pay.userId?.lastName || ""}`.toLowerCase();
+      const uniqueId = (pay.userId?.uniqueId || "").toLowerCase();
+      const mobile = (pay.userId?.mobileNumber || "").toLowerCase();
+      const utr = (pay.utrNumber || "").toLowerCase();
+
+      return name.includes(query) || uniqueId.includes(query) || mobile.includes(query) || utr.includes(query);
+  });
+
+  // --- PAGINATION LOGIC ---
+  // Note: We use filteredPayments here instead of payments
+  const totalPages = Math.ceil(filteredPayments.length / itemsPerPage) || 1;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredPayments.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // --- UNIVERSAL SCROLL INDICATOR LOGIC ---
   useEffect(() => {
     const checkMainScroll = () => {
-        if (selectedImage || payments.length === 0) {
+        // Hide if there are 2 or fewer items, or if the image modal is open
+        if (currentItems.length <= 2 || selectedImage) {
             setShowMainScroll(false);
             return;
         }
+
         const scrollY = window.scrollY || document.documentElement.scrollTop;
-        const windowHeight = window.innerHeight;
-        const documentHeight = document.documentElement.scrollHeight;
-        
-        setShowMainScroll(documentHeight > windowHeight + 50 && scrollY + windowHeight < documentHeight - 60);
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollHeight = document.documentElement.scrollHeight;
+
+        // Use the 80px buffer to account for padding
+        const isScrollable = scrollHeight > clientHeight + 80;
+        const isNotAtBottom = scrollY + clientHeight < scrollHeight - 30;
+
+        setShowMainScroll(isScrollable && isNotAtBottom);
     };
 
-    const timer = setTimeout(checkMainScroll, 500); 
+    const timer = setTimeout(checkMainScroll, 50); 
+    
     window.addEventListener('scroll', checkMainScroll);
     window.addEventListener('resize', checkMainScroll);
 
@@ -67,7 +101,7 @@ export default function RegistrationApprovals() {
         window.removeEventListener('scroll', checkMainScroll);
         window.removeEventListener('resize', checkMainScroll);
     };
-  }, [payments, currentPage, selectedImage]);
+  }, [currentItems, currentPage, selectedImage]);
 
   const handleAction = async (paymentId, action) => {
     setProcessingId(paymentId);
@@ -92,14 +126,6 @@ export default function RegistrationApprovals() {
     }
   };
 
-  // Pagination Logic
-  const totalPages = Math.ceil(payments.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = payments.slice(indexOfFirstItem, indexOfLastItem);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
   return (
     <div className="ra-layout">
       <ToastContainer position="top-right" theme="colored" />
@@ -110,7 +136,27 @@ export default function RegistrationApprovals() {
             <h2>Registration Approvals</h2>
             <p>Verify membership payments and activate users.</p>
         </div>
-        <div className="ra-header-actions">
+        
+        {/* Added Search Bar & Refresh Button Layout */}
+        <div className="ra-header-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+           <div className="ra-search-container" style={{ display: 'flex', alignItems: 'center', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 12px', gap: '8px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+               <Search size={16} color="#64748b" />
+               <input 
+                   type="text" 
+                   placeholder="Search name, ID, mobile, or UTR..." 
+                   value={searchQuery}
+                   onChange={(e) => setSearchQuery(e.target.value)}
+                   style={{ border: 'none', outline: 'none', background: 'transparent', fontSize: '13px', minWidth: '220px', color: '#0f172a' }}
+               />
+               {searchQuery && (
+                   <X 
+                     size={14} 
+                     color="#94a3b8" 
+                     style={{ cursor: 'pointer' }} 
+                     onClick={() => setSearchQuery("")} 
+                   />
+               )}
+           </div>
            <button className="ra-refresh-btn" onClick={fetchPayments}>Refresh List</button>
         </div>
       </div>
@@ -153,11 +199,15 @@ export default function RegistrationApprovals() {
                   </div>
               ))}
            </div>
-        ) : payments.length === 0 ? (
+        ) : filteredPayments.length === 0 ? (
           <div className="ra-empty-state">
              <div className="ra-empty-icon"><Filter size={36}/></div>
              <h3>No records found</h3>
-             <p>There are no {activeTab.toLowerCase()} requests at the moment.</p>
+             <p>
+                {searchQuery 
+                    ? `No matching records found for "${searchQuery}".` 
+                    : `There are no ${activeTab.toLowerCase()} requests at the moment.`}
+             </p>
           </div>
         ) : (
           <>
@@ -221,7 +271,7 @@ export default function RegistrationApprovals() {
                              {pay.status === 'PendingVerification' ? 'Pending' : pay.status}
                           </span>
                       </td>
-                      
+
                       {(activeTab === "PendingVerification" || activeTab === "Rejected") && (
                           <td data-label="Actions" className="ra-text-right">
                           <div className="ra-actions">
@@ -233,7 +283,7 @@ export default function RegistrationApprovals() {
                               >
                                   {processingId === pay._id ? <div className="spinner-sm"></div> : <Check size={18} />}
                               </button>
-                              
+
                               {activeTab === "PendingVerification" && (
                                   <button 
                                       className="ra-btn-reject" 
@@ -263,7 +313,7 @@ export default function RegistrationApprovals() {
                     >
                         <ChevronLeft size={20} />
                     </button>
-                    
+
                     <span className="ra-page-text">
                         Page {currentPage} of {totalPages}
                     </span>
