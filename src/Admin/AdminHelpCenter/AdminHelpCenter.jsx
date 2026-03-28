@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
-import { RefreshCw, Paperclip, X, CheckCircle, Clock, ChevronDown } from 'lucide-react';
+import { RefreshCw, Paperclip, X, CheckCircle, Clock, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import './AdminHelpCenter.css'; 
 
 const AdminHelpCenter = () => {
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Modal state for resolving an issue
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [adminReply, setAdminReply] = useState('');
   const [resolving, setResolving] = useState(false);
-  
+
   // State to toggle inline image viewing
   const [showImage, setShowImage] = useState(false);
+
+  // --- PAGINATION STATES ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4; // 4 items for both Desktop and Mobile
 
   // Mobile Scroll Indicator State
   const [showMainScroll, setShowMainScroll] = useState(false);
@@ -23,21 +27,44 @@ const AdminHelpCenter = () => {
     fetchIssues();
   }, []);
 
-  // Scroll Indicator Logic
+  // --- PAGINATION LOGIC ---
+  const totalPages = Math.ceil(issues.length / itemsPerPage) || 1;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = issues.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // --- MOBILE ONLY SCROLL INDICATOR LOGIC ---
   useEffect(() => {
     const checkMainScroll = () => {
-        if (selectedIssue) {
+        // 1. Hide on desktop entirely
+        if (window.innerWidth > 768) {
             setShowMainScroll(false);
             return;
         }
+
+        // 2. Hide if modal is open or if 1 or fewer items
+        if (selectedIssue || currentItems.length <= 1) {
+            setShowMainScroll(false);
+            return;
+        }
+
         const scrollY = window.scrollY || document.documentElement.scrollTop;
         const windowHeight = window.innerHeight;
         const documentHeight = document.documentElement.scrollHeight;
-        
-        setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
+
+        // 3. Check if the document is taller than the viewport.
+        const isScrollable = documentHeight > windowHeight + 80;
+
+        // 4. Check if we haven't scrolled to the very bottom yet
+        const isNotAtBottom = scrollY + windowHeight < documentHeight - 30;
+
+        // 5. Only show the indicator if it's scrollable AND we aren't at the bottom
+        setShowMainScroll(isScrollable && isNotAtBottom);
     };
 
-    const timer = setTimeout(checkMainScroll, 500); 
+    const timer = setTimeout(checkMainScroll, 50); 
     window.addEventListener('scroll', checkMainScroll);
     window.addEventListener('resize', checkMainScroll);
 
@@ -46,7 +73,7 @@ const AdminHelpCenter = () => {
         window.removeEventListener('scroll', checkMainScroll);
         window.removeEventListener('resize', checkMainScroll);
     };
-  }, [issues, selectedIssue]);
+  }, [currentItems, currentPage, selectedIssue]);
 
   const fetchIssues = async () => {
     setLoading(true);
@@ -63,6 +90,7 @@ const AdminHelpCenter = () => {
 
       if (data.success) {
         setIssues(data.data);
+        setCurrentPage(1); // Reset to first page on refresh
       } else {
         toast.error(data.message || 'Failed to fetch issues.');
       }
@@ -129,7 +157,7 @@ const AdminHelpCenter = () => {
   return (
     <div className="kah-layout">
       <ToastContainer position="top-right" theme="colored" />
-      
+
       {/* Header */}
       <div className="kah-header">
         <div className="kah-title-group">
@@ -160,7 +188,8 @@ const AdminHelpCenter = () => {
                 <tr>
                     <td colSpan="5" className="kah-empty-cell">
                         <div className="kah-skeleton-stack">
-                            {[1, 2, 3, 4, 5].map((i) => (
+                            {/* Reduced to 4 skeleton rows */}
+                            {[1, 2, 3, 4].map((i) => (
                                 <div key={i} className="kah-skeleton-row">
                                     <div className="kah-sk-box kah-sk-date"></div>
                                     <div className="kah-sk-box kah-sk-user"></div>
@@ -184,8 +213,8 @@ const AdminHelpCenter = () => {
                   </td>
                 </tr>
               ) : (
-                /* Actual Data Rows */
-                issues.map((issue) => (
+                /* Actual Data Rows using currentItems */
+                currentItems.map((issue) => (
                   <tr key={issue._id}>
                     <td data-label="Date">
                         <div className="kah-date-cell">
@@ -229,6 +258,31 @@ const AdminHelpCenter = () => {
             </tbody>
           </table>
         </div>
+
+        {/* ALWAYS VISIBLE CIRCULAR PAGINATION DESIGN */}
+        {!loading && totalPages >= 1 && (
+            <div className="kah-pagination-container">
+                <button 
+                    className="kah-page-btn-circle" 
+                    onClick={() => paginate(currentPage - 1)} 
+                    disabled={currentPage === 1}
+                >
+                    <ChevronLeft size={20} />
+                </button>
+
+                <span className="kah-page-text">
+                    Page {currentPage} of {totalPages}
+                </span>
+
+                <button 
+                    className="kah-page-btn-circle" 
+                    onClick={() => paginate(currentPage + 1)} 
+                    disabled={currentPage === totalPages}
+                >
+                    <ChevronRight size={20} />
+                </button>
+            </div>
+        )}
       </div>
 
       {/* MOBILE SCROLL INDICATOR */}
@@ -243,7 +297,7 @@ const AdminHelpCenter = () => {
       {selectedIssue && (
         <div className="kah-modal-overlay" onClick={closeModal}>
           <div className="kah-modal-content" onClick={e => e.stopPropagation()}>
-            
+
             <div className="kah-modal-header">
               <h3>Ticket Details</h3>
               <button onClick={closeModal} className="kah-modal-close"><X size={20} /></button>
@@ -268,7 +322,7 @@ const AdminHelpCenter = () => {
               <div className="kah-issue-details-box">
                 <h4 className="kah-issue-title">{selectedIssue.subject}</h4>
                 <p className="kah-issue-summary-full">{selectedIssue.summary}</p>
-                
+
                 {/* Inline Image Viewer Toggle */}
                 {selectedIssue.screenshotUrl && (
                   <div className="kah-attachment-wrap">
@@ -279,7 +333,7 @@ const AdminHelpCenter = () => {
                     >
                       <Paperclip size={14} /> {showImage ? 'Hide Attached Screenshot' : 'View Attached Screenshot'}
                     </button>
-                    
+
                     {/* Render Image below if toggled on */}
                     {showImage && (
                       <div className="kah-image-preview-box">
@@ -310,7 +364,7 @@ const AdminHelpCenter = () => {
                       required
                     ></textarea>
                   </div>
-                  
+
                   <div className="kah-modal-footer">
                     <button type="button" onClick={closeModal} className="kah-btn-cancel">
                       Cancel
