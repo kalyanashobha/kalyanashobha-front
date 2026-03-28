@@ -14,7 +14,7 @@ const AdminCertificates = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 10; 
 
-  // Mobile Scroll Indicator State
+  // Scroll Indicator State
   const [showMainScroll, setShowMainScroll] = useState(false);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ const AdminCertificates = () => {
     setCurrentPage(1);
   }, [searchTerm]);
 
-  // Scroll Indicator Logic
+  // Scroll Indicator Logic (Desktop & Mobile)
   useEffect(() => {
     const checkMainScroll = () => {
         const scrollY = window.scrollY || document.documentElement.scrollTop;
@@ -147,9 +147,16 @@ const AdminCertificates = () => {
 
       <div className="ac-data-card">
         {loading ? (
-          <div className="ac-state-view">
-            <span className="ac-spinner"></span>
-            Loading user data...
+          <div className="ac-skeleton-stack">
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                  <div key={i} className="ac-skeleton-row">
+                      <div className="ac-sk-box ac-sk-id"></div>
+                      <div className="ac-sk-box ac-sk-name"></div>
+                      <div className="ac-sk-box ac-sk-email"></div>
+                      <div className="ac-sk-box ac-sk-status"></div>
+                      <div className="ac-sk-box ac-sk-action"></div>
+                  </div>
+              ))}
           </div>
         ) : (
           <>
@@ -258,7 +265,7 @@ const AdminCertificates = () => {
         )}
       </div>
 
-      {/* MOBILE SCROLL INDICATOR */}
+      {/* UNIVERSAL SCROLL INDICATOR */}
       {showMainScroll && (
           <div className="ac-scroll-indicator">
               <ChevronDown size={18} />
