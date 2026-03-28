@@ -1,309 +1,359 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Check, X, Database, ChevronLeft, ChevronRight, RefreshCw, Search, ChevronDown } from 'lucide-react';
+            
+import React, { useState, useEffect } from "react";
+import { Check, X, Clock, ArrowRight, Filter, RefreshCw, Phone, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
+import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './DataApproval.css';
 
-const DataApproval = () => {
-    const [pendingItems, setPendingItems] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [actionLoading, setActionLoading] = useState(null); 
+import "./InterestApprovals.css"; 
 
-    // Search State
-    const [searchTerm, setSearchTerm] = useState("");
+export default function InterestApprovals() {
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    // Pagination State
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 6; // Fixed 6 items for both Desktop and Mobile
+  // Tabs: 'PendingAdminPhase1' (New), 'PendingAdminPhase2' (Accepted), 'Finalized' (Completed)
+  const [activeTab, setActiveTab] = useState("PendingAdminPhase1"); 
+  const [processingId, setProcessingId] = useState(null);
+  const [tabCounts, setTabCounts] = useState({ phase1: 0, phase2: 0 });
 
-    // Mobile/Desktop Scroll Indicator State
-    const [showMainScroll, setShowMainScroll] = useState(false);
+  // --- PAGINATION & SCROLL STATES ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6; // Fixed 6 items for both Desktop and Mobile
+  const [showMainScroll, setShowMainScroll] = useState(false);
 
-    const API_BASE = "https://kalyanashobha-back.vercel.app/api/admin/pending-data";
+  // Fetch Data for the active tab
+  const fetchRequests = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await axios.get(
+        `https://kalyanashobha-back.vercel.app/api/admin/interest/workflow?status=${activeTab}`,
+        { headers: { Authorization: token } }
+      );
+      if (response.data.success) {
+        setRequests(response.data.data);
+        setCurrentPage(1); // Reset page on data fetch
+      }
+    } catch (error) {
+      console.error("Error fetching interests", error);
+      toast.error("Failed to load requests.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    useEffect(() => {
-        fetchPendingData();
-    }, []);
+  const fetchCounts = async () => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      const [res1, res2] = await Promise.all([
+        axios.get(`https://kalyanashobha-back.vercel.app/api/admin/interest/workflow?status=PendingAdminPhase1`, { headers: { Authorization: token } }),
+        axios.get(`https://kalyanashobha-back.vercel.app/api/admin/interest/workflow?status=PendingAdminPhase2`, { headers: { Authorization: token } })
+      ]);
 
-    // Filter Logic (Moved up so it can be used in pagination and scroll dependency)
-    const filteredItems = pendingItems.filter(item => {
-        const searchStr = searchTerm.toLowerCase();
-        const val = (item.value || '').toLowerCase();
-        const cat = (item.category || '').toLowerCase();
-        const parent = (item.parentValue || '').toLowerCase();
-        const fName = (item.submittedBy?.firstName || '').toLowerCase();
-        const lName = (item.submittedBy?.lastName || '').toLowerCase();
-        const uId = (item.submittedBy?.uniqueId || '').toLowerCase();
+      setTabCounts({
+        phase1: res1.data.success ? res1.data.data.length : 0,
+        phase2: res2.data.success ? res2.data.data.length : 0,
+      });
+    } catch (error) {
+      console.error("Error fetching counts for badges", error);
+    }
+  };
 
-        return val.includes(searchStr) || cat.includes(searchStr) || parent.includes(searchStr) || fName.includes(searchStr) || lName.includes(searchStr) || uId.includes(searchStr);
-    });
+  useEffect(() => {
+    fetchRequests();
+    fetchCounts();
+  }, [activeTab]);
 
-    // Pagination Calculations
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
+  // --- PAGINATION LOGIC (Moved up so we can use currentItems in the scroll check) ---
+  const totalPages = Math.ceil(requests.length / itemsPerPage) || 1;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = requests.slice(indexOfFirstItem, indexOfLastItem);
 
-    // Reset pagination when search changes
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm]);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-    // --- UNIVERSAL SCROLL INDICATOR LOGIC (Matched with InterestApprovals) ---
-    useEffect(() => {
-        const checkMainScroll = () => {
-            // 1. Safety net: If there are 2 or fewer items, we don't need a scrollbar 
-            if (currentItems.length <= 2) {
-                setShowMainScroll(false);
-                return;
-            }
-
-            const scrollY = window.scrollY || document.documentElement.scrollTop;
-            const clientHeight = document.documentElement.clientHeight;
-            const scrollHeight = document.documentElement.scrollHeight;
-
-            // 2. Check if the document is taller than the viewport (with 80px buffer). 
-            const isScrollable = scrollHeight > clientHeight + 80;
-
-            // 3. Check if we haven't scrolled to the very bottom yet
-            const isNotAtBottom = scrollY + clientHeight < scrollHeight - 30;
-
-            // 4. Only show the indicator if it's scrollable AND we aren't at the bottom
-            setShowMainScroll(isScrollable && isNotAtBottom);
-        };
-
-        const timer = setTimeout(checkMainScroll, 50); 
-
-        window.addEventListener('scroll', checkMainScroll);
-        window.addEventListener('resize', checkMainScroll);
-
-        return () => {
-            clearTimeout(timer);
-            window.removeEventListener('scroll', checkMainScroll);
-            window.removeEventListener('resize', checkMainScroll);
-        };
-    }, [currentItems, currentPage]); // Re-run when currentItems changes
-
-    const fetchPendingData = async () => {
-        setIsLoading(true);
-        try {
-            const token = localStorage.getItem('adminToken');
-            const res = await axios.get(API_BASE, {
-                headers: { Authorization: token } 
-            });
-
-            if (res.data.success) {
-                setPendingItems(res.data.data);
-                setCurrentPage(1); 
-            }
-        } catch (err) {
-            toast.error(err.response?.data?.message || "Failed to load pending data.");
-        } finally {
-            setIsLoading(false);
+  // --- UNIVERSAL SCROLL INDICATOR LOGIC ---
+  useEffect(() => {
+    const checkMainScroll = () => {
+        // 1. Safety net: If there are 2 or fewer items, we definitely don't need a scrollbar 
+        // on a standard layout, so force it to hide.
+        if (currentItems.length <= 2) {
+            setShowMainScroll(false);
+            return;
         }
+
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollHeight = document.documentElement.scrollHeight;
+
+        // 2. Check if the document is taller than the viewport. 
+        // We use an 80px buffer to account for padding and margins.
+        const isScrollable = scrollHeight > clientHeight + 80;
+
+        // 3. Check if we haven't scrolled to the very bottom yet
+        const isNotAtBottom = scrollY + clientHeight < scrollHeight - 30;
+
+        // 4. Only show the indicator if it's scrollable AND we aren't at the bottom
+        setShowMainScroll(isScrollable && isNotAtBottom);
     };
 
-    const handleAction = async (pendingId, action) => {
-        if (action === 'approve') {
-            const currentItem = pendingItems.find(item => item._id === pendingId);
+    const timer = setTimeout(checkMainScroll, 50); 
 
-            if (currentItem && currentItem.parentValue) {
-                const isParentStillPending = pendingItems.some(
-                    pending => pending.value === currentItem.parentValue
-                );
+    window.addEventListener('scroll', checkMainScroll);
+    window.addEventListener('resize', checkMainScroll);
 
-                if (isParentStillPending) {
-                    toast.warning(`Please approve the parent element "${currentItem.parentValue}" first!`);
-                    return; 
-                }
-            }
-        }
-
-        setActionLoading(pendingId);
-        const toastId = toast.loading(`Processing ${action}...`);
-
-        try {
-            const token = localStorage.getItem('adminToken');
-            const res = await axios.post(`${API_BASE}/action`, 
-                { pendingId, action },
-                { headers: { Authorization: token } }
-            );
-
-            if (res.data.success) {
-                toast.update(toastId, { render: `Successfully ${action}d!`, type: "success", isLoading: false, autoClose: 3000 });
-
-                setPendingItems(prev => {
-                    const updatedList = prev.filter(item => item._id !== pendingId);
-
-                    const newTotalPages = Math.ceil(updatedList.length / itemsPerPage);
-                    if (currentPage > newTotalPages && newTotalPages > 0) {
-                        setCurrentPage(newTotalPages);
-                    }
-                    return updatedList;
-                });
-            }
-        } catch (err) {
-            toast.update(toastId, { render: err.response?.data?.message || `Failed to ${action} data.`, type: "error", isLoading: false, autoClose: 3000 });
-        } finally {
-            setActionLoading(null);
-        }
+    return () => {
+        clearTimeout(timer);
+        window.removeEventListener('scroll', checkMainScroll);
+        window.removeEventListener('resize', checkMainScroll);
     };
+  }, [currentItems, currentPage]); // Re-run when currentItems changes
 
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  // Handle Actions
+  const handleAction = async (interestId, action, phase) => {
+    setProcessingId(interestId);
+    const toastId = toast.loading("Processing request...");
 
-    return (
-        <div className="kda-layout">
-            <ToastContainer position="top-right" theme="colored" />
+    try {
+      const token = localStorage.getItem("adminToken");
+      await axios.post(
+        "https://kalyanashobha-back.vercel.app/api/admin/interest/process",
+        { interestId, action, phase },
+        { headers: { Authorization: token } }
+      );
 
-            <div className="kda-header">
-                <div className="kda-title-group">
-                    <h2>Master Data Approvals</h2>
-                    <p>Review new dropdown entries submitted by users.</p>
-                </div>
-                <div className="kda-controls-wrapper">
-                    <div className="kda-search-group">
-                        <Search size={16} className="kda-search-icon" />
-                        <input 
-                            type="text"
-                            placeholder="Search category, value, or user..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="kda-search-input"
-                        />
-                    </div>
-                    <button className="kda-refresh-btn" onClick={fetchPendingData}>
-                        <RefreshCw size={14} /> Refresh
+      toast.update(toastId, { render: "Action completed successfully", type: "success", isLoading: false, autoClose: 3000 });
+      fetchRequests(); 
+      fetchCounts(); 
+    } catch (error) {
+      toast.update(toastId, { render: "Action failed. Please try again.", type: "error", isLoading: false, autoClose: 3000 });
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  return (
+    <div className="ksa-layout">
+      <ToastContainer position="top-right" theme="colored" />
+
+      {/* HEADER */}
+      <div className="ksa-header">
+        <div className="ksa-title-group">
+            <h2>Connection Management</h2>
+            <p>Review new requests and manage active match connections.</p>
+        </div>
+        <button className="ksa-refresh-btn" onClick={() => { fetchRequests(); fetchCounts(); }}>
+            <RefreshCw size={14}/> Refresh
+        </button>
+      </div>
+
+      {/* TABS */}
+      <div className="ksa-tabs-container">
+        <div className="ksa-tabs">
+            <button 
+                className={`ksa-tab ${activeTab === "PendingAdminPhase1" ? "active" : ""}`} 
+                onClick={() => setActiveTab("PendingAdminPhase1")}
+            >
+              New Requests
+              {tabCounts.phase1 > 0 && <span className="ksa-tab-dot"></span>}
+            </button>
+            <button 
+                className={`ksa-tab ${activeTab === "PendingAdminPhase2" ? "active" : ""}`} 
+                onClick={() => setActiveTab("PendingAdminPhase2")}
+            >
+              Accepted Matches
+              {tabCounts.phase2 > 0 && <span className="ksa-tab-dot ksa-dot-green"></span>}
+            </button>
+            <button 
+                className={`ksa-tab ${activeTab === "Finalized" ? "active" : ""}`} 
+                onClick={() => setActiveTab("Finalized")}
+            >
+              Completed Matches
+            </button>
+        </div>
+      </div>
+
+      {/* CONTENT TABLE */}
+      <div className="ksa-content">
+        {loading ? (
+           <div className="ksa-skeleton-stack">
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                  <div key={i} className="ksa-skeleton-row">
+                      <div className="ksa-sk-box ksa-sk-date"></div>
+                      <div className="ksa-sk-box ksa-sk-flow"></div>
+                      <div className="ksa-sk-box ksa-sk-details"></div>
+                      <div className="ksa-sk-box ksa-sk-action"></div>
+                  </div>
+              ))}
+           </div>
+        ) : requests.length === 0 ? (
+          <div className="ksa-empty-state">
+             <div className="ksa-empty-icon"><Filter size={36}/></div>
+             <h3>No requests found</h3>
+             <p>There are no requests in this stage right now.</p>
+          </div>
+        ) : (
+          <>
+            <div className="ksa-table-container">
+              <table className="ksa-table">
+                  <thead>
+                  <tr>
+                      <th>Date</th>
+                      <th>Match Flow</th>
+                      <th>Connection Details</th>
+                      <th>Status</th>
+                      {activeTab !== "Finalized" && <th className="ksa-text-right">Actions</th>}
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {currentItems.map((req) => (
+                      <tr key={req._id} className={processingId === req._id ? "ksa-row-processing" : ""}>
+
+                      {/* DATE */}
+                      <td data-label="Date">
+                          <div className="ksa-date-cell">
+                              <Clock size={14} className="ksa-icon-sub"/>
+                              <div className="ksa-date-text">
+                                  <span>{new Date(req.date).toLocaleDateString()}</span>
+                                  <small>{new Date(req.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
+                              </div>
+                          </div>
+                      </td>
+
+                      {/* FLOW */}
+                      <td data-label="Match Flow">
+                          <div className="ksa-flow-cell">
+                              <div className="ksa-user-mini">
+                                  <div className="ksa-avatar-xs">{req.senderId?.firstName?.[0] || "S"}</div>
+                                  <div className="ksa-user-text">
+                                      <span className="name">{req.senderId?.firstName}</span>
+                                  </div>
+                              </div>
+                              <div className="ksa-flow-arrow"><ArrowRight size={14}/></div>
+                              <div className="ksa-user-mini">
+                                  <div className="ksa-avatar-xs receiver">{req.receiverId?.firstName?.[0] || "R"}</div>
+                                  <div className="ksa-user-text">
+                                      <span className="name">{req.receiverId?.firstName}</span>
+                                  </div>
+                              </div>
+                          </div>
+                      </td>
+
+                      {/* CONNECTION DETAILS */}
+                      <td data-label="Connection Details">
+                          <div className="ksa-contact-box">
+                              {/* SENDER BLOCK */}
+                              <div className="ksa-contact-person">
+                                  <span className="ksa-contact-label">Sent By (Initiator)</span>
+                                  <span className="ksa-contact-name">
+                                      {req.senderId?.firstName} {req.senderId?.lastName} 
+                                      <span className="ksa-contact-id">({req.senderId?.uniqueId})</span>
+                                  </span>
+                                  <span className="ksa-contact-number">
+                                      <Phone size={12}/> {req.senderId?.mobileNumber || "N/A"}
+                                  </span>
+                              </div>
+
+                              {/* RECEIVER BLOCK */}
+                              <div className="ksa-contact-person receiver-block">
+                                  <span className={`ksa-contact-label ${activeTab === 'PendingAdminPhase2' ? 'accepted' : 'pending'}`}>
+                                      {activeTab === 'PendingAdminPhase2' ? "✓ Accepted By (Receiver)" : "To Receiver"}
+                                  </span>
+                                  <span className="ksa-contact-name">
+                                      {req.receiverId?.firstName} {req.receiverId?.lastName} 
+                                      <span className="ksa-contact-id">({req.receiverId?.uniqueId})</span>
+                                  </span>
+                                  <span className="ksa-contact-number">
+                                      <Phone size={12}/> {req.receiverId?.mobileNumber || "N/A"}
+                                  </span>
+                              </div>
+                          </div>
+                      </td>
+
+                      {/* STATUS */}
+                      <td data-label="Status">
+                          <span className={`ksa-status-badge ${req.status}`}>
+                            {req.status === 'PendingAdminPhase1' ? 'Awaiting Review' : 
+                              req.status === 'PendingAdminPhase2' ? 'Action Required' : 
+                              req.status === 'Finalized' ? 'Completed' :
+                              req.status}
+                          </span>
+                      </td>
+
+                      {/* ACTIONS */}
+                      {activeTab === "PendingAdminPhase1" && (
+                          <td data-label="Actions" className="ksa-text-right">
+                          <div className="ksa-actions">
+                              <button 
+                                  className="ksa-btn-outline-primary" 
+                                  onClick={() => handleAction(req._id, 'approve', 1)} 
+                                  disabled={processingId === req._id}
+                              >
+                                  Forward Request
+                              </button>
+                              <button className="ksa-btn-reject" onClick={() => handleAction(req._id, 'reject', 1)} disabled={processingId === req._id} title="Reject Request">
+                                  {processingId === req._id ? <div className="spinner-sm"></div> : <X size={18} />}
+                              </button>
+                          </div>
+                          </td>
+                      )}
+
+                      {activeTab === "PendingAdminPhase2" && (
+                          <td data-label="Actions" className="ksa-text-right">
+                          <div className="ksa-actions">
+                              <button 
+                                  className="ksa-btn-success"
+                                  onClick={() => handleAction(req._id, 'finalize', 2)} 
+                                  disabled={processingId === req._id}
+                              >
+                                  {processingId === req._id ? <div className="spinner-sm"></div> : <><Check size={16} strokeWidth={3}/> Finalize Match</>}
+                              </button>
+                          </div>
+                          </td>
+                      )}
+                      </tr>
+                  ))}
+                  </tbody>
+              </table>
+            </div>
+
+            {/* NEW PAGINATION DESIGN */}
+            {totalPages > 1 && (
+                <div className="ksa-pagination-container">
+                    <button 
+                        className="ksa-page-btn-circle" 
+                        onClick={() => paginate(currentPage - 1)} 
+                        disabled={currentPage === 1}
+                    >
+                        <ChevronLeft size={20} />
+                    </button>
+
+                    <span className="ksa-page-text">
+                        Page {currentPage} of {totalPages}
+                    </span>
+
+                    <button 
+                        className="ksa-page-btn-circle" 
+                        onClick={() => paginate(currentPage + 1)} 
+                        disabled={currentPage === totalPages}
+                    >
+                        <ChevronRight size={20} />
                     </button>
                 </div>
-            </div>
-
-            <div className="kda-content">
-                {isLoading ? (
-                    <div className="kda-skeleton-stack">
-                        {[1, 2, 3, 4, 5, 6].map(i => (
-                            <div key={i} className="kda-skeleton-row">
-                                <div className="kda-sk-box kda-sk-cat"></div>
-                                <div className="kda-sk-box kda-sk-val"></div>
-                                <div className="kda-sk-box kda-sk-user"></div>
-                                <div className="kda-sk-box kda-sk-action"></div>
-                            </div>
-                        ))}
-                    </div>
-                ) : filteredItems.length === 0 ? (
-                    <div className="kda-empty-state">
-                        <div className="kda-empty-icon"><Database size={40} /></div>
-                        <h3>No pending data</h3>
-                        <p>{searchTerm ? `No results match "${searchTerm}".` : "There are no new dropdown entries to review right now."}</p>
-                    </div>
-                ) : (
-                    <>
-                        <div className="kda-table-container">
-                            <table className="kda-table">
-                                <thead>
-                                    <tr>
-                                        <th>Category</th>
-                                        <th>New Value</th>
-                                        <th>Parent Category</th>
-                                        <th>Submitted By</th>
-                                        <th>Date</th>
-                                        <th className="kda-text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {currentItems.map((item) => (
-                                        <tr key={item._id} className={actionLoading === item._id ? "kda-row-processing" : ""}>
-                                            <td data-label="Category">
-                                                <span className="kda-badge-category">{item.category}</span>
-                                            </td>
-                                            <td data-label="New Value" className="kda-fw-bold">
-                                                {item.value}
-                                            </td>
-                                            <td data-label="Parent">
-                                                {item.parentValue ? (
-                                                    <span className="kda-text-muted">{item.parentValue}</span>
-                                                ) : (
-                                                    <span className="kda-text-muted">-- None --</span>
-                                                )}
-                                            </td>
-                                            <td data-label="Submitted By">
-                                                <div className="kda-user-info">
-                                                    <span className="kda-user-name">
-                                                        {item.submittedBy ? `${item.submittedBy.firstName} ${item.submittedBy.lastName}` : "Unknown"}
-                                                    </span>
-                                                    {item.submittedBy?.uniqueId && (
-                                                        <span className="kda-user-id">ID: {item.submittedBy.uniqueId}</span>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td data-label="Date">
-                                                <span className="kda-date-text">
-                                                    {new Date(item.createdAt).toLocaleDateString('en-IN', {day: '2-digit', month: 'short', year: 'numeric'})}
-                                                </span>
-                                            </td>
-                                            <td data-label="Actions" className="kda-text-right">
-                                                <div className="kda-actions">
-                                                    <button 
-                                                        className="kda-btn-approve"
-                                                        onClick={() => handleAction(item._id, 'approve')}
-                                                        disabled={actionLoading === item._id}
-                                                        title="Approve"
-                                                    >
-                                                        {actionLoading === item._id ? <RefreshCw size={16} className="kda-spin" /> : <><Check size={16} strokeWidth={3} /> Approve</>}
-                                                    </button>
-                                                    <button 
-                                                        className="kda-btn-reject"
-                                                        onClick={() => handleAction(item._id, 'reject')}
-                                                        disabled={actionLoading === item._id}
-                                                        title="Reject"
-                                                    >
-                                                        {actionLoading === item._id ? <RefreshCw size={16} className="kda-spin" /> : <X size={18} />}
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {/* NEW CIRCULAR PAGINATION DESIGN */}
-                        {totalPages > 1 && (
-                            <div className="kda-pagination-container">
-                                <button 
-                                    className="kda-page-btn-circle" 
-                                    onClick={() => paginate(currentPage - 1)} 
-                                    disabled={currentPage === 1}
-                                >
-                                    <ChevronLeft size={20} />
-                                </button>
-
-                                <span className="kda-page-text">
-                                    Page {currentPage} of {totalPages}
-                                </span>
-
-                                <button 
-                                    className="kda-page-btn-circle" 
-                                    onClick={() => paginate(currentPage + 1)} 
-                                    disabled={currentPage === totalPages}
-                                >
-                                    <ChevronRight size={20} />
-                                </button>
-                            </div>
-                        )}
-                    </>
-                )}
-            </div>
-
-            {/* UNIVERSAL SCROLL INDICATOR */}
-            {showMainScroll && (
-                <div className="kda-scroll-indicator">
-                    <ChevronDown size={18} />
-                    <span>Scroll for more</span>
-                </div>
             )}
-        </div>
-    );
-};
+          </>
+        )}
+      </div>
 
-export default DataApproval;
+      {/* UNIVERSAL SCROLL INDICATOR */}
+      {showMainScroll && (
+          <div className="ksa-scroll-indicator">
+              <ChevronDown size={18} />
+              <span>Scroll for more</span>
+          </div>
+      )}
+    </div>
+  );
+}
+
+
