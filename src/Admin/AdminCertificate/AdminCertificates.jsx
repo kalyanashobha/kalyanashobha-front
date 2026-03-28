@@ -11,8 +11,10 @@ const AdminCertificates = () => {
   const [processingId, setProcessingId] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // Fixed Pagination States
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 10; 
+  const usersPerPage = 6; // Fixed 6 items for both Desktop and Mobile
 
   // Scroll Indicator State
   const [showMainScroll, setShowMainScroll] = useState(false);
@@ -25,14 +27,18 @@ const AdminCertificates = () => {
     setCurrentPage(1);
   }, [searchTerm]);
 
-  // Scroll Indicator Logic (Desktop & Mobile)
+  // Universal Scroll Indicator Logic (Desktop & Mobile)
   useEffect(() => {
     const checkMainScroll = () => {
+        if (users.length === 0) {
+            setShowMainScroll(false);
+            return;
+        }
         const scrollY = window.scrollY || document.documentElement.scrollTop;
         const windowHeight = window.innerHeight;
         const documentHeight = document.documentElement.scrollHeight;
         
-        setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
+        setShowMainScroll(documentHeight > windowHeight + 20 && scrollY + windowHeight < documentHeight - 30);
     };
 
     const timer = setTimeout(checkMainScroll, 500); 
@@ -113,7 +119,7 @@ const AdminCertificates = () => {
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
-  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage) || 1;
 
   const handleNextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
@@ -148,15 +154,15 @@ const AdminCertificates = () => {
       <div className="ac-data-card">
         {loading ? (
           <div className="ac-skeleton-stack">
-              {[1, 2, 3, 4, 5, 6].map(i => (
-                  <div key={i} className="ac-skeleton-row">
-                      <div className="ac-sk-box ac-sk-id"></div>
-                      <div className="ac-sk-box ac-sk-name"></div>
-                      <div className="ac-sk-box ac-sk-email"></div>
-                      <div className="ac-sk-box ac-sk-status"></div>
-                      <div className="ac-sk-box ac-sk-action"></div>
-                  </div>
-              ))}
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="ac-skeleton-row">
+                <div className="ac-sk-box ac-sk-id"></div>
+                <div className="ac-sk-box ac-sk-name"></div>
+                <div className="ac-sk-box ac-sk-email"></div>
+                <div className="ac-sk-box ac-sk-status"></div>
+                <div className="ac-sk-box ac-sk-action"></div>
+              </div>
+            ))}
           </div>
         ) : (
           <>
@@ -232,33 +238,28 @@ const AdminCertificates = () => {
               </table>
             </div>
 
+            {/* CIRCULAR PAGINATION DESIGN */}
             {totalPages > 1 && (
-              <div className="ac-pagination-bar">
-                <span className="ac-pagination-text">
-                  Showing <strong>{indexOfFirstUser + 1}</strong> to <strong>{Math.min(indexOfLastUser, filteredUsers.length)}</strong> of <strong>{filteredUsers.length}</strong>
-                </span>
-                
-                <div className="ac-pagination-controls">
+              <div className="ac-pagination-container">
                   <button 
-                    className="ac-page-btn"
-                    onClick={handlePrevPage} 
-                    disabled={currentPage === 1}
+                      className="ac-page-btn-circle" 
+                      onClick={handlePrevPage} 
+                      disabled={currentPage === 1}
                   >
-                    <ChevronLeft size={16} /> Prev
+                      <ChevronLeft size={20} />
                   </button>
                   
-                  <span className="ac-page-number active">
-                    {currentPage}
+                  <span className="ac-page-text">
+                      Page {currentPage} of {totalPages}
                   </span>
-                  
+
                   <button 
-                    className="ac-page-btn"
-                    onClick={handleNextPage} 
-                    disabled={currentPage === totalPages}
+                      className="ac-page-btn-circle" 
+                      onClick={handleNextPage} 
+                      disabled={currentPage === totalPages}
                   >
-                    Next <ChevronRight size={16} />
+                      <ChevronRight size={20} />
                   </button>
-                </div>
               </div>
             )}
           </>
