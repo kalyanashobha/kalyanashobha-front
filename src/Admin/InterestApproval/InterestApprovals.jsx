@@ -17,19 +17,8 @@ export default function InterestApprovals() {
 
   // --- PAGINATION & SCROLL STATES ---
   const [currentPage, setCurrentPage] = useState(1);
-  // Automatically switch: 3 items on mobile, 5 on desktop
-  const [itemsPerPage, setItemsPerPage] = useState(window.innerWidth < 768 ? 3 : 5);
+  const itemsPerPage = 6; // Fixed 6 items for both Desktop and Mobile
   const [showMainScroll, setShowMainScroll] = useState(false);
-
-  // Resize listener for dynamic items per page
-  useEffect(() => {
-    const handleResize = () => {
-      setItemsPerPage(window.innerWidth < 768 ? 3 : 5);
-      setCurrentPage(1);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   // Fetch Data for the active tab
   const fetchRequests = async () => {
@@ -176,7 +165,7 @@ export default function InterestApprovals() {
       <div className="ksa-content">
         {loading ? (
            <div className="ksa-skeleton-stack">
-              {[1, 2, 3, 4].map(i => (
+              {[1, 2, 3, 4, 5, 6].map(i => (
                   <div key={i} className="ksa-skeleton-row">
                       <div className="ksa-sk-box ksa-sk-date"></div>
                       <div className="ksa-sk-box ksa-sk-flow"></div>
@@ -316,47 +305,28 @@ export default function InterestApprovals() {
               </table>
             </div>
 
-            {/* Pagination Controls - Visible even if 1 page to show data boundaries */}
-            {requests.length > 0 && (
+            {/* NEW PAGINATION DESIGN */}
+            {totalPages > 1 && (
                 <div className="ksa-pagination-container">
-                    <span className="ksa-page-info">
-                        Showing <strong>{indexOfFirstItem + 1}</strong> to <strong>{Math.min(indexOfLastItem, requests.length)}</strong> of <strong>{requests.length}</strong>
+                    <button 
+                        className="ksa-page-btn-circle" 
+                        onClick={() => paginate(currentPage - 1)} 
+                        disabled={currentPage === 1}
+                    >
+                        <ChevronLeft size={20} />
+                    </button>
+                    
+                    <span className="ksa-page-text">
+                        Page {currentPage} of {totalPages}
                     </span>
-                    <div className="ksa-pagination-controls">
-                        <button 
-                            className="ksa-page-btn" 
-                            onClick={() => paginate(currentPage - 1)} 
-                            disabled={currentPage === 1}
-                        >
-                            <ChevronLeft size={16} /> Prev
-                        </button>
-                        
-                        <div className="ksa-page-numbers">
-                            {[...Array(totalPages)].map((_, index) => {
-                                if (totalPages > 5 && (index + 1 < currentPage - 1 || index + 1 > currentPage + 1) && index !== 0 && index !== totalPages - 1) {
-                                    if (index + 1 === currentPage - 2 || index + 1 === currentPage + 2) return <span key={index} className="ksa-page-dots">...</span>;
-                                    return null;
-                                }
-                                return (
-                                    <button 
-                                        key={index + 1} 
-                                        className={`ksa-page-number ${currentPage === index + 1 ? 'active' : ''}`}
-                                        onClick={() => paginate(index + 1)}
-                                    >
-                                        {index + 1}
-                                    </button>
-                                );
-                            })}
-                        </div>
 
-                        <button 
-                            className="ksa-page-btn" 
-                            onClick={() => paginate(currentPage + 1)} 
-                            disabled={currentPage === totalPages}
-                        >
-                            Next <ChevronRight size={16} />
-                        </button>
-                    </div>
+                    <button 
+                        className="ksa-page-btn-circle" 
+                        onClick={() => paginate(currentPage + 1)} 
+                        disabled={currentPage === totalPages}
+                    >
+                        <ChevronRight size={20} />
+                    </button>
                 </div>
             )}
           </>
