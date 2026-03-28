@@ -10,10 +10,12 @@ export default function AdminVendorLeads() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All"); 
+  
+  // Fixed Pagination States
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; 
+  const itemsPerPage = 6; // Fixed to 6 for both Desktop and Mobile
 
-  // Mobile Scroll Indicator State
+  // Universal Scroll Indicator State
   const [showMainScroll, setShowMainScroll] = useState(false);
 
   useEffect(() => {
@@ -24,14 +26,18 @@ export default function AdminVendorLeads() {
     setCurrentPage(1);
   }, [searchTerm, statusFilter]);
 
-  // Scroll Indicator Logic
+  // Universal Scroll Indicator Logic
   useEffect(() => {
     const checkMainScroll = () => {
+        if (leads.length === 0) {
+            setShowMainScroll(false);
+            return;
+        }
         const scrollY = window.scrollY || document.documentElement.scrollTop;
         const windowHeight = window.innerHeight;
         const documentHeight = document.documentElement.scrollHeight;
         
-        setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
+        setShowMainScroll(documentHeight > windowHeight + 20 && scrollY + windowHeight < documentHeight - 30);
     };
 
     const timer = setTimeout(checkMainScroll, 500); 
@@ -114,7 +120,7 @@ export default function AdminVendorLeads() {
 
   processedLeads.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-  const totalPages = Math.ceil(processedLeads.length / itemsPerPage);
+  const totalPages = Math.ceil(processedLeads.length / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentLeads = processedLeads.slice(startIndex, startIndex + itemsPerPage);
 
@@ -198,7 +204,7 @@ export default function AdminVendorLeads() {
             </thead>
             <tbody>
               {loading ? (
-                [...Array(5)].map((_, index) => <SkeletonRow key={index} />)
+                [...Array(6)].map((_, index) => <SkeletonRow key={index} />)
               ) : currentLeads.length === 0 ? (
                 <tr>
                   <td colSpan="5" className="avl-empty-cell">
@@ -266,33 +272,33 @@ export default function AdminVendorLeads() {
           </table>
         </div>
 
-        {/* Pagination Footer */}
+        {/* CIRCULAR PAGINATION DESIGN */}
         {!loading && totalPages > 1 && (
-            <div className="avl-pagination-bar">
-                <span className="avl-pagination-text">
-                    Showing <strong>{startIndex + 1}</strong> to <strong>{Math.min(startIndex + itemsPerPage, processedLeads.length)}</strong> of <strong>{processedLeads.length}</strong>
+            <div className="avl-pagination-container">
+                <button 
+                    className="avl-page-btn-circle" 
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                >
+                    <ChevronLeft size={20} />
+                </button>
+                
+                <span className="avl-page-text">
+                    Page {currentPage} of {totalPages}
                 </span>
-                <div className="avl-pagination-controls">
-                    <button 
-                        className="avl-page-btn"
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                        disabled={currentPage === 1}
-                    >
-                        <ChevronLeft size={16} /> Prev
-                    </button>
-                    <button 
-                        className="avl-page-btn"
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                        disabled={currentPage === totalPages}
-                    >
-                        Next <ChevronRight size={16} />
-                    </button>
-                </div>
+
+                <button 
+                    className="avl-page-btn-circle" 
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                >
+                    <ChevronRight size={20} />
+                </button>
             </div>
         )}
       </div>
 
-      {/* MOBILE SCROLL INDICATOR */}
+      {/* UNIVERSAL SCROLL INDICATOR */}
       {showMainScroll && (
           <div className="avl-scroll-indicator">
               <ChevronDown size={18} />
