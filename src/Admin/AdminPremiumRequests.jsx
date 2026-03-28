@@ -22,7 +22,7 @@ const AdminPremiumRequests = () => {
 
     // Fixed Pagination States
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 6; // Fixed 6 items for both Desktop and Mobile
+    const itemsPerPage = 4; // Changed to 4 items for both Desktop and Mobile
 
     // Global Scroll Indicator State
     const [showMainScroll, setShowMainScroll] = useState(false);
@@ -69,9 +69,9 @@ const AdminPremiumRequests = () => {
                 },
                 body: JSON.stringify({ status: newStatus })
             });
-            
+
             const data = await res.json();
-            
+
             if (data.success) {
                 toast.success(`Request marked as ${newStatus}`);
                 setRequests(prev => prev.map(req => 
@@ -91,7 +91,7 @@ const AdminPremiumRequests = () => {
     const filteredRequests = requests.filter(req => {
         // Strictly match the active tab status
         if (req.status !== activeTab) return false;
-        
+
         if (searchTerm) {
             const term = searchTerm.toLowerCase();
             const fullName = `${req.userId?.firstName || ''} ${req.userId?.lastName || ''}`.toLowerCase();
@@ -118,21 +118,37 @@ const AdminPremiumRequests = () => {
         }
     };
 
-    // Universal Scroll Indicator Logic
+    // Mobile Only Scroll Indicator Logic
     useEffect(() => {
         const checkMainScroll = () => {
-            if (filteredRequests.length === 0) {
+            // 1. Hide on desktop entirely (checking for widths > 768px)
+            if (window.innerWidth > 768) {
                 setShowMainScroll(false);
                 return;
             }
+
+            // 2. Hide if there is 1 or fewer items
+            if (currentItems.length <= 1) {
+                setShowMainScroll(false);
+                return;
+            }
+
             const scrollY = window.scrollY || document.documentElement.scrollTop;
             const windowHeight = window.innerHeight;
             const documentHeight = document.documentElement.scrollHeight;
-            
-            setShowMainScroll(documentHeight > windowHeight + 20 && scrollY + windowHeight < documentHeight - 30);
+
+            // 3. Check if the document is taller than the viewport. 
+            // We use an 80px buffer to account for padding and margins.
+            const isScrollable = documentHeight > windowHeight + 80;
+
+            // 4. Check if we haven't scrolled to the very bottom yet
+            const isNotAtBottom = scrollY + windowHeight < documentHeight - 30;
+
+            // 5. Only show the indicator if it's scrollable AND we aren't at the bottom
+            setShowMainScroll(isScrollable && isNotAtBottom);
         };
 
-        const timer = setTimeout(checkMainScroll, 500); 
+        const timer = setTimeout(checkMainScroll, 50); 
         window.addEventListener('scroll', checkMainScroll);
         window.addEventListener('resize', checkMainScroll);
 
@@ -141,7 +157,7 @@ const AdminPremiumRequests = () => {
             window.removeEventListener('scroll', checkMainScroll);
             window.removeEventListener('resize', checkMainScroll);
         };
-    }, [filteredRequests, currentPage]);
+    }, [currentItems, currentPage]);
 
     const formatDate = (dateString) => {
         const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
@@ -182,7 +198,7 @@ const AdminPremiumRequests = () => {
     return (
         <div className="admin-layout-container" id="premium-requests-root">
             <Toaster position="top-right" />
-            
+
             <style>{`
                 .admin-layout-container {
                     --pr-primary: #4f46e5;
@@ -694,7 +710,8 @@ const AdminPremiumRequests = () => {
             <div className="admin-data-card" id="premium-data-view">
                 {loading ? (
                     <div className="admin-skeleton-stack">
-                        {[1, 2, 3, 4, 5, 6].map(i => (
+                        {/* Map array reduced from 6 to 4 to match 4 items per page */}
+                        {[1, 2, 3, 4].map(i => (
                             <div key={i} className="admin-skeleton-row">
                                 <div className="admin-sk-box admin-sk-user"></div>
                                 <div className="admin-sk-box admin-sk-contact"></div>
@@ -795,7 +812,7 @@ const AdminPremiumRequests = () => {
                                 >
                                     <Icons.ChevronLeft />
                                 </button>
-                                
+
                                 <span className="admin-page-text">
                                     Page {currentPage} of {totalPages}
                                 </span>
@@ -812,7 +829,7 @@ const AdminPremiumRequests = () => {
                     </>
                 )}
             </div>
-            
+
             {/* SCROLL INDICATOR */}
             {showMainScroll && (
                 <div className="admin-scroll-indicator">
