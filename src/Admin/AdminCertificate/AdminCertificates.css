@@ -181,40 +181,53 @@
   border-radius: 50%;
   animation: ac-spin 1s linear infinite;
 }
+@keyframes ac-spin { to { transform: rotate(360deg); } }
 
-/* --- PAGINATION --- */
-.ac-pagination-bar {
+/* --- NEW CIRCULAR PAGINATION UI --- */
+.ac-pagination-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding: 16px 24px;
-  border-top: 1px solid var(--ac-border);
-  background: #f8fafc;
-  flex-wrap: wrap;
-  gap: 16px;
+  padding: 24px 16px;
+  gap: 24px;
+  background: transparent; 
+  border-top: none;
 }
-.ac-pagination-text { font-size: 13px; color: var(--ac-text-sub); }
-.ac-pagination-controls { display: flex; align-items: center; gap: 8px; }
-.ac-page-btn {
-  display: flex; align-items: center; justify-content: center; gap: 4px;
-  padding: 6px 16px;
-  border: 1px solid var(--ac-border);
-  background: white;
-  border-radius: var(--ac-radius-sm);
-  color: var(--ac-text-main);
-  font-size: 13px; font-weight: 600;
+
+.ac-page-btn-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
   cursor: pointer;
   transition: var(--ac-anim);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
 }
-.ac-page-btn:hover:not(:disabled) { background: #f1f5f9; border-color: var(--ac-border-hover); }
-.ac-page-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #f8fafc; }
 
-.ac-page-number {
-  min-width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 6px; font-size: 13px; font-weight: 600;
-  background: var(--ac-primary); color: white;
-  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+.ac-page-btn-circle:hover:not(:disabled) {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  transform: translateY(-1px);
+}
+
+.ac-page-btn-circle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #f8fafc;
+}
+
+.ac-page-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #475569;
+  letter-spacing: 0.3px;
 }
 
 /* --- SKELETON ANIMATION --- */
@@ -223,18 +236,19 @@
 .ac-sk-box {
   background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
   background-size: 200% 100%;
-  animation: ac-shimmer 1.5s infinite;
+  animation: shimmer 1.5s infinite;
   height: 20px;
   border-radius: 6px;
 }
-@keyframes ac-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-.ac-sk-id { width: 90px; }
-.ac-sk-name { width: 160px; }
-.ac-sk-email { width: 200px; }
-.ac-sk-status { width: 80px; border-radius: 20px;}
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+.ac-sk-id { width: 100px; }
+.ac-sk-name { width: 150px; }
+.ac-sk-email { width: 180px; }
+.ac-sk-status { width: 90px; border-radius: 20px;}
 .ac-sk-action { width: 120px; height: 36px; margin-left: auto; }
 
-/* --- STATE VIEWS --- */
+
+/* --- EMPTY STATE VIEWS --- */
 .ac-state-view {
   padding: 80px 24px;
   display: flex; flex-direction: column;
@@ -243,11 +257,10 @@
 }
 .ac-state-view.empty svg { color: #cbd5e1; }
 .ac-state-view h3 { margin: 0; color: var(--ac-text-main); font-size: 18px; }
-@keyframes ac-spin { to { transform: rotate(360deg); } }
 
-/* --- SCROLL INDICATOR UI --- */
+/* --- SCROLL INDICATOR UI (Global) --- */
 .ac-scroll-indicator {
-  display: flex; 
+  display: flex;
   position: fixed;
   bottom: 24px;
   left: 50%;
@@ -341,17 +354,13 @@
   .ac-action-group { width: 100%; justify-content: flex-end; }
   .ac-btn-download, .ac-btn-disabled { font-size: 12px; padding: 6px 12px; }
   
-  /* Pagination Stack */
-  .ac-pagination-bar {
-      flex-direction: column;
-      border-radius: 12px;
-      border: 1px solid var(--ac-border);
-      padding: 16px;
-      box-shadow: var(--ac-shadow-sm);
+  /* Circular Pagination Stack Mobile */
+  .ac-pagination-container {
+      padding: 16px 0;
       gap: 16px;
   }
-  .ac-pagination-controls { width: 100%; justify-content: space-between; }
-  .ac-page-btn { flex: 1; }
+  .ac-page-btn-circle { width: 40px; height: 40px; }
+  .ac-page-text { font-size: 14px; }
 
   /* Skeleton Mobile */
   .ac-skeleton-stack { padding: 0; }
@@ -361,5 +370,5 @@
       border: 1px solid var(--ac-border); margin-bottom: 16px;
   }
   .ac-sk-id, .ac-sk-name, .ac-sk-email, .ac-sk-status { width: 100%; height: 16px; }
-  .ac-sk-action { width: 100%; height: 36px; margin-top: 8px; margin-left: 0;}
+  .ac-sk-action { width: 100%; height: 36px; margin-top: 8px; margin-left: 0; }
 }
