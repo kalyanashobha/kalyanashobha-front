@@ -63,26 +63,39 @@ export default function InterestApprovals() {
     fetchCounts();
   }, [activeTab]);
 
-  // Universal Scroll Indicator Logic (Desktop & Mobile)
+  // --- PAGINATION LOGIC (Moved up so we can use currentItems in the scroll check) ---
+  const totalPages = Math.ceil(requests.length / itemsPerPage) || 1;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = requests.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // --- UNIVERSAL SCROLL INDICATOR LOGIC ---
   useEffect(() => {
     const checkMainScroll = () => {
+        // 1. Safety net: If there are 2 or fewer items, we definitely don't need a scrollbar 
+        // on a standard layout, so force it to hide.
+        if (currentItems.length <= 2) {
+            setShowMainScroll(false);
+            return;
+        }
+
         const scrollY = window.scrollY || document.documentElement.scrollTop;
-        const windowHeight = window.innerHeight;
-        const documentHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollHeight = document.documentElement.scrollHeight;
 
-        // 1. Check if the document is actually taller than the viewport
-        // (Adding a 10px buffer prevents it from showing if it fits almost perfectly)
-        const isScrollable = documentHeight > windowHeight + 10;
+        // 2. Check if the document is taller than the viewport. 
+        // We use an 80px buffer to account for padding and margins.
+        const isScrollable = scrollHeight > clientHeight + 80;
         
-        // 2. Check if we haven't scrolled to the very bottom yet
-        const isNotAtBottom = scrollY + windowHeight < documentHeight - 30;
+        // 3. Check if we haven't scrolled to the very bottom yet
+        const isNotAtBottom = scrollY + clientHeight < scrollHeight - 30;
 
-        // 3. Only show the indicator if it's scrollable AND we aren't at the bottom
+        // 4. Only show the indicator if it's scrollable AND we aren't at the bottom
         setShowMainScroll(isScrollable && isNotAtBottom);
     };
 
-    // We use a shorter 50ms timeout to give the browser just enough time 
-    // to paint the new items to the screen before checking the heights.
     const timer = setTimeout(checkMainScroll, 50); 
     
     window.addEventListener('scroll', checkMainScroll);
@@ -93,7 +106,7 @@ export default function InterestApprovals() {
         window.removeEventListener('scroll', checkMainScroll);
         window.removeEventListener('resize', checkMainScroll);
     };
-  }, [requests, currentPage]);
+  }, [currentItems, currentPage]); // Re-run when currentItems changes
 
   // Handle Actions
   const handleAction = async (interestId, action, phase) => {
@@ -117,14 +130,6 @@ export default function InterestApprovals() {
       setProcessingId(null);
     }
   };
-
-  // Pagination Logic
-  const totalPages = Math.ceil(requests.length / itemsPerPage) || 1;
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = requests.slice(indexOfFirstItem, indexOfLastItem);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="ksa-layout">
@@ -349,4 +354,3 @@ export default function InterestApprovals() {
     </div>
   );
 }
- 
