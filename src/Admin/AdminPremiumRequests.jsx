@@ -22,7 +22,7 @@ const AdminPremiumRequests = () => {
 
     // Fixed Pagination States
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 4; // Changed to 4 items for both Desktop and Mobile
+    const itemsPerPage = 4; // 4 items for both Desktop and Mobile
 
     // Global Scroll Indicator State
     const [showMainScroll, setShowMainScroll] = useState(false);
@@ -802,8 +802,8 @@ const AdminPremiumRequests = () => {
                             </table>
                         </div>
 
-                        {/* CIRCULAR PAGINATION DESIGN */}
-                        {totalPages > 1 && (
+                        {/* ALWAYS VISIBLE CIRCULAR PAGINATION DESIGN */}
+                        {totalPages >= 1 && (
                             <div className="admin-pagination-container">
                                 <button 
                                     className="admin-page-btn-circle" 
