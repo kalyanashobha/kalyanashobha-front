@@ -9,7 +9,7 @@ import "./InterestApprovals.css";
 export default function InterestApprovals() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Tabs: 'PendingAdminPhase1' (New), 'PendingAdminPhase2' (Accepted), 'Finalized' (Completed)
   const [activeTab, setActiveTab] = useState("PendingAdminPhase1"); 
   const [processingId, setProcessingId] = useState(null);
@@ -48,7 +48,7 @@ export default function InterestApprovals() {
         axios.get(`https://kalyanashobha-back.vercel.app/api/admin/interest/workflow?status=PendingAdminPhase1`, { headers: { Authorization: token } }),
         axios.get(`https://kalyanashobha-back.vercel.app/api/admin/interest/workflow?status=PendingAdminPhase2`, { headers: { Authorization: token } })
       ]);
-      
+
       setTabCounts({
         phase1: res1.data.success ? res1.data.data.length : 0,
         phase2: res2.data.success ? res2.data.data.length : 0,
@@ -66,19 +66,25 @@ export default function InterestApprovals() {
   // Universal Scroll Indicator Logic (Desktop & Mobile)
   useEffect(() => {
     const checkMainScroll = () => {
-        if (requests.length === 0) {
-            setShowMainScroll(false);
-            return;
-        }
         const scrollY = window.scrollY || document.documentElement.scrollTop;
         const windowHeight = window.innerHeight;
         const documentHeight = document.documentElement.scrollHeight;
+
+        // 1. Check if the document is actually taller than the viewport
+        // (Adding a 10px buffer prevents it from showing if it fits almost perfectly)
+        const isScrollable = documentHeight > windowHeight + 10;
         
-        // Show if document is taller than window, and we haven't scrolled to the very bottom
-        setShowMainScroll(documentHeight > windowHeight + 20 && scrollY + windowHeight < documentHeight - 30);
+        // 2. Check if we haven't scrolled to the very bottom yet
+        const isNotAtBottom = scrollY + windowHeight < documentHeight - 30;
+
+        // 3. Only show the indicator if it's scrollable AND we aren't at the bottom
+        setShowMainScroll(isScrollable && isNotAtBottom);
     };
 
-    const timer = setTimeout(checkMainScroll, 500); 
+    // We use a shorter 50ms timeout to give the browser just enough time 
+    // to paint the new items to the screen before checking the heights.
+    const timer = setTimeout(checkMainScroll, 50); 
+    
     window.addEventListener('scroll', checkMainScroll);
     window.addEventListener('resize', checkMainScroll);
 
@@ -196,7 +202,7 @@ export default function InterestApprovals() {
                   <tbody>
                   {currentItems.map((req) => (
                       <tr key={req._id} className={processingId === req._id ? "ksa-row-processing" : ""}>
-                      
+
                       {/* DATE */}
                       <td data-label="Date">
                           <div className="ksa-date-cell">
@@ -207,7 +213,7 @@ export default function InterestApprovals() {
                               </div>
                           </div>
                       </td>
-                      
+
                       {/* FLOW */}
                       <td data-label="Match Flow">
                           <div className="ksa-flow-cell">
@@ -315,7 +321,7 @@ export default function InterestApprovals() {
                     >
                         <ChevronLeft size={20} />
                     </button>
-                    
+
                     <span className="ksa-page-text">
                         Page {currentPage} of {totalPages}
                     </span>
