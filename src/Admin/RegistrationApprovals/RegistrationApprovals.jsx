@@ -16,7 +16,7 @@ export default function RegistrationApprovals() {
   // --- SEARCH & PAGINATION STATES ---
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6; 
+  const itemsPerPage = 3; // Changed to 3 items for both Desktop and Mobile
 
   // Mobile Scroll Indicator State
   const [showMainScroll, setShowMainScroll] = useState(false);
@@ -86,7 +86,7 @@ export default function RegistrationApprovals() {
         // 2. Check if the document is actually taller than the screen.
         // We use an 80px buffer to account for padding and margins.
         const isScrollable = scrollHeight > clientHeight + 80;
-        
+
         // 3. Check if we haven't scrolled to the very bottom yet.
         const isNotAtBottom = scrollY + clientHeight < scrollHeight - 30;
 
@@ -95,7 +95,7 @@ export default function RegistrationApprovals() {
     };
 
     const timer = setTimeout(checkMainScroll, 50); 
-    
+
     window.addEventListener('scroll', checkMainScroll);
     window.addEventListener('resize', checkMainScroll);
 
@@ -139,7 +139,7 @@ export default function RegistrationApprovals() {
             <h2>Registration Approvals</h2>
             <p>Verify membership payments and activate users.</p>
         </div>
-        
+
         <div className="ra-header-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
            <div className="ra-search-container" style={{ display: 'flex', alignItems: 'center', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 12px', gap: '8px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
                <Search size={16} color="#64748b" />
@@ -192,7 +192,8 @@ export default function RegistrationApprovals() {
       <div className="ra-content">
         {loading ? (
            <div className="ra-skeleton-stack">
-              {[1, 2, 3, 4, 5, 6].map(i => (
+              {/* Updated to show 3 skeletons matching the 3 items per page */}
+              {[1, 2, 3].map(i => (
                   <div key={i} className="ra-skeleton-row">
                       <div className="sk-box sk-date"></div>
                       <div className="sk-box sk-user"></div>
