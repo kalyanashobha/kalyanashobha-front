@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
-import { RefreshCw, Paperclip, X, CheckCircle, Clock, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { RefreshCw, Paperclip, X, CheckCircle, Clock, ChevronDown } from 'lucide-react';
 import './AdminHelpCenter.css'; 
 
 const AdminHelpCenter = () => {
@@ -16,24 +16,12 @@ const AdminHelpCenter = () => {
   // State to toggle inline image viewing
   const [showImage, setShowImage] = useState(false);
 
-  // --- PAGINATION STATES ---
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4; // 4 items for both Desktop and Mobile
-
   // Mobile Scroll Indicator State
   const [showMainScroll, setShowMainScroll] = useState(false);
 
   useEffect(() => {
     fetchIssues();
   }, []);
-
-  // --- PAGINATION LOGIC ---
-  const totalPages = Math.ceil(issues.length / itemsPerPage) || 1;
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = issues.slice(indexOfFirstItem, indexOfLastItem);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // --- MOBILE ONLY SCROLL INDICATOR LOGIC ---
   useEffect(() => {
@@ -44,8 +32,8 @@ const AdminHelpCenter = () => {
             return;
         }
 
-        // 2. Hide if modal is open or if 1 or fewer items
-        if (selectedIssue || currentItems.length <= 1) {
+        // 2. Hide if there is 1 or fewer items, OR if the modal is currently open
+        if (issues.length <= 1 || selectedIssue) {
             setShowMainScroll(false);
             return;
         }
@@ -54,7 +42,8 @@ const AdminHelpCenter = () => {
         const windowHeight = window.innerHeight;
         const documentHeight = document.documentElement.scrollHeight;
 
-        // 3. Check if the document is taller than the viewport.
+        // 3. Check if the document is taller than the viewport. 
+        // We use an 80px buffer to account for padding and margins.
         const isScrollable = documentHeight > windowHeight + 80;
 
         // 4. Check if we haven't scrolled to the very bottom yet
@@ -73,7 +62,7 @@ const AdminHelpCenter = () => {
         window.removeEventListener('scroll', checkMainScroll);
         window.removeEventListener('resize', checkMainScroll);
     };
-  }, [currentItems, currentPage, selectedIssue]);
+  }, [issues, selectedIssue]);
 
   const fetchIssues = async () => {
     setLoading(true);
@@ -90,7 +79,6 @@ const AdminHelpCenter = () => {
 
       if (data.success) {
         setIssues(data.data);
-        setCurrentPage(1); // Reset to first page on refresh
       } else {
         toast.error(data.message || 'Failed to fetch issues.');
       }
@@ -188,8 +176,7 @@ const AdminHelpCenter = () => {
                 <tr>
                     <td colSpan="5" className="kah-empty-cell">
                         <div className="kah-skeleton-stack">
-                            {/* Reduced to 4 skeleton rows */}
-                            {[1, 2, 3, 4].map((i) => (
+                            {[1, 2, 3, 4, 5].map((i) => (
                                 <div key={i} className="kah-skeleton-row">
                                     <div className="kah-sk-box kah-sk-date"></div>
                                     <div className="kah-sk-box kah-sk-user"></div>
@@ -213,8 +200,8 @@ const AdminHelpCenter = () => {
                   </td>
                 </tr>
               ) : (
-                /* Actual Data Rows using currentItems */
-                currentItems.map((issue) => (
+                /* Actual Data Rows */
+                issues.map((issue) => (
                   <tr key={issue._id}>
                     <td data-label="Date">
                         <div className="kah-date-cell">
@@ -258,34 +245,9 @@ const AdminHelpCenter = () => {
             </tbody>
           </table>
         </div>
-
-        {/* ALWAYS VISIBLE CIRCULAR PAGINATION DESIGN */}
-        {!loading && totalPages >= 1 && (
-            <div className="kah-pagination-container">
-                <button 
-                    className="kah-page-btn-circle" 
-                    onClick={() => paginate(currentPage - 1)} 
-                    disabled={currentPage === 1}
-                >
-                    <ChevronLeft size={20} />
-                </button>
-
-                <span className="kah-page-text">
-                    Page {currentPage} of {totalPages}
-                </span>
-
-                <button 
-                    className="kah-page-btn-circle" 
-                    onClick={() => paginate(currentPage + 1)} 
-                    disabled={currentPage === totalPages}
-                >
-                    <ChevronRight size={20} />
-                </button>
-            </div>
-        )}
       </div>
 
-      {/* MOBILE SCROLL INDICATOR */}
+      {/* MOBILE ONLY SCROLL INDICATOR */}
       {showMainScroll && (
           <div className="kah-scroll-indicator">
               <ChevronDown size={18} />
