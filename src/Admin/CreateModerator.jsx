@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function CreateModerator() {
   const [formData, setFormData] = useState({
@@ -10,7 +11,6 @@ export default function CreateModerator() {
   });
 
   const [selectedPermissions, setSelectedPermissions] = useState([]);
-  const [message, setMessage] = useState({ type: '', text: '' });
   const [isLoading, setIsLoading] = useState(false);
 
   const [moderators, setModerators] = useState([]);
@@ -78,6 +78,7 @@ export default function CreateModerator() {
       }
     } catch (error) {
       console.error("Failed to fetch moderators", error);
+      toast.error("Failed to load active moderators.");
     }
   };
 
@@ -109,7 +110,6 @@ export default function CreateModerator() {
       password: '' 
     });
     setSelectedPermissions(mod.permissions || []);
-    setMessage({ type: '', text: '' });
     window.scrollTo({ top: 0, behavior: 'smooth' }); 
   };
 
@@ -117,12 +117,12 @@ export default function CreateModerator() {
     setEditingModId(null);
     setFormData({ username: '', email: '', password: '' });
     setSelectedPermissions([]);
-    setMessage({ type: '', text: '' });
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this moderator? This action cannot be undone.")) return;
 
+    const toastId = toast.loading('Deleting moderator...');
     try {
       const token = localStorage.getItem('adminToken');
       const response = await axios.delete(`https://kalyanashobha-back.vercel.app/api/admin/moderators/${id}`, {
@@ -130,25 +130,25 @@ export default function CreateModerator() {
       });
 
       if (response.data.success) {
-        setMessage({ type: 'success', text: 'Moderator deleted successfully.' });
+        toast.success('Moderator deleted successfully.', { id: toastId });
         fetchModerators(); 
         if (editingModId === id) handleCancelEdit(); 
       }
     } catch (error) {
-      setMessage({ type: 'error', text: error.response?.data?.message || 'Failed to delete moderator.' });
+      toast.error(error.response?.data?.message || 'Failed to delete moderator.', { id: toastId });
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage({ type: '', text: '' });
-    setIsLoading(true);
 
     if (selectedPermissions.length === 0) {
-      setMessage({ type: 'error', text: 'Please select at least one permission.' });
-      setIsLoading(false);
+      toast.error('Please select at least one permission.');
       return;
     }
+
+    setIsLoading(true);
+    const toastId = toast.loading(editingModId ? 'Updating moderator...' : 'Creating moderator profile...');
 
     try {
       const token = localStorage.getItem('adminToken');
@@ -174,18 +174,12 @@ export default function CreateModerator() {
       }
 
       if (response.data.success) {
-        setMessage({ 
-          type: 'success', 
-          text: editingModId ? 'Moderator updated successfully.' : 'Moderator profile successfully created.' 
-        });
+        toast.success(editingModId ? 'Moderator updated successfully.' : 'Moderator profile successfully created.', { id: toastId });
         handleCancelEdit(); 
         fetchModerators();  
       }
     } catch (error) {
-      setMessage({ 
-        type: 'error', 
-        text: error.response?.data?.message || `Failed to ${editingModId ? 'update' : 'create'} moderator.` 
-      });
+      toast.error(error.response?.data?.message || `Failed to ${editingModId ? 'update' : 'create'} moderator.`, { id: toastId });
     } finally {
       setIsLoading(false);
     }
@@ -205,9 +199,11 @@ export default function CreateModerator() {
 
   return (
     <div className="ks-mod-admin-wrapper">
+      <Toaster position="top-right" />
+      
       <style>{`
         :root {
-          /* Updated to Thick Red Theme */
+          /* Thick Red Theme */
           --ks-mod-primary: #dc2626; 
           --ks-mod-primary-hover: #b91c1c; 
           --ks-mod-text-dark: #0f172a;
@@ -263,26 +259,6 @@ export default function CreateModerator() {
           margin: 0;
           color: var(--ks-mod-text-muted);
           font-size: 15px;
-        }
-
-        .ks-mod-alert {
-          padding: 14px 16px;
-          border-radius: 8px;
-          margin-bottom: 24px;
-          font-size: 14px;
-          font-weight: 600;
-        }
-
-        .ks-mod-alert-success {
-          background-color: var(--ks-mod-success-bg);
-          color: var(--ks-mod-success-text);
-          border: 1px solid #bbf7d0;
-        }
-
-        .ks-mod-alert-error {
-          background-color: var(--ks-mod-error-bg);
-          color: var(--ks-mod-error-text);
-          border: 1px solid #fecaca;
         }
 
         .ks-mod-form {
@@ -570,7 +546,7 @@ export default function CreateModerator() {
             gap: 16px;
             border-bottom-left-radius: var(--ks-mod-radius);
             border-bottom-right-radius: var(--ks-mod-radius);
-            margin: 0 -32px -32px -32px; /* Pulls pagination flush against card edges */
+            margin: 0 -32px -32px -32px; 
         }
 
         .ks-mod-pagination-text { 
@@ -761,12 +737,6 @@ export default function CreateModerator() {
           <h2>{editingModId ? 'Edit Moderator Access' : 'Create Moderator Access'}</h2>
           <p>{editingModId ? 'Update administrative roles and permissions.' : 'Assign administrative roles and configure dashboard permissions.'}</p>
         </div>
-
-        {message.text && (
-          <div className={`ks-mod-alert ${message.type === 'success' ? 'ks-mod-alert-success' : 'ks-mod-alert-error'}`}>
-            {message.text}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="ks-mod-form">
           <div className="ks-mod-input-grid">
