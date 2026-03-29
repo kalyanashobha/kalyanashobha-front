@@ -8,11 +8,11 @@ export default function CreateModerator() {
     email: '',
     password: ''
   });
-  
+
   const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [moderators, setModerators] = useState([]);
   const [editingModId, setEditingModId] = useState(null);
 
@@ -36,7 +36,9 @@ export default function CreateModerator() {
     { id: "help-center", label: "Help Center" },
     { id: "data-approval", label: "Data Approval" },
     { id: "manage-pages", label: "Manage Pages" },
-    { id: "testimonials", label: "Testimonials" }
+    { id: "testimonials", label: "Testimonials" },
+    { id: "fee-settings", label: "Fee Settings" },
+    { id: "create-moderator", label: "Create Moderator" }
   ];
 
   useEffect(() => {
@@ -49,7 +51,7 @@ export default function CreateModerator() {
         const scrollY = window.scrollY || document.documentElement.scrollTop;
         const windowHeight = window.innerHeight;
         const documentHeight = document.documentElement.scrollHeight;
-        
+
         setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
     };
 
@@ -120,7 +122,7 @@ export default function CreateModerator() {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this moderator? This action cannot be undone.")) return;
-    
+
     try {
       const token = localStorage.getItem('adminToken');
       const response = await axios.delete(`https://kalyanashobha-back.vercel.app/api/admin/moderators/${id}`, {
@@ -205,8 +207,9 @@ export default function CreateModerator() {
     <div className="ks-mod-admin-wrapper">
       <style>{`
         :root {
-          --ks-mod-primary: #8E1B1B;
-          --ks-mod-primary-hover: #7a1717;
+          /* Updated to Thick Red Theme */
+          --ks-mod-primary: #dc2626; 
+          --ks-mod-primary-hover: #b91c1c; 
           --ks-mod-text-dark: #0f172a;
           --ks-mod-text-muted: #64748b;
           --ks-mod-border: #e2e8f0;
@@ -323,7 +326,7 @@ export default function CreateModerator() {
 
         .ks-mod-input:focus {
           border-color: var(--ks-mod-primary);
-          box-shadow: 0 0 0 4px rgba(142, 27, 27, 0.1);
+          box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
         }
 
         .ks-mod-permissions-panel {
@@ -396,7 +399,7 @@ export default function CreateModerator() {
 
         .ks-mod-checkbox-card.is-active {
           border-color: var(--ks-mod-primary);
-          background-color: #fdf2f2;
+          background-color: #fef2f2;
         }
 
         .ks-mod-checkbox-card input[type="checkbox"] {
@@ -431,13 +434,13 @@ export default function CreateModerator() {
           cursor: pointer;
           transition: var(--ks-mod-anim);
           width: 100%;
-          box-shadow: 0 2px 4px rgba(142, 27, 27, 0.2);
+          box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
         }
 
         .ks-mod-btn-primary:hover:not(:disabled) {
           background-color: var(--ks-mod-primary-hover);
           transform: translateY(-1px);
-          box-shadow: 0 4px 6px rgba(142, 27, 27, 0.3);
+          box-shadow: 0 4px 6px rgba(220, 38, 38, 0.3);
         }
 
         .ks-mod-btn-primary:disabled {
@@ -619,11 +622,10 @@ export default function CreateModerator() {
             font-weight: 600;
             background: var(--ks-mod-primary); 
             color: white;
-            box-shadow: 0 2px 4px rgba(142, 27, 27, 0.2);
+            box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
         }
 
         /* --- SCROLL INDICATOR UI --- */
-        /* Changed to display: flex by default, then controlled by state */
         .ks-mod-scroll-indicator {
           position: fixed;
           bottom: 24px;
@@ -642,7 +644,7 @@ export default function CreateModerator() {
           z-index: 50;
           animation: bounceSubtle 2s infinite ease-in-out;
           backdrop-filter: blur(4px);
-          display: flex; /* Shown dynamically via react state */
+          display: flex; 
         }
         @keyframes bounceSubtle {
           0%, 100% { transform: translate(-50%, 0); }
@@ -685,7 +687,7 @@ export default function CreateModerator() {
            ========================================================= */
         @media (max-width: 767px) {
           .ks-mod-admin-wrapper { padding: 16px; }
-          .ks-mod-card { padding: 20px; border-radius: 16px; overflow: hidden; } /* Ensure overflow hidden for pagination bar */
+          .ks-mod-card { padding: 20px; border-radius: 16px; overflow: hidden; }
 
           .ks-mod-header h2 { font-size: 20px; }
           .ks-mod-header p { font-size: 13px; }
@@ -709,7 +711,7 @@ export default function CreateModerator() {
               display: flex; justify-content: space-between; align-items: flex-start;
               padding: 12px 0; border-bottom: 1px dashed var(--ks-mod-border);
               text-align: right; 
-              gap: 12px; /* Prevent label and data from touching */
+              gap: 12px; 
           }
           
           .ks-mod-table td:last-child { border-bottom: none; padding-bottom: 0; }
@@ -721,14 +723,14 @@ export default function CreateModerator() {
               font-size: 11px; font-weight: 700; color: var(--ks-mod-text-sub);
               text-transform: uppercase; letter-spacing: 0.5px;
               flex-shrink: 0; margin-top: 2px;
-              width: 90px; /* Force rigid width so data side scales correctly */
+              width: 90px; 
               text-align: left;
           }
 
           /* OVERRIDE FOR SQUISHED TEXT ISSUE */
           .ks-mod-td-bold, .ks-mod-td-muted, .ks-mod-badge {
               flex: 1;
-              word-break: break-all; /* Forces extremely long text to break cleanly */
+              word-break: break-all; 
               overflow-wrap: anywhere;
               text-align: right;
               font-size: 13px;
@@ -740,7 +742,7 @@ export default function CreateModerator() {
           /* Mobile Pagination Styling */
           .ks-mod-pagination-bar {
               flex-direction: column;
-              margin: 0 -20px -20px -20px; /* Adapts to mobile card padding */
+              margin: 0 -20px -20px -20px; 
               padding: 16px 20px;
           }
           
@@ -759,7 +761,7 @@ export default function CreateModerator() {
           <h2>{editingModId ? 'Edit Moderator Access' : 'Create Moderator Access'}</h2>
           <p>{editingModId ? 'Update administrative roles and permissions.' : 'Assign administrative roles and configure dashboard permissions.'}</p>
         </div>
-        
+
         {message.text && (
           <div className={`ks-mod-alert ${message.type === 'success' ? 'ks-mod-alert-success' : 'ks-mod-alert-error'}`}>
             {message.text}
@@ -822,7 +824,7 @@ export default function CreateModerator() {
                 {selectedPermissions.length === availablePermissions.length ? 'Deselect All' : 'Select All'}
               </button>
             </div>
-            
+
             <div className="ks-mod-permissions-grid">
               {availablePermissions.map((perm) => (
                 <label key={perm.id} className={`ks-mod-checkbox-card ${selectedPermissions.includes(perm.id) ? 'is-active' : ''}`}>
@@ -914,7 +916,7 @@ export default function CreateModerator() {
                 <span className="ks-mod-pagination-text">
                     Showing <strong>{indexOfFirstItem + 1}</strong> to <strong>{Math.min(indexOfLastItem, moderators.length)}</strong> of <strong>{moderators.length}</strong>
                 </span>
-                
+
                 <div className="ks-mod-pagination-controls">
                     <button 
                         className="ks-mod-page-btn"
@@ -923,11 +925,11 @@ export default function CreateModerator() {
                     >
                         <ChevronLeft size={16} /> Prev
                     </button>
-                    
+
                     <span className="ks-mod-page-number">
                         {currentPage}
                     </span>
-                    
+
                     <button 
                         className="ks-mod-page-btn"
                         onClick={() => handlePageChange(currentPage + 1)} 
