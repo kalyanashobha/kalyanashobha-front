@@ -1,57 +1,65 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
-import './Login/AdminLogin.css'; 
+import { IndianRupee, QrCode, Save, Settings } from 'lucide-react';
 
 const AdminFeeSettings = () => {
     // State management
-    const [maleFee, setMaleFee] = useState(0);
-    const [femaleFee, setFemaleFee] = useState(0);
+    const [maleFee, setMaleFee] = useState('');
+    const [femaleFee, setFemaleFee] = useState('');
     const [upiId, setUpiId] = useState(''); 
-    const [isLoading, setIsLoading] = useState(false);
+    
+    // Separate loading states for fetching vs updating
+    const [isFetching, setIsFetching] = useState(true);
+    const [isUpdating, setIsUpdating] = useState(false);
 
-    // Separate URLs to perfectly match your backend routes
     const GET_API_URL = "https://kalyanashobha-back.vercel.app/api/admin/settings/fees";
     const PUT_API_URL = "https://kalyanashobha-back.vercel.app/api/admin/settings";
 
-    // Fetch the current settings when the component loads
     useEffect(() => {
         fetchCurrentSettings();
     }, []);
 
     const fetchCurrentSettings = async () => {
+        setIsFetching(true);
+        // 1. Show processing toast while fetching
+        const fetchToastId = toast.loading('Fetching current settings...');
+
         try {
             const token = localStorage.getItem('adminToken');
-            
-            // Using the correct GET route
+
             const res = await axios.get(GET_API_URL, {
                 headers: { Authorization: token }
             });
-            
+
             if (res.data.success) {
                 const settingsData = res.data.data || {};
-                
-                setMaleFee(settingsData.maleRegistrationFee || 0);
-                setFemaleFee(settingsData.femaleRegistrationFee || 0);
-                setUpiId(settingsData.upiId || '8897714968@axl'); // Provide fallback if empty
+
+                setMaleFee(settingsData.maleRegistrationFee || '');
+                setFemaleFee(settingsData.femaleRegistrationFee || '');
+                setUpiId(settingsData.upiId || ''); 
+
+                // 2. Update toast on success
+                toast.success('Settings loaded successfully!', { id: fetchToastId });
             }
         } catch (err) {
             console.error("Error fetching settings:", err);
-            toast.error('Failed to load current settings.');
+            // 3. Update toast on error
+            toast.error('Failed to load current settings.', { id: fetchToastId });
+        } finally {
+            setIsFetching(false);
         }
     };
 
     const handleUpdateSettings = async (e) => {
         e.preventDefault();
-        setIsLoading(true); 
-        
-        // Trigger the loading toast
-        const toastId = toast.loading('Updating settings...');
+        setIsUpdating(true); 
+
+        const updateToastId = toast.loading('Updating settings...');
 
         try {
             const token = localStorage.getItem('adminToken');
-            
-            // Using the correct PUT route
+
             const res = await axios.put(PUT_API_URL, { 
                 maleRegistrationFee: Number(maleFee), 
                 femaleRegistrationFee: Number(femaleFee),
@@ -61,78 +69,297 @@ const AdminFeeSettings = () => {
             });
 
             if (res.data.success) {
-                // Replace the loading toast with a success toast
-                toast.success('Settings updated successfully!', { id: toastId });
+                toast.success('Settings updated successfully!', { id: updateToastId });
             }
         } catch (err) {
-            // Replace the loading toast with an error toast
-            toast.error(err.response?.data?.message || "Failed to update settings.", { id: toastId });
+            toast.error(err.response?.data?.message || "Failed to update settings.", { id: updateToastId });
         } finally {
-            setIsLoading(false);
+            setIsUpdating(false);
         }
     };
 
     return (
-        <>
-            {/* Toaster component renders the actual toast popups */}
-            <Toaster position="top-center" reverseOrder={false} />
+        <div className="afs-layout-wrapper" id="admin-fee-settings-root">
+            <Toaster position="top-right" reverseOrder={false} />
 
-            <div className="admin-login-container">
-                <div className="login-card">
-                    
-                    <div className="login-header">
-                        <h2>Platform Settings</h2>
-                        <p>Set global registration fees and payment details</p>
+            {/* INTERNAL CSS */}
+            <style>{`
+                .afs-layout-wrapper {
+                    --afs-primary: #4f46e5;
+                    --afs-primary-hover: #4338ca;
+                    --afs-bg: #f8fafc;
+                    --afs-card-bg: #ffffff;
+                    --afs-text-main: #0f172a;
+                    --afs-text-sub: #64748b;
+                    --afs-border: #e2e8f0;
+                    --afs-input-bg: #f8fafc;
+                    --afs-radius: 16px;
+                    --afs-radius-sm: 8px;
+                    --afs-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+                    --afs-transition: all 0.2s ease-in-out;
+
+                    min-height: 100vh;
+                    background-color: var(--afs-bg);
+                    padding: 40px 20px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: flex-start;
+                    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+                    box-sizing: border-box;
+                }
+
+                .afs-card-container {
+                    background: var(--afs-card-bg);
+                    width: 100%;
+                    max-width: 500px;
+                    border-radius: var(--afs-radius);
+                    box-shadow: var(--afs-shadow);
+                    border: 1px solid var(--afs-border);
+                    overflow: hidden;
+                    animation: afsFadeIn 0.4s ease-out;
+                }
+
+                @keyframes afsFadeIn {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+
+                .afs-header-section {
+                    padding: 32px 32px 24px 32px;
+                    border-bottom: 1px solid var(--afs-border);
+                    text-align: center;
+                }
+
+                .afs-icon-wrap {
+                    width: 48px;
+                    height: 48px;
+                    background: #e0e7ff;
+                    color: var(--afs-primary);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 auto 16px auto;
+                }
+
+                .afs-header-section h2 {
+                    margin: 0 0 8px 0;
+                    font-size: 24px;
+                    color: var(--afs-text-main);
+                    font-weight: 800;
+                    letter-spacing: -0.5px;
+                }
+
+                .afs-header-section p {
+                    margin: 0;
+                    color: var(--afs-text-sub);
+                    font-size: 14px;
+                    line-height: 1.5;
+                }
+
+                .afs-form-section {
+                    padding: 32px;
+                }
+
+                .afs-input-group {
+                    margin-bottom: 24px;
+                }
+
+                .afs-label {
+                    display: block;
+                    font-size: 13px;
+                    font-weight: 700;
+                    color: var(--afs-text-main);
+                    margin-bottom: 8px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+
+                .afs-input-wrapper {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                }
+
+                .afs-input-icon {
+                    position: absolute;
+                    left: 16px;
+                    color: #94a3b8;
+                    pointer-events: none;
+                }
+
+                .afs-input-field {
+                    width: 100%;
+                    background: var(--afs-input-bg);
+                    border: 1px solid var(--afs-border);
+                    padding: 14px 16px 14px 44px;
+                    border-radius: var(--afs-radius-sm);
+                    font-size: 15px;
+                    color: var(--afs-text-main);
+                    transition: var(--afs-transition);
+                    box-sizing: border-box;
+                    font-family: inherit;
+                }
+
+                .afs-input-field:focus {
+                    outline: none;
+                    border-color: var(--afs-primary);
+                    background: #ffffff;
+                    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+                }
+
+                .afs-input-field:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                }
+
+                .afs-btn-submit {
+                    width: 100%;
+                    background: var(--afs-primary);
+                    color: #ffffff;
+                    border: none;
+                    padding: 16px;
+                    border-radius: var(--afs-radius-sm);
+                    font-size: 15px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    transition: var(--afs-transition);
+                    margin-top: 8px;
+                }
+
+                .afs-btn-submit:hover:not(:disabled) {
+                    background: var(--afs-primary-hover);
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+                }
+
+                .afs-btn-submit:disabled {
+                    opacity: 0.7;
+                    cursor: not-allowed;
+                }
+
+                /* Skeleton Loading Styles */
+                .afs-skeleton-input {
+                    width: 100%;
+                    height: 50px;
+                    border-radius: var(--afs-radius-sm);
+                    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+                    background-size: 200% 100%;
+                    animation: afsShimmer 1.5s infinite;
+                }
+
+                @keyframes afsShimmer {
+                    0% { background-position: -200% 0; }
+                    100% { background-position: 200% 0; }
+                }
+
+                /* Mobile Adjustments */
+                @media (max-width: 600px) {
+                    .afs-layout-wrapper {
+                        padding: 20px 16px;
+                    }
+                    .afs-header-section {
+                        padding: 24px 20px 20px 20px;
+                    }
+                    .afs-form-section {
+                        padding: 24px 20px;
+                    }
+                }
+            `}</style>
+
+            <div className="afs-card-container">
+                <div className="afs-header-section">
+                    <div className="afs-icon-wrap">
+                        <Settings size={24} />
                     </div>
+                    <h2>Platform Settings</h2>
+                    <p>Manage global payment details and membership registration fees.</p>
+                </div>
 
+                <div className="afs-form-section">
                     <form onSubmit={handleUpdateSettings}>
-                        
-                        <div className="form-group">
-                            <label>Payment UPI ID</label>
-                            <input 
-                                type="text" 
-                                className="form-control" 
-                                placeholder="e.g. 8897714968@axl" 
-                                value={upiId}
-                                onChange={(e) => setUpiId(e.target.value)} 
-                                required 
-                            />
+
+                        <div className="afs-input-group">
+                            <label className="afs-label" htmlFor="afs-upi-id">Payment UPI ID</label>
+                            {isFetching ? (
+                                <div className="afs-skeleton-input"></div>
+                            ) : (
+                                <div className="afs-input-wrapper">
+                                    <QrCode size={18} className="afs-input-icon" />
+                                    <input 
+                                        id="afs-upi-id"
+                                        type="text" 
+                                        className="afs-input-field" 
+                                        placeholder="e.g. 8897714968@axl" 
+                                        value={upiId}
+                                        onChange={(e) => setUpiId(e.target.value)} 
+                                        required 
+                                        disabled={isUpdating}
+                                    />
+                                </div>
+                            )}
                         </div>
 
-                        <div className="form-group">
-                            <label>Male Registration Fee (₹)</label>
-                            <input 
-                                type="number" 
-                                className="form-control" 
-                                placeholder="Enter amount" 
-                                value={maleFee}
-                                onChange={(e) => setMaleFee(e.target.value)} 
-                                required 
-                                min="0"
-                            />
+                        <div className="afs-input-group">
+                            <label className="afs-label" htmlFor="afs-male-fee">Male Registration Fee</label>
+                            {isFetching ? (
+                                <div className="afs-skeleton-input"></div>
+                            ) : (
+                                <div className="afs-input-wrapper">
+                                    <IndianRupee size={18} className="afs-input-icon" />
+                                    <input 
+                                        id="afs-male-fee"
+                                        type="number" 
+                                        className="afs-input-field" 
+                                        placeholder="Enter amount" 
+                                        value={maleFee}
+                                        onChange={(e) => setMaleFee(e.target.value)} 
+                                        required 
+                                        min="0"
+                                        disabled={isUpdating}
+                                    />
+                                </div>
+                            )}
                         </div>
 
-                        <div className="form-group" style={{ marginBottom: '20px' }}>
-                            <label>Female Registration Fee (₹)</label>
-                            <input 
-                                type="number" 
-                                className="form-control" 
-                                placeholder="Enter amount" 
-                                value={femaleFee}
-                                onChange={(e) => setFemaleFee(e.target.value)} 
-                                required 
-                                min="0"
-                            />
+                        <div className="afs-input-group">
+                            <label className="afs-label" htmlFor="afs-female-fee">Female Registration Fee</label>
+                            {isFetching ? (
+                                <div className="afs-skeleton-input"></div>
+                            ) : (
+                                <div className="afs-input-wrapper">
+                                    <IndianRupee size={18} className="afs-input-icon" />
+                                    <input 
+                                        id="afs-female-fee"
+                                        type="number" 
+                                        className="afs-input-field" 
+                                        placeholder="Enter amount" 
+                                        value={femaleFee}
+                                        onChange={(e) => setFemaleFee(e.target.value)} 
+                                        required 
+                                        min="0"
+                                        disabled={isUpdating}
+                                    />
+                                </div>
+                            )}
                         </div>
 
-                        <button type="submit" className="btn-primary" disabled={isLoading}>
-                            {isLoading ? 'Updating...' : 'Save Changes'}
+                        <button 
+                            type="submit" 
+                            className="afs-btn-submit" 
+                            disabled={isFetching || isUpdating}
+                        >
+                            <Save size={18} />
+                            {isUpdating ? 'Saving Changes...' : 'Save Settings'}
                         </button>
                     </form>
-
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 
