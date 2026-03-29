@@ -1,67 +1,90 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 
 const UserList = () => {
-    const [users, setUsers] = useState([]);
+    const [allRequests, setAllRequests] = useState([]); // Holds all fetched data
     const [loading, setLoading] = useState(false);
+    
+    // Search states
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchInput, setSearchInput] = useState(''); // To hold input before submitting
+    const [searchInput, setSearchInput] = useState(''); 
+    
+    // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [totalUsers, setTotalUsers] = useState(0);
-
-    const API_BASE_URL = 'https://kalyanashobha-back.vercel.app';
     const LIMIT = 5;
 
-    const fetchUsers = async (page, search) => {
+    const API_BASE_URL = 'https://kalyanashobha-back.vercel.app';
+
+    // 1. Fetch data from the new Resolved Premium Requests API
+    const fetchResolvedUsers = async () => {
         setLoading(true);
-        // Replace 'adminToken' with wherever you store your admin JWT token
         const token = localStorage.getItem('adminToken'); 
 
         try {
-            const response = await fetch(
-                `${API_BASE_URL}/api/admin/users/advanced?page=${page}&limit=${LIMIT}&search=${encodeURIComponent(search)}`,
-                {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': token 
-                    }
+            const response = await fetch(`${API_BASE_URL}/api/admin/premium-requests/resolved`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token 
                 }
-            );
+            });
 
             const data = await response.json();
 
             if (data.success) {
-                setUsers(data.users);
-                setTotalPages(data.totalPages || 1);
-                setCurrentPage(data.currentPage || 1);
-                setTotalUsers(data.totalUsers || 0);
-                
-                // Only show success toast if it's a new search, to avoid spamming on simple page changes
-                if (search && page === 1) {
-                    toast.success(`Found ${data.totalUsers} users`);
-                }
+                setAllRequests(data.data);
             } else {
-                toast.error(data.message || 'Failed to fetch users');
+                toast.error(data.message || 'Failed to fetch premium users');
             }
         } catch (error) {
             console.error("Fetch error:", error);
-            toast.error('Server error while fetching users');
+            toast.error('Server error while fetching premium users');
         } finally {
             setLoading(false);
         }
     };
 
-    // Fetch on initial mount and when currentPage or searchQuery changes
+    // Fetch on initial mount
     useEffect(() => {
-        fetchUsers(currentPage, searchQuery);
-    }, [currentPage, searchQuery]);
+        fetchResolvedUsers();
+    }, []);
 
+    // 2. Client-Side Search Filtering
+    const filteredRequests = useMemo(() => {
+        if (!searchQuery) return allRequests;
+        
+        const lowerSearch = searchQuery.toLowerCase();
+        return allRequests.filter(req => {
+            const user = req.userId;
+            if (!user) return false; // Safety check in case user was deleted
+            
+            return (
+                (user.firstName && user.firstName.toLowerCase().includes(lowerSearch)) ||
+                (user.lastName && user.lastName.toLowerCase().includes(lowerSearch)) ||
+                (user.email && user.email.toLowerCase().includes(lowerSearch)) ||
+                (user.mobileNumber && user.mobileNumber.toLowerCase().includes(lowerSearch)) ||
+                (user.uniqueId && user.uniqueId.toLowerCase().includes(lowerSearch))
+            );
+        });
+    }, [allRequests, searchQuery]);
+
+    // 3. Client-Side Pagination Calculations
+    const totalUsers = filteredRequests.length;
+    const totalPages = Math.ceil(totalUsers / LIMIT) || 1;
+    
+    const currentUsers = useMemo(() => {
+        const startIndex = (currentPage - 1) * LIMIT;
+        return filteredRequests.slice(startIndex, startIndex + LIMIT);
+    }, [filteredRequests, currentPage]);
+
+    // Handlers
     const handleSearchSubmit = (e) => {
         e.preventDefault();
         setCurrentPage(1); // Reset to first page on new search
         setSearchQuery(searchInput);
+        if (searchInput) {
+            toast.success(`Showing results for "${searchInput}"`);
+        }
     };
 
     const handleClearSearch = () => {
@@ -134,7 +157,7 @@ const UserList = () => {
             textAlign: 'left'
         },
         th: {
-            backgroundColor: '#fef2f2', // Very light red for header background
+            backgroundColor: '#fef2f2', // Light red header background
             color: '#b91c1c', // Thick red text
             padding: '14px',
             fontWeight: 'bold',
@@ -145,14 +168,14 @@ const UserList = () => {
             borderBottom: '1px solid #f3f4f6',
             color: '#4b5563'
         },
-        statusBadge: (isActive) => ({
-            backgroundColor: isActive ? '#dcfce7' : '#fee2e2',
-            color: isActive ? '#166534' : '#991b1b',
+        badge: {
+            backgroundColor: '#dcfce7',
+            color: '#166534',
             padding: '4px 8px',
             borderRadius: '12px',
             fontSize: '12px',
             fontWeight: 'bold'
-        }),
+        },
         paginationContainer: {
             display: 'flex',
             justifyContent: 'space-between',
@@ -176,9 +199,9 @@ const UserList = () => {
             <Toaster position="top-right" />
             
             <div style={styles.header}>
-                <h2 style={{ margin: 0 }}>User Management</h2>
+                <h2 style={{ margin: 0 }}>Resolved Premium Users</h2>
                 <span style={{ fontSize: '14px', color: '#6b7280' }}>
-                    Total Users: <strong>{totalUsers}</strong>
+                    Total Records: <strong>{totalUsers}</strong>
                 </span>
             </div>
 
@@ -208,8 +231,8 @@ const UserList = () => {
                         <tr>
                             <th style={styles.th}>Profile ID</th>
                             <th style={styles.th}>Name</th>
-                            <th style={styles.th}>Email</th>
-                            <th style={styles.th}>Mobile</th>
+                            <th style={styles.th}>Contact Info</th>
+                            <th style={styles.th}>Location</th>
                             <th style={styles.th}>Status</th>
                         </tr>
                     </thead>
@@ -220,24 +243,31 @@ const UserList = () => {
                                     <strong>Loading records...</strong>
                                 </td>
                             </tr>
-                        ) : users.length > 0 ? (
-                            users.map((user) => (
-                                <tr key={user._id}>
-                                    <td style={styles.td}><strong>{user.uniqueId}</strong></td>
-                                    <td style={styles.td}>{user.firstName} {user.lastName}</td>
-                                    <td style={styles.td}>{user.email}</td>
-                                    <td style={styles.td}>{user.mobileNumber}</td>
-                                    <td style={styles.td}>
-                                        <span style={styles.statusBadge(user.isActive)}>
-                                            {user.isActive ? 'Active' : 'Blocked'}
-                                        </span>
-                                    </td>
-                                </tr>
-                            ))
+                        ) : currentUsers.length > 0 ? (
+                            currentUsers.map((req) => {
+                                const user = req.userId;
+                                // Failsafe if user was deleted but request remained
+                                if (!user) return null; 
+
+                                return (
+                                    <tr key={req._id}>
+                                        <td style={styles.td}><strong>{user.uniqueId}</strong></td>
+                                        <td style={styles.td}>{user.firstName} {user.lastName}</td>
+                                        <td style={styles.td}>
+                                            <div>{user.mobileNumber}</div>
+                                            <div style={{ fontSize: '12px', color: '#9ca3af' }}>{user.email}</div>
+                                        </td>
+                                        <td style={styles.td}>{user.city}, {user.state}</td>
+                                        <td style={styles.td}>
+                                            <span style={styles.badge}>{req.status}</span>
+                                        </td>
+                                    </tr>
+                                );
+                            })
                         ) : (
                             <tr>
                                 <td colSpan="5" style={styles.emptyState}>
-                                    No users found matching your search.
+                                    No resolved users found matching your search.
                                 </td>
                             </tr>
                         )}
