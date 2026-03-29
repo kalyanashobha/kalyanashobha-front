@@ -85,8 +85,8 @@ const AdminFeeSettings = () => {
             {/* INTERNAL CSS */}
             <style>{`
                 .afs-layout-wrapper {
-                    --afs-primary: #4f46e5;
-                    --afs-primary-hover: #4338ca;
+                    --afs-primary: #dc2626;      /* Thick Red */
+                    --afs-primary-hover: #b91c1c; /* Darker Thick Red */
                     --afs-bg: #f8fafc;
                     --afs-card-bg: #ffffff;
                     --afs-text-main: #0f172a;
@@ -133,7 +133,7 @@ const AdminFeeSettings = () => {
                 .afs-icon-wrap {
                     width: 48px;
                     height: 48px;
-                    background: #e0e7ff;
+                    background: #fee2e2; /* Light red background */
                     color: var(--afs-primary);
                     border-radius: 50%;
                     display: flex;
@@ -205,7 +205,7 @@ const AdminFeeSettings = () => {
                     outline: none;
                     border-color: var(--afs-primary);
                     background: #ffffff;
-                    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+                    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1); /* Red shadow */
                 }
 
                 .afs-input-field:disabled {
@@ -234,7 +234,7 @@ const AdminFeeSettings = () => {
                 .afs-btn-submit:hover:not(:disabled) {
                     background: var(--afs-primary-hover);
                     transform: translateY(-1px);
-                    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+                    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); /* Red shadow */
                 }
 
                 .afs-btn-submit:disabled {
