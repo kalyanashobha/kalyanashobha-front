@@ -14,13 +14,14 @@ export default function CreateModerator() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [moderators, setModerators] = useState([]);
+  const [isFetchingMods, setIsFetchingMods] = useState(true);
   const [editingModId, setEditingModId] = useState(null);
 
   // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // Global Scroll Indicator State (Desktop & Mobile)
+  // Global Scroll Indicator State
   const [showMainScroll, setShowMainScroll] = useState(false);
 
   const availablePermissions = [
@@ -45,29 +46,8 @@ export default function CreateModerator() {
     fetchModerators();
   }, []);
 
-  // Universal Scroll Indicator Logic (applies to all screen sizes)
-  useEffect(() => {
-    const checkMainScroll = () => {
-        const scrollY = window.scrollY || document.documentElement.scrollTop;
-        const windowHeight = window.innerHeight;
-        const documentHeight = document.documentElement.scrollHeight;
-
-        setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
-    };
-
-    // Run initial check
-    const timer = setTimeout(checkMainScroll, 500); 
-    window.addEventListener('scroll', checkMainScroll);
-    window.addEventListener('resize', checkMainScroll);
-
-    return () => {
-        clearTimeout(timer);
-        window.removeEventListener('scroll', checkMainScroll);
-        window.removeEventListener('resize', checkMainScroll);
-    };
-  }, [moderators, currentPage]);
-
   const fetchModerators = async () => {
+    setIsFetchingMods(true);
     try {
       const token = localStorage.getItem('adminToken');
       const response = await axios.get('https://kalyanashobha-back.vercel.app/api/admin/moderators', {
@@ -78,9 +58,63 @@ export default function CreateModerator() {
       }
     } catch (error) {
       console.error("Failed to fetch moderators", error);
-      toast.error("Failed to load active moderators.");
+      toast.error("Failed to load moderators.");
+    } finally {
+      setIsFetchingMods(false);
     }
   };
+
+  // Pagination Calculations
+  const totalPages = Math.ceil(moderators.length / itemsPerPage) || 1;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentModerators = moderators.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handlePageChange = (pageNumber) => {
+      if (pageNumber > 0 && pageNumber <= totalPages) {
+          setCurrentPage(pageNumber);
+      }
+  };
+
+  // --- MOBILE ONLY SCROLL INDICATOR LOGIC ---
+  useEffect(() => {
+    const checkMainScroll = () => {
+        // 1. Hide on desktop entirely
+        if (window.innerWidth > 768) {
+            setShowMainScroll(false);
+            return;
+        }
+
+        // 2. Hide if there is 1 or fewer items
+        if (currentModerators.length <= 1) {
+            setShowMainScroll(false);
+            return;
+        }
+
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+
+        // 3. Check if the document is taller than the viewport. 
+        const isScrollable = documentHeight > windowHeight + 80;
+
+        // 4. Check if we haven't scrolled to the very bottom yet
+        const isNotAtBottom = scrollY + windowHeight < documentHeight - 30;
+
+        // 5. Only show the indicator if it's scrollable AND we aren't at the bottom
+        setShowMainScroll(isScrollable && isNotAtBottom);
+    };
+
+    const timer = setTimeout(checkMainScroll, 50); 
+    window.addEventListener('scroll', checkMainScroll);
+    window.addEventListener('resize', checkMainScroll);
+
+    return () => {
+        clearTimeout(timer);
+        window.removeEventListener('scroll', checkMainScroll);
+        window.removeEventListener('resize', checkMainScroll);
+    };
+  }, [currentModerators, currentPage]);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -141,7 +175,7 @@ export default function CreateModerator() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     if (selectedPermissions.length === 0) {
       toast.error('Please select at least one permission.');
       return;
@@ -185,22 +219,9 @@ export default function CreateModerator() {
     }
   };
 
-  // Pagination Calculations
-  const totalPages = Math.ceil(moderators.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentModerators = moderators.slice(indexOfFirstItem, indexOfLastItem);
-
-  const handlePageChange = (pageNumber) => {
-      if (pageNumber > 0 && pageNumber <= totalPages) {
-          setCurrentPage(pageNumber);
-      }
-  };
-
   return (
     <div className="ks-mod-admin-wrapper">
-      <Toaster position="top-right" />
-      
+      <Toaster position="top-right" reverseOrder={false} />
       <style>{`
         :root {
           /* Thick Red Theme */
@@ -441,6 +462,26 @@ export default function CreateModerator() {
         .ks-mod-btn-cancel:hover {
           background-color: #f1f5f9;
         }
+
+        /* --- SKELETON STYLES --- */
+        .ks-mod-skeleton-row td {
+          padding: 16px 20px;
+        }
+        .ks-mod-sk-box {
+          background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+          background-size: 200% 100%;
+          animation: ks-shimmer 1.5s infinite;
+          height: 20px;
+          border-radius: 6px;
+        }
+        @keyframes ks-shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        .ks-sk-username { width: 120px; }
+        .ks-sk-email { width: 180px; }
+        .ks-sk-badge { width: 80px; border-radius: 20px; }
+        .ks-sk-actions { width: 140px; margin-left: auto; }
 
         /* --- TABLE STYLES --- */
         .ks-mod-table-container {
@@ -728,6 +769,14 @@ export default function CreateModerator() {
           }
           
           .ks-mod-page-btn { flex: 1; }
+
+          /* Skeleton Mobile */
+          .ks-mod-skeleton-row td {
+            display: flex; flex-direction: column; gap: 8px; border-bottom: none;
+          }
+          .ks-mod-skeleton-row td::before { display: none; }
+          .ks-sk-username, .ks-sk-email, .ks-sk-badge, .ks-sk-actions { width: 100%; height: 16px; }
+          .ks-sk-actions { height: 32px; margin-top: 8px; }
         }
       `}</style>
 
@@ -843,7 +892,17 @@ export default function CreateModerator() {
               </tr>
             </thead>
             <tbody>
-              {currentModerators.length > 0 ? (
+              {isFetchingMods ? (
+                /* Skeleton Loader */
+                [...Array(itemsPerPage)].map((_, i) => (
+                  <tr key={i} className="ks-mod-skeleton-row">
+                    <td data-label="Username"><div className="ks-mod-sk-box ks-sk-username"></div></td>
+                    <td data-label="Email"><div className="ks-mod-sk-box ks-sk-email"></div></td>
+                    <td data-label="Permissions"><div className="ks-mod-sk-box ks-sk-badge"></div></td>
+                    <td data-label="Actions"><div className="ks-mod-sk-box ks-sk-actions"></div></td>
+                  </tr>
+                ))
+              ) : currentModerators.length > 0 ? (
                 currentModerators.map(mod => (
                   <tr key={mod._id}>
                     <td data-label="Username" className="ks-mod-td-bold">{mod.username}</td>
@@ -880,8 +939,8 @@ export default function CreateModerator() {
           </table>
         </div>
 
-        {/* PAGINATION CONTROLS */}
-        {totalPages > 1 && (
+        {/* ALWAYS VISIBLE PAGINATION CONTROLS */}
+        {!isFetchingMods && totalPages >= 1 && (
             <div className="ks-mod-pagination-bar">
                 <span className="ks-mod-pagination-text">
                     Showing <strong>{indexOfFirstItem + 1}</strong> to <strong>{Math.min(indexOfLastItem, moderators.length)}</strong> of <strong>{moderators.length}</strong>
@@ -912,7 +971,7 @@ export default function CreateModerator() {
         )}
       </div>
 
-      {/* UNIVERSAL SCROLL INDICATOR */}
+      {/* MOBILE ONLY SCROLL INDICATOR */}
       {showMainScroll && (
           <div className="ks-mod-scroll-indicator">
               <ChevronDown size={18} />
