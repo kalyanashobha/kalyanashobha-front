@@ -2,20 +2,17 @@ import React, { useState, useEffect, useMemo } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 
 const UserList = () => {
-    const [allRequests, setAllRequests] = useState([]); // Holds all fetched data
+    const [allRequests, setAllRequests] = useState([]);
     const [loading, setLoading] = useState(false);
     
-    // Search states
     const [searchQuery, setSearchQuery] = useState('');
     const [searchInput, setSearchInput] = useState(''); 
     
-    // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
     const LIMIT = 5;
 
     const API_BASE_URL = 'https://kalyanashobha-back.vercel.app';
 
-    // 1. Fetch data from the new Resolved Premium Requests API
     const fetchResolvedUsers = async () => {
         setLoading(true);
         const token = localStorage.getItem('adminToken'); 
@@ -44,19 +41,17 @@ const UserList = () => {
         }
     };
 
-    // Fetch on initial mount
     useEffect(() => {
         fetchResolvedUsers();
     }, []);
 
-    // 2. Client-Side Search Filtering
     const filteredRequests = useMemo(() => {
         if (!searchQuery) return allRequests;
         
         const lowerSearch = searchQuery.toLowerCase();
         return allRequests.filter(req => {
             const user = req.userId;
-            if (!user) return false; // Safety check in case user was deleted
+            if (!user) return false; 
             
             return (
                 (user.firstName && user.firstName.toLowerCase().includes(lowerSearch)) ||
@@ -68,7 +63,6 @@ const UserList = () => {
         });
     }, [allRequests, searchQuery]);
 
-    // 3. Client-Side Pagination Calculations
     const totalUsers = filteredRequests.length;
     const totalPages = Math.ceil(totalUsers / LIMIT) || 1;
     
@@ -77,10 +71,9 @@ const UserList = () => {
         return filteredRequests.slice(startIndex, startIndex + LIMIT);
     }, [filteredRequests, currentPage]);
 
-    // Handlers
     const handleSearchSubmit = (e) => {
         e.preventDefault();
-        setCurrentPage(1); // Reset to first page on new search
+        setCurrentPage(1); 
         setSearchQuery(searchInput);
         if (searchInput) {
             toast.success(`Showing results for "${searchInput}"`);
@@ -93,180 +86,294 @@ const UserList = () => {
         setCurrentPage(1);
     };
 
-    // --- INTERNAL STYLES ---
-    const styles = {
-        container: {
-            fontFamily: "'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-            maxWidth: '1000px',
-            margin: '40px auto',
-            padding: '20px',
-            backgroundColor: '#ffffff',
-            borderRadius: '8px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-        },
-        header: {
-            color: '#b91c1c', // Thick Red
-            borderBottom: '3px solid #b91c1c',
-            paddingBottom: '10px',
-            marginBottom: '20px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-        },
-        searchForm: {
-            display: 'flex',
-            gap: '10px',
-            marginBottom: '20px'
-        },
-        input: {
-            flex: 1,
-            padding: '12px 15px',
-            fontSize: '16px',
-            border: '2px solid #e5e7eb',
-            borderRadius: '6px',
-            outline: 'none',
-            transition: 'border-color 0.3s'
-        },
-        primaryButton: {
-            backgroundColor: '#b91c1c', // Thick Red
-            color: 'white',
-            border: 'none',
-            padding: '10px 20px',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            transition: 'background-color 0.3s'
-        },
-        secondaryButton: {
-            backgroundColor: '#f3f4f6',
-            color: '#374151',
-            border: '1px solid #d1d5db',
-            padding: '10px 20px',
-            fontSize: '16px',
-            borderRadius: '6px',
-            cursor: 'pointer'
-        },
-        tableWrapper: {
-            overflowX: 'auto',
-            marginBottom: '20px'
-        },
-        table: {
-            width: '100%',
-            borderCollapse: 'collapse',
-            textAlign: 'left'
-        },
-        th: {
-            backgroundColor: '#fef2f2', // Light red header background
-            color: '#b91c1c', // Thick red text
-            padding: '14px',
-            fontWeight: 'bold',
-            borderBottom: '2px solid #fca5a5'
-        },
-        td: {
-            padding: '14px',
-            borderBottom: '1px solid #f3f4f6',
-            color: '#4b5563'
-        },
-        badge: {
-            backgroundColor: '#dcfce7',
-            color: '#166534',
-            padding: '4px 8px',
-            borderRadius: '12px',
-            fontSize: '12px',
-            fontWeight: 'bold'
-        },
-        paginationContainer: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            paddingTop: '20px',
-            borderTop: '1px solid #e5e7eb'
-        },
-        pageInfo: {
-            color: '#6b7280',
-            fontWeight: '500'
-        },
-        emptyState: {
-            textAlign: 'center',
-            padding: '40px',
-            color: '#6b7280'
-        }
-    };
-
     return (
-        <div style={styles.container}>
+        <div className="admin-container">
+            {/* INTERNAL CSS BLOCK */}
+            <style>{`
+                .admin-container {
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                    max-width: 1050px;
+                    margin: 40px auto;
+                    padding: 30px;
+                    background-color: #ffffff;
+                    border-radius: 12px;
+                    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0,0,0,0.02);
+                    color: #111827;
+                }
+
+                .admin-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-bottom: 2px solid #fee2e2;
+                    padding-bottom: 20px;
+                    margin-bottom: 24px;
+                }
+
+                .admin-header h2 {
+                    margin: 0;
+                    color: #b91c1c;
+                    font-size: 24px;
+                    font-weight: 700;
+                    letter-spacing: -0.02em;
+                }
+
+                .record-count {
+                    background-color: #f3f4f6;
+                    color: #4b5563;
+                    padding: 6px 14px;
+                    border-radius: 20px;
+                    font-size: 13px;
+                    font-weight: 600;
+                }
+
+                .record-count strong {
+                    color: #111827;
+                }
+
+                .search-form {
+                    display: flex;
+                    gap: 12px;
+                    margin-bottom: 24px;
+                }
+
+                .search-input {
+                    flex: 1;
+                    padding: 12px 16px;
+                    font-size: 15px;
+                    color: #374151;
+                    background-color: #f9fafb;
+                    border: 1px solid #d1d5db;
+                    border-radius: 8px;
+                    outline: none;
+                    transition: all 0.2s ease-in-out;
+                }
+
+                .search-input:focus {
+                    background-color: #ffffff;
+                    border-color: #b91c1c;
+                    box-shadow: 0 0 0 4px rgba(185, 28, 28, 0.1);
+                }
+
+                .btn {
+                    padding: 12px 24px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    border: none;
+                }
+
+                .btn:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                }
+
+                .btn-primary {
+                    background-color: #b91c1c;
+                    color: #ffffff;
+                }
+
+                .btn-primary:hover:not(:disabled) {
+                    background-color: #991b1b;
+                    transform: translateY(-1px);
+                }
+
+                .btn-primary:active:not(:disabled) {
+                    transform: translateY(0);
+                }
+
+                .btn-secondary {
+                    background-color: #ffffff;
+                    color: #4b5563;
+                    border: 1px solid #d1d5db;
+                }
+
+                .btn-secondary:hover:not(:disabled) {
+                    background-color: #f3f4f6;
+                    color: #111827;
+                }
+
+                .table-wrapper {
+                    overflow-x: auto;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 8px;
+                    margin-bottom: 24px;
+                }
+
+                .admin-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    text-align: left;
+                    white-space: nowrap;
+                }
+
+                .admin-table th {
+                    background-color: #fef2f2;
+                    color: #991b1b;
+                    padding: 16px;
+                    font-size: 12px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    border-bottom: 2px solid #fca5a5;
+                }
+
+                .admin-table td {
+                    padding: 16px;
+                    font-size: 14px;
+                    color: #374151;
+                    border-bottom: 1px solid #f3f4f6;
+                    vertical-align: middle;
+                }
+
+                .admin-table tbody tr {
+                    transition: background-color 0.15s ease;
+                }
+
+                .admin-table tbody tr:hover {
+                    background-color: #f9fafb;
+                }
+
+                .admin-table tbody tr:last-child td {
+                    border-bottom: none;
+                }
+
+                .unique-id {
+                    font-family: monospace;
+                    background: #f3f4f6;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    color: #4b5563;
+                    font-weight: 600;
+                }
+
+                .contact-subtext {
+                    font-size: 12px;
+                    color: #6b7280;
+                    margin-top: 4px;
+                }
+
+                .status-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    background-color: #dcfce7;
+                    color: #166534;
+                    padding: 6px 12px;
+                    border-radius: 9999px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    text-transform: capitalize;
+                }
+
+                .empty-state {
+                    text-align: center;
+                    padding: 48px 20px;
+                    color: #6b7280;
+                    font-size: 15px;
+                }
+
+                .pagination-wrapper {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding-top: 10px;
+                }
+
+                .page-info {
+                    font-size: 14px;
+                    color: #6b7280;
+                    font-weight: 500;
+                }
+
+                @media (max-width: 640px) {
+                    .admin-container {
+                        margin: 10px;
+                        padding: 20px;
+                    }
+                    .admin-header {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 12px;
+                    }
+                    .search-form {
+                        flex-direction: column;
+                    }
+                    .search-input, .btn {
+                        width: 100%;
+                    }
+                }
+            `}</style>
+
             <Toaster position="top-right" />
             
-            <div style={styles.header}>
-                <h2 style={{ margin: 0 }}>Resolved Premium Users</h2>
-                <span style={{ fontSize: '14px', color: '#6b7280' }}>
+            <div className="admin-header">
+                <h2>Resolved Premium Users</h2>
+                <div className="record-count">
                     Total Records: <strong>{totalUsers}</strong>
-                </span>
+                </div>
             </div>
 
-            <form style={styles.searchForm} onSubmit={handleSearchSubmit}>
+            <form className="search-form" onSubmit={handleSearchSubmit}>
                 <input
                     type="text"
+                    className="search-input"
                     placeholder="Search by Name, Email, Mobile, or Profile ID..."
-                    style={styles.input}
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
-                    onFocus={(e) => e.target.style.borderColor = '#b91c1c'}
-                    onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                 />
-                <button type="submit" style={styles.primaryButton} disabled={loading}>
+                <button type="submit" className="btn btn-primary" disabled={loading}>
                     {loading ? 'Searching...' : 'Search'}
                 </button>
                 {searchQuery && (
-                    <button type="button" style={styles.secondaryButton} onClick={handleClearSearch}>
+                    <button type="button" className="btn btn-secondary" onClick={handleClearSearch}>
                         Clear
                     </button>
                 )}
             </form>
 
-            <div style={styles.tableWrapper}>
-                <table style={styles.table}>
+            <div className="table-wrapper">
+                <table className="admin-table">
                     <thead>
                         <tr>
-                            <th style={styles.th}>Profile ID</th>
-                            <th style={styles.th}>Name</th>
-                            <th style={styles.th}>Contact Info</th>
-                            <th style={styles.th}>Location</th>
-                            <th style={styles.th}>Status</th>
+                            <th>Profile ID</th>
+                            <th>Name</th>
+                            <th>Contact Info</th>
+                            <th>Location</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
                             <tr>
-                                <td colSpan="5" style={{ textAlign: 'center', padding: '30px', color: '#b91c1c' }}>
-                                    <strong>Loading records...</strong>
+                                <td colSpan="5" className="empty-state">
+                                    <strong style={{ color: '#b91c1c' }}>Loading records...</strong>
                                 </td>
                             </tr>
                         ) : currentUsers.length > 0 ? (
                             currentUsers.map((req) => {
                                 const user = req.userId;
-                                // Failsafe if user was deleted but request remained
                                 if (!user) return null; 
 
                                 return (
                                     <tr key={req._id}>
-                                        <td style={styles.td}><strong>{user.uniqueId}</strong></td>
-                                        <td style={styles.td}>{user.firstName} {user.lastName}</td>
-                                        <td style={styles.td}>
+                                        <td><span className="unique-id">{user.uniqueId}</span></td>
+                                        <td style={{ fontWeight: 500 }}>{user.firstName} {user.lastName}</td>
+                                        <td>
                                             <div>{user.mobileNumber}</div>
-                                            <div style={{ fontSize: '12px', color: '#9ca3af' }}>{user.email}</div>
+                                            <div className="contact-subtext">{user.email}</div>
                                         </td>
-                                        <td style={styles.td}>{user.city}, {user.state}</td>
-                                        <td style={styles.td}>
-                                            <span style={styles.badge}>{req.status}</span>
+                                        <td>{user.city}, {user.state}</td>
+                                        <td>
+                                            <span className="status-badge">{req.status}</span>
                                         </td>
                                     </tr>
                                 );
                             })
                         ) : (
                             <tr>
-                                <td colSpan="5" style={styles.emptyState}>
+                                <td colSpan="5" className="empty-state">
                                     No resolved users found matching your search.
                                 </td>
                             </tr>
@@ -277,21 +384,21 @@ const UserList = () => {
 
             {/* Pagination Controls */}
             {!loading && totalPages > 0 && (
-                <div style={styles.paginationContainer}>
+                <div className="pagination-wrapper">
                     <button 
-                        style={{...styles.secondaryButton, opacity: currentPage === 1 ? 0.5 : 1, cursor: currentPage === 1 ? 'not-allowed' : 'pointer'}}
+                        className="btn btn-secondary"
                         onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
                     >
                         &laquo; Previous
                     </button>
                     
-                    <div style={styles.pageInfo}>
-                        Page <strong style={{ color: '#b91c1c' }}>{currentPage}</strong> of <strong>{totalPages}</strong>
+                    <div className="page-info">
+                        Page <strong style={{ color: '#111827' }}>{currentPage}</strong> of <strong>{totalPages}</strong>
                     </div>
 
                     <button 
-                        style={{...styles.primaryButton, opacity: currentPage === totalPages ? 0.5 : 1, cursor: currentPage === totalPages ? 'not-allowed' : 'pointer'}}
+                        className="btn btn-secondary"
                         onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages}
                     >
