@@ -502,9 +502,8 @@ const MyProfile = () => {
                     <InputField label="College" name="collegeName" value={formData.collegeName} onChange={handleChange} />
                     <SelectField label="Job Role" name="jobRole" value={formData.jobRole} options={masterData.occupations} onChange={handleChange} />
                     <InputField label="Annual Income" name="annualIncome" value={formData.annualIncome} onChange={handleChange} />
-                    
-                    <InputField label="Email" name="email" type="email" value={formData.email} onChange={handleChange} />
-                    <InputField label="Phone" name="mobileNumber" type="tel" value={formData.mobileNumber} onChange={handleChange} />
+
+                    {/* Email and Phone number inputs removed from here */}
 
                     <SelectField label="Country" name="country" value={formData.country} options={masterData.countries} onChange={handleChange} />
                     <SelectField label="State" name="state" value={formData.state} options={dependentStates} onChange={handleChange} />
