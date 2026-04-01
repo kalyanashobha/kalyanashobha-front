@@ -152,7 +152,7 @@ const MyProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
-  
+
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [existingPhotos, setExistingPhotos] = useState([]); 
   const [newPhotos, setNewPhotos] = useState([]); 
@@ -185,11 +185,11 @@ const MyProfile = () => {
         '/public/master-data/Star',
         '/public/master-data/Moonsign'
       ];
-      
+
       const responses = await Promise.all(
         endpoints.map(ep => fetch(`${API_BASE_URL}${ep}`).then(res => res.json()))
       );
-      
+
       setMasterData({
         communities: responses[0]?.success ? (responses[0].data || []) : [],
         countries: responses[1]?.success ? (responses[1].data || []) : [],
@@ -212,13 +212,13 @@ const MyProfile = () => {
         headers: { 'Content-Type': 'application/json', 'Authorization': token }
       });
       const data = await res.json();
-      
+
       if (data.success) {
         setUser(data.user);
         setReferredBy(data.referredBy || null); 
-        
+
         const subComm = data.user.subCommunity || data.user.caste || '';
-        
+
         setFormData({
             ...data.user,
             subCommunity: subComm,
@@ -265,7 +265,7 @@ const MyProfile = () => {
         method: 'PUT', headers: { 'Authorization': token }, body: submitData
       });
       const data = await res.json();
-      
+
       if (data.success) {
         setUser(data.user);
         setExistingPhotos(data.user.photos || []);
@@ -280,7 +280,7 @@ const MyProfile = () => {
 
   const handleChange = async (e) => {
     const { name, value } = e.target;
-    
+
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
       setFormData(prev => ({ ...prev, [parent]: { ...(prev[parent] || {}), [child]: value } }));
@@ -362,7 +362,7 @@ const MyProfile = () => {
 
       {loading ? <ProfileSkeleton /> : (
         <div className="mp-container mp-fade-in">
-          
+
           <div className="mp-hero">
             <div className="mp-avatar-wrapper">
               <img src={user?.photos?.[0] || "https://cdn-icons-png.flaticon.com/512/847/847969.png"} alt="Profile" className="mp-avatar" />
@@ -370,7 +370,7 @@ const MyProfile = () => {
                 <div className="mp-badge" title="Verified Member"><BadgeCheck size={24} fill="#10B981" color="#fff" /></div>
               )}
             </div>
-            
+
             <div className="mp-hero-info">
               <h1 className="mp-name">{user?.firstName} {user?.lastName}</h1>
               <div className="mp-meta">
@@ -421,6 +421,7 @@ const MyProfile = () => {
                   <DataField label="Job Role" value={user?.jobRole} />
                   <DataField label="Company" value={user?.companyName} />
                   <DataField label="Annual Income" value={user?.annualIncome} />
+                  <DataField label="Email" value={user?.email} />
                   <DataField label="Phone" value={user?.mobileNumber} />
                   <DataField label="Country" value={user?.country} />
                   <DataField label="Location" value={user?.city ? `${user.city}, ${user.state}` : null} />
@@ -454,7 +455,7 @@ const MyProfile = () => {
           ) : (
             <form onSubmit={handleUpdate} className="mp-fade-in">
               <div className="mp-grid">
-                
+
                 {/* PHOTOS - Full Width */}
                 <div className="mp-card mp-card-full">
                   <h3 className="mp-card-title">Manage Photos (Max 2)</h3>
@@ -488,20 +489,23 @@ const MyProfile = () => {
                     <InputField label="Height (cm)" name="height" type="number" value={formData.height} onChange={handleChange} />
                     <SelectField label="Diet" name="diet" value={formData.diet} options={["Veg", "Non-Veg", "Eggetarian"]} onChange={handleChange} />
                     <InputField label="Gothra" name="gothra" value={formData.gothra} onChange={handleChange} />
-                    
+
                     <SelectField label="Community" name="community" value={formData.community} options={masterData.communities} onChange={handleChange} />
                     <SelectField label="Sub-Community / Caste" name="subCommunity" value={formData.subCommunity} options={editModeSubCommunities} onChange={handleChange} />
                   </div>
                 </div>
 
                 <div className="mp-card">
-                  <h3 className="mp-card-title">Professional & Location</h3>
+                  <h3 className="mp-card-title">Professional & Contact</h3>
                   <div className="mp-form-grid">
                     <SelectField label="Qualification" name="highestQualification" value={formData.highestQualification} options={masterData.educations} onChange={handleChange} />
                     <InputField label="College" name="collegeName" value={formData.collegeName} onChange={handleChange} />
                     <SelectField label="Job Role" name="jobRole" value={formData.jobRole} options={masterData.occupations} onChange={handleChange} />
                     <InputField label="Annual Income" name="annualIncome" value={formData.annualIncome} onChange={handleChange} />
                     
+                    <InputField label="Email" name="email" type="email" value={formData.email} onChange={handleChange} />
+                    <InputField label="Phone" name="mobileNumber" type="tel" value={formData.mobileNumber} onChange={handleChange} />
+
                     <SelectField label="Country" name="country" value={formData.country} options={masterData.countries} onChange={handleChange} />
                     <SelectField label="State" name="state" value={formData.state} options={dependentStates} onChange={handleChange} />
                     <SelectField label="City" name="city" value={formData.city} options={dependentCities} onChange={handleChange} />
@@ -515,7 +519,7 @@ const MyProfile = () => {
                     <SelectField label="Star / Nakshatra" name="astrologyDetails.star" value={formData.astrologyDetails?.star} options={masterData.stars} onChange={handleChange} />
                     <InputField label="Pada" name="astrologyDetails.pada" value={formData.astrologyDetails?.pada} onChange={handleChange} />
                     <SelectField label="Mother Tongue" name="astrologyDetails.motherTongue" value={formData.astrologyDetails?.motherTongue} options={masterData.motherTongues} onChange={handleChange} />
-                    
+
                     <div className="mp-input-group">
                       <input type="text" className="mp-input" name="astrologyDetails.timeOfBirth" value={formData.astrologyDetails?.timeOfBirth || ''} onClick={() => setShowTimePicker(true)} readOnly placeholder=" " style={{ cursor: 'pointer' }} />
                       <label className={formData.astrologyDetails?.timeOfBirth ? 'mp-label-active' : ''}>Time of Birth</label>
@@ -531,7 +535,7 @@ const MyProfile = () => {
                     <SelectField label="Father's Occ." name="familyDetails.fatherOccupation" value={formData.familyDetails?.fatherOccupation} options={masterData.occupations} onChange={handleChange} />
                     <InputField label="Mother's Name" name="familyDetails.motherName" value={formData.familyDetails?.motherName} onChange={handleChange} />
                     <SelectField label="Mother's Occ." name="familyDetails.motherOccupation" value={formData.familyDetails?.motherOccupation} options={masterData.occupations} onChange={handleChange} />
-                    
+
                     {/* CHANGED TO DROPDOWNS 0-10 */}
                     <SelectField label="Total Brothers" name="familyDetails.noOfBrothers" value={formData.familyDetails?.noOfBrothers} options={countOptions} onChange={handleChange} />
                     <SelectField label="Brothers Married" name="familyDetails.noOfBrothersMarried" value={formData.familyDetails?.noOfBrothersMarried} options={countOptions} onChange={handleChange} />
