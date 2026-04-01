@@ -13,6 +13,9 @@ const UserList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const LIMIT = 5;
 
+    // Scroll Indicator State
+    const [showScrollIndicator, setShowScrollIndicator] = useState(true);
+
     const API_BASE_URL = 'https://kalyanashobha-back.vercel.app';
 
     // 1. Fetch data
@@ -49,9 +52,23 @@ const UserList = () => {
         fetchResolvedUsers();
     }, []);
 
+    // Scroll Listener for the Mobile Indicator
+    useEffect(() => {
+        const handleScroll = () => {
+            // Hide the indicator if the user scrolls down more than 50px
+            if (window.scrollY > 50) {
+                setShowScrollIndicator(false);
+            } else {
+                setShowScrollIndicator(true);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     // 2. Client-Side Search Filtering & Validation
     const filteredRequests = useMemo(() => {
-        // FIX: Filter out any requests that have a null or missing userId first.
         const validRequests = allRequests.filter(req => req.userId);
 
         if (!searchQuery) return validRequests;
@@ -295,7 +312,7 @@ const UserList = () => {
             60% { transform: translateY(-3px); }
         }
 
-        /* --- RESPONSIVE MOBILE STYLES (No Horizontal Scroll) --- */
+        /* --- RESPONSIVE MOBILE STYLES --- */
         @media (max-width: 768px) {
             .ul-wrapper {
                 padding: 16px;
@@ -343,30 +360,47 @@ const UserList = () => {
 
             .ul-primary-text, .ul-secondary-text { text-align: right; }
 
-            .ul-pagination { flex-direction: column; gap: 16px; margin-top: 16px; }
+            .ul-pagination { flex-direction: column; gap: 16px; margin-top: 16px; padding-bottom: 40px; }
             .ul-btn { width: 100%; }
 
+            /* Enhanced Floating Scroll Indicator */
             .mobile-scroll-indicator {
                 display: flex;
+                position: fixed;
+                bottom: 24px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: rgba(31, 41, 55, 0.9);
+                color: #ffffff;
+                padding: 10px 20px;
+                border-radius: 30px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                z-index: 50;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                color: #9ca3af;
-                font-size: 12px;
+                font-size: 11px;
                 font-weight: 600;
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
-                margin-bottom: 24px;
                 animation: bounce 2s infinite;
+                transition: opacity 0.3s ease, visibility 0.3s ease;
+            }
+
+            /* Fade out class controlled by React state */
+            .mobile-scroll-indicator.hide {
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
             }
 
             .arrow-down {
                 width: 0; 
                 height: 0; 
-                border-left: 6px solid transparent;
-                border-right: 6px solid transparent;
-                border-top: 6px solid #9ca3af;
-                margin-top: 4px;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 5px solid #ffffff;
+                margin-top: 6px;
             }
         }
     `;
@@ -482,10 +516,10 @@ const UserList = () => {
                     </table>
                 </div>
 
-                {/* Mobile Bouncing Scroll Indicator */}
-                {!loading && currentUsers.length > 0 && (
-                    <div className="mobile-scroll-indicator">
-                        <span>Scroll down for more info</span>
+                {/* Mobile Bouncing Scroll Indicator (Now Dynamic) */}
+                {!loading && currentUsers.length > 2 && (
+                    <div className={`mobile-scroll-indicator ${!showScrollIndicator ? 'hide' : ''}`}>
+                        <span>Scroll for more</span>
                         <div className="arrow-down"></div>
                     </div>
                 )}
