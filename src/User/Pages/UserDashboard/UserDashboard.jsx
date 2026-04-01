@@ -77,10 +77,10 @@ const CustomTimePicker = ({ isOpen, onClose, onSet, initialTime }) => {
       <div style={{ backgroundColor: '#6366f1', color: 'white', padding: '20px' }}>
         <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '500' }}>Set time</h3>
       </div>
-      
+
       <div style={{ padding: '24px 20px' }}>
         <p style={{ margin: '0 0 16px 0', fontSize: '0.9rem', color: '#475569', fontWeight: '500' }}>Type in time</p>
-        
+
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <input 
@@ -134,9 +134,9 @@ const DashboardComboInput = ({ label, name, value, onChange, options, required, 
     const [filtered, setFiltered] = useState(options || []);
     const wrapperRef = useRef(null);
     const inputRef = useRef(null);
-  
+
     useEffect(() => { setFiltered(options || []); }, [options]);
-  
+
     useEffect(() => {
       const handleClickOutside = (event) => {
         if (wrapperRef.current && !wrapperRef.current.contains(event.target)) setIsOpen(false);
@@ -144,7 +144,7 @@ const DashboardComboInput = ({ label, name, value, onChange, options, required, 
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
-  
+
     const handleInputChange = (e) => {
       if (disabled) return;
       onChange(e); 
@@ -165,12 +165,12 @@ const DashboardComboInput = ({ label, name, value, onChange, options, required, 
       setIsOpen(true); 
       setFiltered(options || []);
     }
-  
+
     const handleSelect = (val) => {
       if (disabled) return;
       onChange({ target: { name, value: val } });
       setIsOpen(false);
-      
+
       if (inputRef.current) {
         const form = inputRef.current.closest('form');
         if (form) {
@@ -182,7 +182,7 @@ const DashboardComboInput = ({ label, name, value, onChange, options, required, 
         }
       }
     };
-  
+
     return (
       <div 
         className="dash-form-group" 
@@ -210,7 +210,7 @@ const DashboardComboInput = ({ label, name, value, onChange, options, required, 
               backgroundColor: disabled ? '#f1f5f9' : '#fff',
               cursor: disabled ? 'not-allowed' : 'text'
             }}
-            readOnly={disabled} // Native way to prevent mobile keyboards popping up if disabled
+            readOnly={disabled} 
           />
           <div 
             style={{ 
@@ -289,7 +289,7 @@ const formatDisplayName = (fullName) => {
   return `${surnameInitial}. ${formattedGivenName}`;
 };
 
-// --- HELPER COMPONENT FOR DEPENDENT DROPDOWNS (Used in main filters) ---
+// --- HELPER COMPONENT FOR DEPENDENT DROPDOWNS ---
 const DependentSelect = ({ label, name, value, onChange, disabled, options, emptyOption = "Any", errorMessage }) => {
   return (
     <div className="dash-form-group">
@@ -341,7 +341,7 @@ const UserDashboard = () => {
   const [dashboardLoading, setDashboardLoading] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
   const [regPaymentStatus, setRegPaymentStatus] = useState(null);
-  
+
   const [premiumRequestLoading, setPremiumRequestLoading] = useState(false);
   const [premiumRequested, setPremiumRequested] = useState(false);
   const [premiumStatus, setPremiumStatus] = useState(null); 
@@ -352,7 +352,6 @@ const UserDashboard = () => {
   const [filterStates, setFilterStates] = useState([]);
   const [filterCities, setFilterCities] = useState([]);
 
-  // Need separate states for extra details to not conflict with search filters
   const [extraDetailsStates, setExtraDetailsStates] = useState([]);
   const [extraDetailsCities, setExtraDetailsCities] = useState([]);
 
@@ -363,7 +362,7 @@ const UserDashboard = () => {
 
   const [showFilters, setShowFilters] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
-  
+
   const [filters, setFilters] = useState({
     searchId: '', minAge: '', maxAge: '', minHeight: '', maxHeight: '', 
     education: '', community: '', subCommunity: '', occupation: '', maritalStatus: '',
@@ -374,18 +373,18 @@ const UserDashboard = () => {
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [termsAgreed, setTermsAgreed] = useState(false);
   const [submittingSignature, setSubmittingSignature] = useState(false);
-  
+
   const sigRef = useRef(null);
 
   const [needsExtraDetails, setNeedsExtraDetails] = useState(false);
   const [showExtraDetailsModal, setShowExtraDetailsModal] = useState(false);
   const [submittingExtraDetails, setSubmittingExtraDetails] = useState(false);
-  
+
   const [showTimePicker, setShowTimePicker] = useState(false);
 
   const [extraDetailsForm, setExtraDetailsForm] = useState({
       moonsign: '', star: '', pada: '', motherTongue: '', timeOfBirth: '', placeOfBirth: '', nativeLocation: '', complexion: '',
-      country: '', state: '', city: '', // Added country state city to form
+      country: '', state: '', city: '',
       familyType: '', fatherName: '', fatherOccupation: '', motherName: '', motherOccupation: '', noOfBrothers: 0, noOfBrothersMarried: 0, noOfSisters: 0, noOfSistersMarried: 0
   });
 
@@ -427,7 +426,7 @@ const UserDashboard = () => {
 
           const prefRes = await fetch(`${API_BASE_URL}/preference`, { headers: { 'Authorization': token }});
           const prefJson = await prefRes.json();
-          
+
           if (prefJson.success && prefJson.data) {
              const p = prefJson.data;
              const savedFilters = {
@@ -437,14 +436,14 @@ const UserDashboard = () => {
                 state: p.state || '', city: p.city || '', diet: p.diet || '', motherTongue: p.motherTongue || '',
                 star: p.star || '', pada: p.pada || '', complexion: p.complexion || ''
              };
-             
+
              setFilters(savedFilters);
-             
+
              if (p.community) {
                  const found = commData.find(c => c.name === p.community);
                  if (found) setAvailableSubCommunities(found.subCommunities || []);
              }
-             
+
              if (p.country) {
                 fetch(`${PUBLIC_API_BASE}/master-data/State?parent=${p.country}`)
                     .then(res => res.json())
@@ -463,7 +462,7 @@ const UserDashboard = () => {
           }
         } catch (e) { console.error("Failed to load user info", e); }
       }
-      
+
       fetchFeedAndData({});
     };
 
@@ -534,7 +533,7 @@ const UserDashboard = () => {
           const profileRes = await fetch(`${API_BASE_URL}/my-profile`, { headers: { 'Authorization': token } });
           const profileData = await profileRes.json();
           let missingTerms = false;
-          
+
           if (profileData.success && !profileData.user.termsAcceptedAt) {
               setNeedsTermsAcceptance(true);
               setShowTermsModal(true);
@@ -545,8 +544,7 @@ const UserDashboard = () => {
           const extraData = await extraRes.json();
           if (extraData.success && !extraData.hasAstrologyAndFamilyDetails) {
               setNeedsExtraDetails(true);
-              
-              // Seed Extra Details Form with Profile Locations if they exist
+
               if (profileData.success && profileData.user) {
                   const u = profileData.user;
                   setExtraDetailsForm(prev => ({
@@ -555,8 +553,7 @@ const UserDashboard = () => {
                       state: u.state || '',
                       city: u.city || ''
                   }));
-                  
-                  // Fetch state and city options for the extra details modal if pre-filled
+
                   if (u.country) {
                       fetch(`${PUBLIC_API_BASE}/master-data/State?parent=${u.country}`)
                           .then(r => r.json())
@@ -644,12 +641,12 @@ const UserDashboard = () => {
             body: formData
         });
         const data = await res.json();
-        
+
         if (data.success) {
             setNeedsTermsAcceptance(false);
             setShowTermsModal(false);
             toast.success("Terms accepted successfully!");
-            
+
             if (needsExtraDetails) {
                 setShowExtraDetailsModal(true);
             } else if (needsPhotos) {
@@ -677,7 +674,7 @@ const UserDashboard = () => {
             headers: { 'Content-Type': 'application/json', 'Authorization': token }
         });
         const data = await response.json();
-        
+
         if (data.success) {
             toast.success("Request sent! Our team will contact you shortly.");
             setPremiumRequested(true);
@@ -706,7 +703,7 @@ const UserDashboard = () => {
     else if (name === 'country') {
       setFilters(prev => ({ ...prev, country: safeValue, state: '', city: '' }));
       setFilterCities([]); 
-      
+
       if (safeValue) {
          try {
            const res = await fetch(`${PUBLIC_API_BASE}/master-data/State?parent=${safeValue}`);
@@ -719,7 +716,7 @@ const UserDashboard = () => {
     } 
     else if (name === 'state') {
       setFilters(prev => ({ ...prev, state: safeValue, city: '' }));
-      
+
       if (safeValue) {
          try {
            const res = await fetch(`${PUBLIC_API_BASE}/master-data/City?parent=${safeValue}`);
@@ -763,11 +760,11 @@ const UserDashboard = () => {
         toast("Verification is currently in progress. Please wait for admin approval.", { icon: <Icons.Info /> });
         return;
     }
-    
+
     if (needsTermsAcceptance) { setShowTermsModal(true); return; }
     if (needsExtraDetails) { setShowExtraDetailsModal(true); return; }
     if (needsPhotos) { setShowPhotoModal(true); return; }
-    
+
     navigate('/payment-registration');
   };
 
@@ -820,7 +817,7 @@ const UserDashboard = () => {
   const submitExtraDetails = async (e) => {
       e.preventDefault();
       setSubmittingExtraDetails(true);
-      
+
       let userId = localStorage.getItem('userId');
       if (!userId) {
           const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -835,7 +832,6 @@ const UserDashboard = () => {
 
       const payload = {
           userId: userId,
-          // Add country, state, city to base payload if API expects it
           country: extraDetailsForm.country,
           state: extraDetailsForm.state,
           city: extraDetailsForm.city,
@@ -871,13 +867,13 @@ const UserDashboard = () => {
               },
               body: JSON.stringify(payload)
           });
-          
+
           const data = await res.json();
           if (data.success) {
               setNeedsExtraDetails(false);
               setShowExtraDetailsModal(false);
               toast.success("Additional details saved successfully!");
-              
+
               if (needsPhotos) { setShowPhotoModal(true); } 
           } else {
               toast.error(data.message);
@@ -893,17 +889,17 @@ const UserDashboard = () => {
     if (file) { 
       try {
         setCompressingPhotos(prev => ({ ...prev, [type]: true }));
-        
+
         const options = { 
           maxSizeMB: 1, 
           maxWidthOrHeight: 1920, 
           useWebWorker: false, 
           alwaysKeepResolution: true 
         };
-        
+
         const compressedFile = await imageCompression(file, options);
         setPhotoFiles(prev => ({ ...prev, [type]: compressedFile }));
-        
+
       } catch (error) {
         console.error("Compression Error:", error);
         toast.error("Failed to compress image. Please try another photo.");
@@ -921,19 +917,19 @@ const UserDashboard = () => {
     const primarySizeMB = photoFiles.primary.size / (1024 * 1024);
     const secondarySizeMB = photoFiles.secondary.size / (1024 * 1024);
     if (primarySizeMB + secondarySizeMB > 2.5) return toast.error("Photos are too large even after compression! Please choose different images.");
-    
+
     setUploading(true);
     const formData = new FormData();
     formData.append('photos', photoFiles.primary);
     formData.append('photos', photoFiles.secondary);
-  
+
     try {
       const res = await fetch(`${API_BASE_URL}/upload-photos`, {
         method: 'POST', 
         headers: { 'Authorization': localStorage.getItem('token') }, 
         body: formData
       });
-  
+
       if (!res.ok) throw new Error(`Server returned status: ${res.status}`);
       const data = await res.json();
       if (data.success || res.ok) { 
@@ -961,7 +957,7 @@ const UserDashboard = () => {
        else handleVerifyClick();
        return;
     }
-    
+
     setActionLoadingId(profile.id);
     try {
       const res = await fetch("https://kalyanashobha-back.vercel.app/api/interest/send", {
@@ -973,7 +969,7 @@ const UserDashboard = () => {
         body: JSON.stringify({ receiverId: profile.id })
       });
       const data = await res.json();
-      
+
       if (data.success) {
         setMatches(prev => prev.map(m => m.id === profile.id ? { ...m, interestStatus: 'PendingAdminPhase1' } : m));
         toast.success("Interest sent to Admin for approval");
@@ -1018,14 +1014,13 @@ const UserDashboard = () => {
   return (
     <>
       <Navbar />
-      {/* UPDATED: Pass containerStyle to Toaster to move it down below the Navbar */}
       <Toaster 
         position="top-center" 
         toastOptions={{ 
             style: { background: '#1e293b', color: '#fff', fontFamily: 'Inter' } 
         }} 
         containerStyle={{
-            top: '85px', // Moves toasts down by 85px to clear the header!
+            top: '85px',
             zIndex: 9999999
         }}
       />
@@ -1034,12 +1029,12 @@ const UserDashboard = () => {
 
         <div className="dash-hero-section">
           <div className="dash-hero-overlay"></div>
-          
+
           <div className="dash-container dash-hero-content">
             <div className="dash-hero-content-inner">
               <h1 className="dash-hero-title">Find your perfect match</h1>
               <p className="dash-hero-subtitle">Discover profiles curated just for you.</p>
-              
+
               <div className="dash-hero-search-wrapper">
                 {!isPremium && (
                   <div className="dash-search-locked-overlay" onClick={handleVerifyClick} style={{ cursor: regPaymentStatus?.status === 'PendingVerification' ? 'default' : 'pointer' }}>
@@ -1063,7 +1058,6 @@ const UserDashboard = () => {
                       onChange={handleFilterChange} 
                       disabled={!isPremium}
                     />
-                    {/* ADDED: "X" clear button inside the text search */}
                     {filters.searchId && isPremium && (
                       <button 
                         className="dash-search-clear-btn"
@@ -1077,15 +1071,14 @@ const UserDashboard = () => {
                       </button>
                     )}
                   </div>
-                  
+
                   <div className="dash-hero-search-divider"></div>
-                  
-                  {/* FIXED: Toggle properly for Desktop to show 'Close' when open */}
+
                   <button className="dash-hero-filter-toggle" onClick={() => isPremium && setShowFilters(!showFilters)} disabled={!isPremium}>
                     {showFilters ? <Icons.Close /> : <Icons.Filter />}
                     <span className="dash-btn-text">{showFilters ? "Close" : "Filters"}</span>
                   </button>
-                  
+
                   <button className="dash-hero-search-btn" onClick={handleSearch} disabled={!isPremium || searchLoading}>
                     {searchLoading ? (
                       <Icons.Loader />
@@ -1098,24 +1091,21 @@ const UserDashboard = () => {
                   </button>
                 </div>
 
-                {/* --- HIERARCHICAL / RESPONSIVE FILTERS PANEL --- */}
                 {showFilters && isPremium && (
                   <>
                     <div className="dash-mobile-filter-backdrop" onClick={() => setShowFilters(false)}></div>
                     <div className="dash-filters-panel">
-                      
-                      {/* --- MOBILE SPECIFIC HEADER (Actions + Close Button at the top) --- */}
+
                       <div className="dash-filters-mobile-header">
                         <button className="dash-header-text-btn" onClick={() => { clearFilters(); setShowFilters(false); }}>
                            Reset
                         </button>
                         <h3 style={{flex: 1, textAlign: 'center'}}>Filters</h3>
-                        
+
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <button className="dash-header-primary-btn" onClick={() => { handleSearch(); setShowFilters(false); }}>
                              Apply
                           </button>
-                          {/* ADDED: Dedicated close 'X' icon for mobile */}
                           <button className="dash-header-close-btn" onClick={() => setShowFilters(false)}>
                              <Icons.Close />
                           </button>
@@ -1130,7 +1120,7 @@ const UserDashboard = () => {
                               <input type="number" name="maxAge" placeholder="Max" className="dash-input" value={filters.maxAge} onChange={handleFilterChange}/>
                             </div>
                           </div>
-                          
+
                           <div className="dash-form-group">
                             <label className="dash-label">Marital Status</label>
                             <select name="maritalStatus" className="dash-input" value={filters.maritalStatus} onChange={handleFilterChange}>
@@ -1155,7 +1145,6 @@ const UserDashboard = () => {
                             </select>
                           </div>
 
-                          {/* REPLACED WITH DependentSelect Component */}
                           <DependentSelect
                             label="Sub-Community / Caste"
                             name="subCommunity"
@@ -1182,7 +1171,6 @@ const UserDashboard = () => {
                             </select>
                           </div>
 
-                          {/* REPLACED WITH DependentSelect Component */}
                           <DependentSelect
                             label="State"
                             name="state"
@@ -1193,7 +1181,6 @@ const UserDashboard = () => {
                             errorMessage="Please select a Country first"
                           />
 
-                          {/* REPLACED WITH DependentSelect Component */}
                           <DependentSelect
                             label="City"
                             name="city"
@@ -1252,8 +1239,7 @@ const UserDashboard = () => {
                             </div>
                           </div>
                       </div>
-                      
-                      {/* Desktop ONLY actions at the bottom */}
+
                       <div className="dash-filter-actions">
                         <button className="dash-btn dash-btn-outline" style={{width:'auto', flex: 1}} onClick={() => { clearFilters(); setShowFilters(false); }}>Reset</button>
                         <button className="dash-btn dash-btn-accent" style={{width:'auto', flex: 2}} onClick={() => { handleSearch(); setShowFilters(false); }}>Apply Filters</button>
@@ -1270,42 +1256,50 @@ const UserDashboard = () => {
           <div className="dash-container">
 
             {/* --- PREMIUM UPGRADE BANNER --- */}
-            {isPremium && premiumStatus !== 'Resolved' && (
-              <div className={`dash-premium-banner-card ${premiumRequested || premiumStatus === 'Pending' || premiumStatus === 'Contacted' ? 'requested' : ''}`}>
-                <div className="dash-premium-bg-shape"></div>
+            <div className={`dash-premium-banner-card ${premiumRequested || premiumStatus === 'Pending' || premiumStatus === 'Contacted' || premiumStatus === 'Resolved' ? 'requested' : ''}`}>
+              <div className="dash-premium-bg-shape"></div>
 
-                {(premiumRequested || premiumStatus === 'Pending' || premiumStatus === 'Contacted') ? (
-                  <div className="dash-premium-content requested-content">
-                    <div className="dash-premium-icon-box success-icon">
-                      <Icons.CheckCircle />
-                    </div>
-                    <div className="dash-premium-text-col">
-                      <h3>Request Received</h3>
-                      <p>Our support team will contact you shortly to process your premium upgrade.</p>
-                    </div>
+              {premiumStatus === 'Resolved' ? (
+                <div className="dash-premium-content requested-content">
+                  <div className="dash-premium-icon-box gold-icon">
+                    <Icons.Diamond />
                   </div>
-                ) : (
-                  <div className="dash-premium-content default-content">
-                    <div className="dash-premium-icon-box gold-icon">
-                      <Icons.Diamond />
-                    </div>
-                    <div className="dash-premium-text-col">
-                      <h3>Upgrade to Premium</h3>
-                      <p>Get personalized assistance from our expert matchmaking team. Request your exclusive upgrade today.</p>
-                    </div>
-                    <div className="dash-premium-action">
-                      <button 
-                        className="dash-premium-btn" 
-                        onClick={handlePremiumRequest} 
-                        disabled={premiumRequestLoading}
-                      >
-                        {premiumRequestLoading ? "Processing..." : <>Request Upgrade <Icons.ArrowRight /></>}
-                      </button>
-                    </div>
+                  <div className="dash-premium-text-col">
+                    <h3>Premium Member</h3>
+                    <p>Welcome to Premium! You now have full access to advanced features, and our expert matchmaking team is here to assist you personally.</p>
                   </div>
-                )}
-              </div>
-            )}
+                </div>
+              ) : (premiumRequested || premiumStatus === 'Pending' || premiumStatus === 'Contacted') ? (
+                <div className="dash-premium-content requested-content">
+                  <div className="dash-premium-icon-box success-icon">
+                    <Icons.CheckCircle />
+                  </div>
+                  <div className="dash-premium-text-col">
+                    <h3>Request Received</h3>
+                    <p>Our support team will contact you shortly to process your premium upgrade.</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="dash-premium-content default-content">
+                  <div className="dash-premium-icon-box gold-icon">
+                    <Icons.Diamond />
+                  </div>
+                  <div className="dash-premium-text-col">
+                    <h3>Upgrade to Premium</h3>
+                    <p>Get personalized assistance from our expert matchmaking team. Request your exclusive upgrade today.</p>
+                  </div>
+                  <div className="dash-premium-action">
+                    <button 
+                      className="dash-premium-btn" 
+                      onClick={handlePremiumRequest} 
+                      disabled={premiumRequestLoading}
+                    >
+                      {premiumRequestLoading ? "Processing..." : <>Request Upgrade <Icons.ArrowRight /></>}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* --- PENDING VERIFICATION BANNER --- */}
             {!isPremium && regPaymentStatus?.status === 'PendingVerification' && (
@@ -1343,7 +1337,7 @@ const UserDashboard = () => {
                       <div className="dash-name">{formatDisplayName(profile.name)} <Icons.Verify /></div>
                       <span className="dash-age-badge">{profile.age} Yrs</span>
                     </div>
-                    
+
                     <p className="dash-job">{profile.occupation || profile.job || "Not Specified"}</p>
                     <div className="dash-info-grid">
                       <div className="dash-info-item"><span className="dash-lbl">Education</span><span className="dash-val">{profile.education || "--"}</span></div>
@@ -1373,7 +1367,7 @@ const UserDashboard = () => {
             <p className="dash-subtitle" style={{marginBottom:'1.5rem'}}>
                Welcome! As your profile was created by an agent, you must accept our terms and provide a digital signature to proceed with your account.
             </p>
-            
+
             <form onSubmit={submitTerms}>
               <div className="dash-form-group">
                 <label className="dash-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', lineHeight: '1.4' }}>
@@ -1402,7 +1396,7 @@ const UserDashboard = () => {
       {showExtraDetailsModal && (
         <div className="dash-overlay">
           <div className="dash-modal-large" style={{ position: 'relative' }}>
-            
+
             {showTimePicker && (
               <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(2px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'inherit' }}>
                 <CustomTimePicker isOpen={showTimePicker} onClose={() => setShowTimePicker(false)} initialTime={extraDetailsForm.timeOfBirth} onSet={(formattedTime) => { setExtraDetailsForm(prev => ({ ...prev, timeOfBirth: formattedTime })); }} />
@@ -1416,7 +1410,7 @@ const UserDashboard = () => {
                </div>
                <button className="dash-close-btn" onClick={() => setShowExtraDetailsModal(false)}>✕</button>
             </div>
-            
+
             <div className="dash-modal-body">
                <form onSubmit={submitExtraDetails} onKeyDown={handleEnterToNext}>
                  <div className="dash-form-section">
@@ -1426,7 +1420,7 @@ const UserDashboard = () => {
                      <DashboardComboInput label="Star (Nakshatram)" name="star" value={extraDetailsForm.star} onChange={handleExtraDetailsChange} options={dynamicOptions.Star} required={true} onKeyDown={handleEnterToNext}/>
                      <DashboardComboInput label="Pada/Quarter" name="pada" value={extraDetailsForm.pada} onChange={handleExtraDetailsChange} options={dynamicOptions.Pada} required={false} onKeyDown={handleEnterToNext}/>
                      <DashboardComboInput label="Mother Tongue" name="motherTongue" value={extraDetailsForm.motherTongue} onChange={handleExtraDetailsChange} options={dynamicOptions.MotherTongue} required={true} onKeyDown={handleEnterToNext}/>
-                     
+
                      <div className="dash-form-group">
                        <label className="dash-label">Time of Birth</label>
                        <div style={{ position: 'relative' }}>
@@ -1434,14 +1428,11 @@ const UserDashboard = () => {
                          <div style={{ position: 'absolute', right: '12px', top: '12px', color: '#64748b', pointerEvents: 'none' }}><Icons.ChevronDown /></div>
                        </div>
                      </div>
-                     
+
                      <div className="dash-form-group"><label className="dash-label">Place of Birth</label><input type="text" name="placeOfBirth" className="dash-input" placeholder="City or Village name" value={extraDetailsForm.placeOfBirth} onChange={handleExtraDetailsChange}/></div>
                      <div className="dash-form-group"><label className="dash-label">Native Location</label><input type="text" name="nativeLocation" className="dash-input" placeholder="Native Place" value={extraDetailsForm.nativeLocation} onChange={handleExtraDetailsChange}/></div>
                      <DashboardComboInput label="Complexion" name="complexion" value={extraDetailsForm.complexion} onChange={handleExtraDetailsChange} options={dynamicOptions.Complexion} required={false} onKeyDown={handleEnterToNext}/>
-                     
-                     
 
-                     
                    </div>
                  </div>
 
@@ -1506,7 +1497,7 @@ const UserDashboard = () => {
                       {type === 'primary' ? 'Primary Profile Photo' : 'Secondary Portrait'}
                       {isLocked && <span style={{ color: '#ef4444', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}></span>}
                     </label>
-                    
+
                     <div 
                       className={`dash-upload-zone ${photoFiles[type] ? 'active' : ''}`}
                       style={{ opacity: disableInput ? 0.6 : 1, cursor: disableInput ? 'not-allowed' : 'pointer', backgroundColor: disableInput ? '#f1f5f9' : '' }}
