@@ -1,20 +1,17 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import { Search, ChevronLeft, ChevronRight, ChevronDown, CheckCircle, UserCheck } from 'lucide-react';
-import './UserList.css'; 
 
 const UserList = () => {
     const [allRequests, setAllRequests] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
+    // Search states
     const [searchQuery, setSearchQuery] = useState('');
+    const [searchInput, setSearchInput] = useState(''); 
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
-    const LIMIT = 6; // Fixed 6 items to match other components
-
-    // Scroll Indicator State
-    const [showMainScroll, setShowMainScroll] = useState(false);
+    const LIMIT = 5;
 
     const API_BASE_URL = 'https://kalyanashobha-back.vercel.app';
 
@@ -35,10 +32,7 @@ const UserList = () => {
             const data = await response.json();
 
             if (data.success) {
-                // BUG FIX: Filter out any "orphaned" requests where the user was deleted (req.userId is null)
-                // This ensures the Total Count perfectly matches the Rendered Items.
-                const validRequests = (data.data || []).filter(req => req.userId);
-                setAllRequests(validRequests);
+                setAllRequests(data.data);
             } else {
                 toast.error(data.message || 'Failed to fetch premium users');
             }
@@ -50,21 +44,20 @@ const UserList = () => {
         }
     };
 
+    // Fetch on initial mount
     useEffect(() => {
         fetchResolvedUsers();
     }, []);
 
-    // Reset pagination when search changes
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchQuery]);
-
-    // 2. Client-Side Search Filtering
+    // 2. Client-Side Search Filtering & Validation
     const filteredRequests = useMemo(() => {
-        if (!searchQuery) return allRequests;
+        // FIX: Filter out any requests that have a null or missing userId first.
+        const validRequests = allRequests.filter(req => req.userId);
+
+        if (!searchQuery) return validRequests;
 
         const lowerSearch = searchQuery.toLowerCase();
-        return allRequests.filter(req => {
+        return validRequests.filter(req => {
             const user = req.userId;
             return (
                 (user.firstName && user.firstName.toLowerCase().includes(lowerSearch)) ||
@@ -79,169 +72,452 @@ const UserList = () => {
     // 3. Client-Side Pagination Calculations
     const totalUsers = filteredRequests.length;
     const totalPages = Math.ceil(totalUsers / LIMIT) || 1;
-    const startIndex = (currentPage - 1) * LIMIT;
-    const currentUsers = filteredRequests.slice(startIndex, startIndex + LIMIT);
 
-    // Universal Scroll Indicator Logic
-    useEffect(() => {
-        const checkMainScroll = () => {
-            if (filteredRequests.length === 0) {
-                setShowMainScroll(false);
-                return;
-            }
-            const scrollY = window.scrollY || document.documentElement.scrollTop;
-            const windowHeight = window.innerHeight;
-            const documentHeight = document.documentElement.scrollHeight;
-            
-            setShowMainScroll(documentHeight > windowHeight + 20 && scrollY + windowHeight < documentHeight - 30);
-        };
-
-        const timer = setTimeout(checkMainScroll, 500); 
-        window.addEventListener('scroll', checkMainScroll);
-        window.addEventListener('resize', checkMainScroll);
-
-        return () => {
-            clearTimeout(timer);
-            window.removeEventListener('scroll', checkMainScroll);
-            window.removeEventListener('resize', checkMainScroll);
-        };
+    const currentUsers = useMemo(() => {
+        const startIndex = (currentPage - 1) * LIMIT;
+        return filteredRequests.slice(startIndex, startIndex + LIMIT);
     }, [filteredRequests, currentPage]);
 
-    return (
-        <div className="ul-layout">
-            <Toaster position="top-right" />
+    // Handlers
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        setCurrentPage(1); 
+        setSearchQuery(searchInput);
+        if (searchInput) {
+            toast.success(`Showing results for "${searchInput}"`);
+        }
+    };
 
-            {/* Header */}
-            <div className="ul-header">
-                <div className="ul-title-group">
+    const handleClearSearch = () => {
+        setSearchInput('');
+        setSearchQuery('');
+        setCurrentPage(1);
+    };
+
+    // --- INTERNAL CSS ---
+    const internalCss = `
+        .ul-wrapper {
+            font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            max-width: 1050px;
+            margin: 40px auto;
+            padding: 32px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 4px 6px rgba(0, 0, 0, 0.02);
+            color: #1f2937;
+        }
+        
+        .ul-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid #f3f4f6;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .ul-header h2 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ul-header h2::before {
+            content: '';
+            display: block;
+            width: 12px;
+            height: 12px;
+            background-color: #b91c1c;
+            border-radius: 50%;
+        }
+
+        .ul-record-count {
+            font-size: 14px;
+            color: #6b7280;
+            background-color: #f3f4f6;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .ul-search-form {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .ul-input {
+            flex: 1;
+            padding: 12px 16px;
+            font-size: 15px;
+            color: #111827;
+            background-color: #f9fafb;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .ul-input:focus {
+            background-color: #ffffff;
+            border-color: #b91c1c;
+            box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.15);
+        }
+
+        .ul-btn {
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .ul-btn-primary {
+            background-color: #b91c1c;
+            color: #ffffff;
+            box-shadow: 0 2px 4px rgba(185, 28, 28, 0.2);
+        }
+
+        .ul-btn-primary:hover:not(:disabled) {
+            background-color: #991b1b;
+            transform: translateY(-1px);
+        }
+
+        .ul-btn-secondary {
+            background-color: #ffffff;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .ul-table-wrapper {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .ul-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            word-break: break-word;
+        }
+
+        .ul-table th {
+            background-color: #f9fafb;
+            color: #6b7280;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 16px;
+            font-weight: 600;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .ul-table td {
+            padding: 16px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #4b5563;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .ul-table tbody tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .ul-primary-text {
+            color: #111827;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .ul-secondary-text {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .ul-badge {
+            display: inline-flex;
+            align-items: center;
+            background-color: #ecfdf5;
+            color: #059669;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid #a7f3d0;
+        }
+
+        .ul-pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ul-empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: #6b7280;
+        }
+
+        /* --- SKELETON ANIMATION --- */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #f0f2f5 25%, #e2e4e8 50%, #f0f2f5 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite linear;
+            border-radius: 4px;
+        }
+
+        .skeleton-text { height: 16px; margin-bottom: 8px; }
+        .skeleton-text-sm { height: 12px; width: 60%; }
+        .skeleton-badge { height: 24px; width: 60px; border-radius: 12px; }
+
+        /* --- MOBILE SCROLL INDICATOR --- */
+        .mobile-scroll-indicator {
+            display: none;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-6px); }
+            60% { transform: translateY(-3px); }
+        }
+
+        /* --- RESPONSIVE MOBILE STYLES (No Horizontal Scroll) --- */
+        @media (max-width: 768px) {
+            .ul-wrapper {
+                padding: 16px;
+                margin: 16px auto;
+            }
+
+            .ul-search-form { flex-direction: column; }
+            .ul-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+
+            .ul-table-wrapper { border: none; margin-bottom: 8px; }
+            
+            .ul-table, .ul-table tbody, .ul-table tr, .ul-table td {
+                display: block;
+                width: 100%;
+            }
+
+            .ul-table thead { display: none; }
+
+            .ul-table tbody tr {
+                margin-bottom: 16px;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            }
+
+            .ul-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                text-align: right;
+                padding: 12px 16px;
+                border-bottom: 1px solid #f3f4f6;
+            }
+
+            .ul-table td::before {
+                content: attr(data-label);
+                font-size: 12px;
+                text-transform: uppercase;
+                font-weight: 600;
+                color: #6b7280;
+                margin-right: 16px;
+                text-align: left;
+                flex-shrink: 0;
+            }
+
+            .ul-primary-text, .ul-secondary-text { text-align: right; }
+
+            .ul-pagination { flex-direction: column; gap: 16px; margin-top: 16px; }
+            .ul-btn { width: 100%; }
+
+            .mobile-scroll-indicator {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                color: #9ca3af;
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                margin-bottom: 24px;
+                animation: bounce 2s infinite;
+            }
+
+            .arrow-down {
+                width: 0; 
+                height: 0; 
+                border-left: 6px solid transparent;
+                border-right: 6px solid transparent;
+                border-top: 6px solid #9ca3af;
+                margin-top: 4px;
+            }
+        }
+    `;
+
+    // Render 5 Skeleton rows while loading
+    const renderSkeletons = () => {
+        return [...Array(LIMIT)].map((_, index) => (
+            <tr key={`skeleton-${index}`}>
+                <td data-label="Profile ID">
+                    <div className="skeleton skeleton-text" style={{ width: '80%' }}></div>
+                </td>
+                <td data-label="Name">
+                    <div className="skeleton skeleton-text" style={{ width: '90%' }}></div>
+                </td>
+                <td data-label="Contact Info">
+                    <div className="skeleton skeleton-text" style={{ width: '100%' }}></div>
+                    <div className="skeleton skeleton-text-sm"></div>
+                </td>
+                <td data-label="Location">
+                    <div className="skeleton skeleton-text" style={{ width: '70%' }}></div>
+                    <div className="skeleton skeleton-text-sm"></div>
+                </td>
+                <td data-label="Status">
+                    <div className="skeleton skeleton-badge"></div>
+                </td>
+            </tr>
+        ));
+    };
+
+    return (
+        <>
+            <style>{internalCss}</style>
+
+            <div className="ul-wrapper">
+                <Toaster position="top-right" />
+
+                <div className="ul-header">
                     <h2>Resolved Premium Users</h2>
-                    <p>View users who have successfully received premium assistance.</p>
-                </div>
-                <div className="ul-header-actions">
-                    <span className="ul-count-badge">
-                        Total Records: <strong>{totalUsers}</strong>
+                    <span className="ul-record-count">
+                        Total Records: <strong>{loading ? '-' : totalUsers}</strong>
                     </span>
                 </div>
-            </div>
 
-            {/* Controls */}
-            <div className="ul-controls-group">
-                <div className="ul-search-group">
-                    <Search size={18} />
+                <form className="ul-search-form" onSubmit={handleSearchSubmit}>
                     <input
                         type="text"
                         placeholder="Search by Name, Email, Mobile, or Profile ID..."
-                        className="ul-search-input"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="ul-input"
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
                     />
-                </div>
-            </div>
+                    <button type="submit" className="ul-btn ul-btn-primary" disabled={loading}>
+                        {loading ? 'Searching...' : 'Search'}
+                    </button>
+                    {searchQuery && (
+                        <button type="button" className="ul-btn ul-btn-secondary" onClick={handleClearSearch}>
+                            Clear
+                        </button>
+                    )}
+                </form>
 
-            {/* Data Table / Cards */}
-            <div className="ul-data-card">
-                {loading ? (
-                    <div className="ul-skeleton-stack">
-                        {[1, 2, 3, 4, 5, 6].map(i => (
-                            <div key={i} className="ul-skeleton-row">
-                                <div className="ul-skel-box ul-skel-id"></div>
-                                <div className="ul-skel-box ul-skel-name"></div>
-                                <div className="ul-skel-box ul-skel-contact"></div>
-                                <div className="ul-skel-box ul-skel-loc"></div>
-                                <div className="ul-skel-box ul-skel-status"></div>
-                            </div>
-                        ))}
+                <div className="ul-table-wrapper">
+                    <table className="ul-table">
+                        <thead>
+                            <tr>
+                                <th>Profile ID</th>
+                                <th>Name</th>
+                                <th>Contact Info</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                renderSkeletons()
+                            ) : currentUsers.length > 0 ? (
+                                currentUsers.map((req) => {
+                                    const user = req.userId;
+                                    return (
+                                        <tr key={req._id}>
+                                            <td data-label="Profile ID">
+                                                <span className="ul-primary-text">{user.uniqueId}</span>
+                                            </td>
+                                            <td data-label="Name">
+                                                <span className="ul-primary-text">{user.firstName} {user.lastName}</span>
+                                            </td>
+                                            <td data-label="Contact Info">
+                                                <div>
+                                                    <span className="ul-primary-text">{user.mobileNumber}</span>
+                                                    <span className="ul-secondary-text">{user.email}</span>
+                                                </div>
+                                            </td>
+                                            <td data-label="Location">
+                                                <div>
+                                                    <span className="ul-primary-text">{user.city}</span>
+                                                    <span className="ul-secondary-text">{user.state}</span>
+                                                </div>
+                                            </td>
+                                            <td data-label="Status">
+                                                <span className="ul-badge">{req.status}</span>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            ) : (
+                                <tr>
+                                    <td colSpan="5" className="ul-empty-state">
+                                        No resolved users found matching your search.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Mobile Bouncing Scroll Indicator */}
+                {!loading && currentUsers.length > 0 && (
+                    <div className="mobile-scroll-indicator">
+                        <span>Scroll down for more info</span>
+                        <div className="arrow-down"></div>
                     </div>
-                ) : currentUsers.length === 0 ? (
-                    <div className="ul-state-view empty">
-                        <UserCheck size={48} />
-                        <h3>No resolved users found</h3>
-                        <p>{searchQuery ? `No users match "${searchQuery}".` : "There are no resolved premium requests yet."}</p>
-                    </div>
-                ) : (
-                    <>
-                        <div className="ul-table-wrapper">
-                            <table className="ul-data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Profile ID</th>
-                                        <th>User Name</th>
-                                        <th>Contact Info</th>
-                                        <th>Location</th>
-                                        <th className="ul-text-right">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {currentUsers.map((req) => {
-                                        const user = req.userId;
-                                        return (
-                                            <tr key={req._id}>
-                                                <td data-label="Profile ID">
-                                                    <span className="ul-id-badge">{user.uniqueId || 'N/A'}</span>
-                                                </td>
-                                                <td data-label="User Name">
-                                                    <strong>{user.firstName} {user.lastName}</strong>
-                                                </td>
-                                                <td data-label="Contact Info">
-                                                    <div className="ul-info-stack">
-                                                        <span className="ul-primary-text">{user.mobileNumber || 'N/A'}</span>
-                                                        <span className="ul-text-muted">{user.email || 'N/A'}</span>
-                                                    </div>
-                                                </td>
-                                                <td data-label="Location">
-                                                    <div className="ul-info-stack">
-                                                        <span className="ul-primary-text">{user.city || 'N/A'}</span>
-                                                        <span className="ul-text-muted">{user.state || 'N/A'}</span>
-                                                    </div>
-                                                </td>
-                                                <td data-label="Status" className="ul-text-right">
-                                                    <span className="ul-status-badge">
-                                                        <CheckCircle size={14} /> {req.status}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
+                )}
+
+                {/* Pagination Controls */}
+                {!loading && totalPages > 0 && (
+                    <div className="ul-pagination">
+                        <button 
+                            className="ul-btn ul-btn-secondary"
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                            style={{ opacity: currentPage === 1 ? 0.5 : 1 }}
+                        >
+                            &laquo; Previous
+                        </button>
+
+                        <div className="ul-page-info">
+                            Page <strong style={{ color: '#111827' }}>{currentPage}</strong> of <strong>{totalPages}</strong>
                         </div>
 
-                        {/* CIRCULAR PAGINATION DESIGN */}
-                        {totalPages > 1 && (
-                            <div className="ul-pagination-container">
-                                <button 
-                                    className="ul-page-btn-circle" 
-                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                                    disabled={currentPage === 1}
-                                >
-                                    <ChevronLeft size={20} />
-                                </button>
-                                
-                                <span className="ul-page-text">
-                                    Page {currentPage} of {totalPages}
-                                </span>
-
-                                <button 
-                                    className="ul-page-btn-circle" 
-                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                                    disabled={currentPage === totalPages}
-                                >
-                                    <ChevronRight size={20} />
-                                </button>
-                            </div>
-                        )}
-                    </>
+                        <button 
+                            className="ul-btn ul-btn-secondary"
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                            style={{ opacity: currentPage === totalPages ? 0.5 : 1 }}
+                        >
+                            Next &raquo;
+                        </button>
+                    </div>
                 )}
             </div>
-
-            {/* SCROLL INDICATOR */}
-            {showMainScroll && (
-                <div className="ul-scroll-indicator">
-                    <ChevronDown size={18} />
-                    <span>Scroll for more</span>
-                </div>
-            )}
-        </div>
+        </>
     );
 };
 
