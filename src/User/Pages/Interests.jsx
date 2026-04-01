@@ -13,7 +13,8 @@ import {
   Send, 
   Users,
   Briefcase,
-  ChevronRight
+  ChevronRight,
+  Loader2
 } from 'lucide-react';
 import Navbar from "../Components/Navbar.jsx";
 import './Interests.css';
@@ -44,6 +45,9 @@ const Interests = () => {
   const [sentList, setSentList] = useState([]);
   const [receivedList, setReceivedList] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // NEW: Track the ID of the request currently being processed
+  const [processingId, setProcessingId] = useState(null);
 
   const neutralAvatar = "https://cdn-icons-png.flaticon.com/512/847/847969.png"; 
   const API_BASE = "https://kalyanashobha-back.vercel.app/api/user";
@@ -102,7 +106,10 @@ const Interests = () => {
     // 1. Gracefully dismiss the confirmation toast
     toast.dismiss(toastId); 
 
-    // 2. Trigger the processing toast and capture its ID
+    // 2. Set the processing ID to disable buttons
+    setProcessingId(interestId);
+
+    // 3. Trigger the processing toast and capture its ID
     const loadingToastId = toast.loading("Processing...");
 
     const token = localStorage.getItem('token');
@@ -118,7 +125,7 @@ const Interests = () => {
       if (data.success) {
         // Wait for the UI data to refresh FIRST
         await fetchInterests(true); 
-        // 3. Update the existing loading toast to a success toast
+        // Update the existing loading toast to a success toast
         toast.success(action === 'accept' ? "Request accepted successfully!" : "Request declined.", { id: loadingToastId });
       } else {
         // Update the existing loading toast to an error toast
@@ -127,6 +134,9 @@ const Interests = () => {
     } catch (err) {
       // Update the existing loading toast to a network error toast
       toast.error("Network error", { id: loadingToastId });
+    } finally {
+      // 4. Clear the processing ID to re-enable buttons (or let them disappear on refresh)
+      setProcessingId(null);
     }
   };
 
@@ -149,7 +159,7 @@ const Interests = () => {
     </div>
   );
 
-  const ProfileRow = ({ profile, status, type, onAction, item }) => {
+  const ProfileRow = ({ profile, status, type, onAction, item, isProcessing }) => {
     const isConnected = ['Finalized', 'Accepted'].includes(status);
 
     let age = "--";
@@ -205,11 +215,25 @@ const Interests = () => {
              </span>
           ) : type === 'received' && status === 'PendingUser' ? (
             <div className="ui-row__btn-group">
-              <button onClick={() => onAction(item._id, 'decline')} className="ui-btn ui-btn--soft-danger">
+              <button 
+                onClick={() => onAction(item._id, 'decline')} 
+                className="ui-btn ui-btn--soft-danger"
+                disabled={isProcessing}
+                style={{ opacity: isProcessing ? 0.6 : 1, cursor: isProcessing ? 'not-allowed' : 'pointer' }}
+              >
                 Decline
               </button>
-              <button onClick={() => onAction(item._id, 'accept')} className="ui-btn ui-btn--soft-success">
-                Accept <ChevronRight size={16} />
+              <button 
+                onClick={() => onAction(item._id, 'accept')} 
+                className="ui-btn ui-btn--soft-success"
+                disabled={isProcessing}
+                style={{ opacity: isProcessing ? 0.6 : 1, cursor: isProcessing ? 'not-allowed' : 'pointer' }}
+              >
+                {isProcessing ? (
+                  <>Processing <Loader2 size={16} className="spinner" /></>
+                ) : (
+                  <>Accept <ChevronRight size={16} /></>
+                )}
               </button>
             </div>
           ) : (
@@ -272,6 +296,12 @@ const Interests = () => {
         }} 
       />
 
+      {/* Add a tiny CSS string for the spinner animation if you don't have it globally */}
+      <style>{`
+        .spinner { animation: spin 1s linear infinite; margin-left: 4px; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+      `}</style>
+
       <main className="dashboard">
         <header className="dashboard__header">
           <h2 className="dashboard__title">Network & Connections</h2>
@@ -318,7 +348,8 @@ const Interests = () => {
                   profile={item.profile} 
                   status={item.status} 
                   type={item.type} 
-                  onAction={handleRespond} 
+                  onAction={handleRespond}
+                  isProcessing={processingId === item._id} 
                 />
               ))}
             </div>
