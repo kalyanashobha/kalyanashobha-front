@@ -207,8 +207,8 @@ const DataApproval = () => {
                                             <td data-label="Category">
                                                 <span className="kda-badge-category">{item.category}</span>
                                             </td>
-                                            <td data-label="New Value" className="kda-fw-bold">
-                                                {item.value}
+                                            <td data-label="New Value">
+                                                <span className="kda-fw-bold">{item.value}</span>
                                             </td>
                                             <td data-label="Parent">
                                                 {item.parentValue ? (
