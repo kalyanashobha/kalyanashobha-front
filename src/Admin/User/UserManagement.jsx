@@ -66,10 +66,10 @@ const CustomTimePicker = ({ isOpen, onClose, onSet, initialTime }) => {
       <div style={{ backgroundColor: '#6366f1', color: 'white', padding: '20px' }}>
         <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '500' }}>Set time</h3>
       </div>
-      
+
       <div style={{ padding: '24px 20px' }}>
         <p style={{ margin: '0 0 16px 0', fontSize: '0.9rem', color: '#475569', fontWeight: '500' }}>Type in time</p>
-        
+
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <input 
@@ -91,9 +91,9 @@ const CustomTimePicker = ({ isOpen, onClose, onSet, initialTime }) => {
             />
             <span style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px' }}>hour</span>
           </div>
-          
+
           <span style={{ fontSize: '1.5rem', fontWeight: 'bold', paddingBottom: '20px' }}>:</span>
-          
+
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <input 
               type="number" 
@@ -114,7 +114,7 @@ const CustomTimePicker = ({ isOpen, onClose, onSet, initialTime }) => {
             />
             <span style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px' }}>minute</span>
           </div>
-          
+
           <div style={{ flex: 1 }}>
             <select 
               value={period}
@@ -154,7 +154,7 @@ const AdminUserManagement = () => {
   // Dynamic Master Data States
   const [masterCommunities, setMasterCommunities] = useState([]); 
   const [availableSubCommunities, setAvailableSubCommunities] = useState([]);
-  
+
   const [masterCountries, setMasterCountries] = useState([]);
   const [masterEducations, setMasterEducations] = useState([]);
   const [masterOccupations, setMasterOccupations] = useState([]);
@@ -168,7 +168,7 @@ const AdminUserManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [referralFilter, setReferralFilter] = useState("all");
   const [advFilters, setAdvFilters] = useState(INITIAL_FILTERS);
-  
+
   // --- MAIN PAGE SCROLL INDICATOR LOGIC ---
   const [showMainScroll, setShowMainScroll] = useState(false);
 
@@ -183,7 +183,7 @@ const AdminUserManagement = () => {
       const scrollY = window.scrollY || document.documentElement.scrollTop;
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
-      
+
       // If the page has scrolling room and we aren't near the bottom, show the indicator
       setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
     };
@@ -227,7 +227,7 @@ const AdminUserManagement = () => {
         console.error("Failed to load master data", err);
       }
     };
-    
+
     fetchInitialMasterData();
   }, []);
 
@@ -265,7 +265,7 @@ const AdminUserManagement = () => {
 
   const handleAdvChange = async (e) => {
     const { name, value } = e.target;
-    
+
     if (name === 'community') {
       setAdvFilters({ ...advFilters, community: value, subCommunity: '' });
       const found = masterCommunities.find(c => c.name === value);
@@ -277,7 +277,7 @@ const AdminUserManagement = () => {
     } else if (name === 'country') {
       setAdvFilters({ ...advFilters, country: value, state: '', city: '' });
       setAdvCities([]); 
-      
+
       if (value) {
         try {
           const res = await axios.get(`${API_BASE_URL}/public/master-data/State?parent=${value}`);
@@ -399,20 +399,20 @@ const AdminUserManagement = () => {
                     <Hash size={14} className="um-input-icon"/>
                     <input name="memberId" value={advFilters.memberId} onChange={handleAdvChange} placeholder="Member ID" className="um-input" />
                 </div>
-                
+
                 <select name="gender" value={advFilters.gender} onChange={handleAdvChange} className="um-input">
                     <option value="">Gender (Any)</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                 </select>
-                
+
                 <select name="maritalStatus" value={advFilters.maritalStatus} onChange={handleAdvChange} className="um-input">
                     <option value="">Marital Status (Any)</option>
                     {MARITAL_STATUSES.map(status => (
                       <option key={status} value={status}>{status}</option>
                     ))}
                 </select>
-                
+
                 <div className="um-range-group">
                   <input type="number" name="minAge" placeholder="Min Age" value={advFilters.minAge} onChange={handleAdvChange} className="um-input" />
                   <span className="um-divider">-</span>
@@ -545,7 +545,7 @@ const AdminUserManagement = () => {
             }}
           />
         )}
-        
+
         {/* NEW MAIN PAGE SCROLL INDICATOR */}
         {showMainScroll && !selectedUser && (
           <div className="um-scroll-indicator" style={{ position: 'fixed', zIndex: 40 }}>
@@ -744,7 +744,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
 
   const handleInputChange = async (e) => {
     const { name, value } = e.target;
-    
+
     if (name === 'community') {
         setFormData(prev => ({ ...prev, [name]: value, subCommunity: '' }));
     } 
@@ -781,6 +781,10 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
     if (activeImg === urlToRemove) setActiveImg(existingPhotos[0] || null);
   };
 
+  const handleRemoveNewPhoto = (index) => {
+    setNewPhotos(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleNewPhotoChange = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
@@ -815,7 +819,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
 
       setNewPhotos(prev => [...prev, ...processedFiles]);
       toast.update(loadingToast, { render: "Photos processed successfully", type: "success", isLoading: false, autoClose: 2000 });
-      
+
     } catch (error) {
       console.error("Compression Error:", error);
       toast.update(loadingToast, { render: "Failed to compress images. Try another photo.", type: "error", isLoading: false, autoClose: 3000 });
@@ -827,11 +831,11 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
   const handleSave = async () => {
     setLoading(true);
     const toastId = toast.loading("Saving updates...");
-    
+
     try {
       const token = localStorage.getItem('adminToken');
       const submitData = new FormData();
-      
+
       const mainData = {
           firstName: formData.firstName, lastName: formData.lastName, gender: formData.gender,
           dob: formData.dob, maritalStatus: formData.maritalStatus, height: formData.height, diet: formData.diet,
@@ -881,7 +885,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
   return (
     <div className="um-modal-overlay" onClick={onClose}>
       <div className="um-modal-container" onClick={e => e.stopPropagation()} style={{maxWidth: '900px', position: 'relative'}}>
-        
+
         {showTimePicker && (
           <div style={{
             position: 'absolute', inset: 0,
@@ -963,7 +967,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
                     <DataRow label="Gothra" value={user.gothra} />
                   </div>
                 </div>
-                
+
                 <div className="um-detail-column">
                   <h3 className="um-column-title"><Briefcase size={16} /> Professional</h3>
                   <div className="um-data-table">
@@ -1025,13 +1029,13 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
                       <DataRow label="NRI Status" value={user.nri} /> 
                     </div>
                   </div>
-                  
+
                   <div className="um-detail-column" style={{opacity: 0}}></div>
                 </div>
               )}
             </>
           ) : (
-            
+
           <div className="um-edit-form">
             <h3 className="um-column-title" style={{marginBottom: '15px'}}><User size={16} /> Basic Details</h3>
             <div className="um-form-grid" style={{marginBottom: '20px'}}>
@@ -1060,7 +1064,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
                   {masterData?.communities.map((c, i) => <option key={i} value={c.name}>{c.name}</option>)}
                 </select>
               </FormGroup>
-              
+
               <FormGroup label="Sub-Community / Caste">
                 <select name="subCommunity" value={formData.subCommunity} onChange={handleInputChange} className="um-input" disabled={!formData.community}>
                   <option value="">Select Sub-Community</option>
@@ -1072,7 +1076,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
               </FormGroup>
 
               <FormGroup label="Gothra"><input name="gothra" value={formData.gothra} onChange={handleInputChange} placeholder="Gothra" className="um-input" /></FormGroup>
-              
+
               <FormGroup label="Diet">
                 <select name="diet" value={formData.diet} onChange={handleInputChange} className="um-input">
                   <option value="">Select Diet</option>
@@ -1102,7 +1106,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
               <FormGroup label="College Name"><input name="collegeName" value={formData.collegeName} onChange={handleInputChange} placeholder="College Name" className="um-input" /></FormGroup>
               <FormGroup label="Company Name"><input name="companyName" value={formData.companyName} onChange={handleInputChange} placeholder="Company Name" className="um-input" /></FormGroup>
               <FormGroup label="Annual Income"><input name="annualIncome" value={formData.annualIncome} onChange={handleInputChange} placeholder="Annual Income" className="um-input" /></FormGroup>
-              
+
               <FormGroup label="Country">
                 <select name="country" value={formData.country} onChange={handleInputChange} className="um-input">
                   <option value="">Select Country</option>
@@ -1206,13 +1210,13 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
                 </FormGroup>
 
                 <FormGroup label="Father's Name"><input name="fatherName" value={formData.fatherName} onChange={handleInputChange} placeholder="Father's Name" className="um-input" /></FormGroup>
-                
+
                 <FormGroup label="Father's Occupation">
                   <input name="fatherOccupation" value={formData.fatherOccupation} onChange={handleInputChange} placeholder="Father's Occupation" className="um-input" />
                 </FormGroup>
 
                 <FormGroup label="Mother's Name"><input name="motherName" value={formData.motherName} onChange={handleInputChange} placeholder="Mother's Name" className="um-input" /></FormGroup>
-                
+
                 <FormGroup label="Mother's Occupation">
                   <input name="motherOccupation" value={formData.motherOccupation} onChange={handleInputChange} placeholder="Mother's Occupation" className="um-input" />
                 </FormGroup>
@@ -1222,19 +1226,19 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
                     {[...Array(11).keys()].map(n => <option key={n} value={n}>{n}</option>)}
                   </select>
                 </FormGroup>
-                
+
                 <FormGroup label="Brothers Married">
                   <select name="noOfBrothersMarried" value={formData.noOfBrothersMarried} onChange={handleInputChange} className="um-input">
                     {[...Array(11).keys()].map(n => <option key={n} value={n}>{n}</option>)}
                   </select>
                 </FormGroup>
-                
+
                 <FormGroup label="No. of Sisters">
                   <select name="noOfSisters" value={formData.noOfSisters} onChange={handleInputChange} className="um-input">
                     {[...Array(11).keys()].map(n => <option key={n} value={n}>{n}</option>)}
                   </select>
                 </FormGroup>
-                
+
                 <FormGroup label="Sisters Married">
                   <select name="noOfSistersMarried" value={formData.noOfSistersMarried} onChange={handleInputChange} className="um-input">
                     {[...Array(11).keys()].map(n => <option key={n} value={n}>{n}</option>)}
@@ -1251,7 +1255,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
 
             <h3 className="um-column-title" style={{marginBottom: '15px'}}>Manage Photos (Max 2)</h3>
             <div style={{display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '15px'}}>
-              
+
               {existingPhotos.map((url, i) => (
                 <div key={`exist-${i}`} style={{position: 'relative', width: '100px', height: '100px'}}>
                   <img src={url} alt="existing" style={{width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px'}} />
@@ -1299,7 +1303,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
           </div>
           )}
         </div>
-        
+
         {/* NEW MODAL SCROLL INDICATOR */}
         {showScrollIndicator && (
           <div className="um-scroll-indicator">
@@ -1313,10 +1317,11 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
   );
 };
 
+// CLEANED UP THE INLINE STYLES HERE TO ALLOW PROPER TEXT WRAPPING
 const DataRow = ({ label, value }) => (
   <div className="um-row">
     <span className="um-lbl">{label}</span>
-    <span className="um-val" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>{value || "-"}</span>
+    <span className="um-val">{value || "-"}</span>
   </div>
 );
 
