@@ -332,18 +332,18 @@
    ========================================================= */
 @media (max-width: 768px) {
   .kda-layout { padding: 16px; }
-  
+
   .kda-scroll-indicator { display: flex; }
 
   .kda-title-group h2 { font-size: 20px; }
   .kda-title-group p { font-size: 13px; }
-  
+
   .kda-controls-wrapper { flex-direction: column; align-items: stretch; width: 100%;}
   .kda-search-group { min-width: 100%; }
   .kda-refresh-btn { padding: 8px 14px; font-size: 12px; width: 100%; justify-content: center;}
 
   .kda-table thead { display: none; }
-  
+
   .kda-content { background: transparent; border: none; box-shadow: none; }
   .kda-table { min-width: unset; display: flex; flex-direction: column; gap: 16px;}
   .kda-table tbody { display: flex; flex-direction: column; gap: 16px; }
@@ -365,10 +365,8 @@
     align-items: flex-start; 
     padding: 12px 0;
     border-bottom: 1px dashed var(--kda-border);
-    text-align: right; 
-    word-break: break-word; 
   }
-  
+
   .kda-table td:last-child { border-bottom: none; padding-bottom: 0; }
   .kda-table td[data-label="Actions"] { padding-top: 16px; margin-top: 4px; align-items: center;}
 
@@ -383,17 +381,20 @@
     margin-right: 12px;
     flex-shrink: 0; 
     margin-top: 2px; 
-    width: 90px; 
+    width: 100px; /* Fixed width to prevent squishing */
     text-align: left;
   }
 
-  /* Specific Adjustments */
-  .kda-badge-category, .kda-fw-bold, .kda-text-muted, .kda-user-info, .kda-date-text {
+  /* Target the content wrappers inside TD (The right side) */
+  .kda-table td > span,
+  .kda-table td > div {
       flex: 1;
-      max-width: calc(100% - 100px); /* Prevents overflow pushing the cell wide */
       text-align: right;
+      overflow-wrap: break-word; /* Safely wraps text to the next line naturally */
+      line-height: 1.4;
   }
 
+  /* Specific Adjustments */
   .kda-badge-category { font-size: 10px; padding: 4px 8px; width: fit-content; margin-left: auto; }
   .kda-fw-bold { font-size: 14px; }
   .kda-text-muted { font-size: 13px; }
