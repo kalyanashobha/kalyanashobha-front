@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
@@ -141,9 +142,94 @@ const CustomTimePicker = ({ isOpen, onClose, onSet, initialTime }) => {
   );
 };
 
+// --- AGENT SEARCHABLE COMBOBOX ---
+const AgentComboBox = ({ agents, value, onChange, placeholder = "Search Agent..." }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const wrapperRef = useRef(null);
+
+  useEffect(() => {
+    const selected = agents.find(a => a._id === value);
+    if (selected) {
+      setSearch(`${selected.name} (${selected.agentCode})`);
+    } else {
+      setSearch("");
+    }
+  }, [value, agents]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setIsOpen(false);
+        const selected = agents.find(a => a._id === value);
+        if (selected) setSearch(`${selected.name} (${selected.agentCode})`);
+        else setSearch("");
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [value, agents]);
+
+  const filtered = agents.filter(a => 
+    a.name.toLowerCase().includes(search.toLowerCase()) || 
+    (a.agentCode && a.agentCode.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  return (
+    <div ref={wrapperRef} style={{ position: 'relative', minWidth: '240px' }}>
+      <input 
+        type="text" 
+        placeholder={placeholder}
+        className="um-select"
+        value={search}
+        onChange={(e) => {
+          setSearch(e.target.value);
+          setIsOpen(true);
+          if (e.target.value === "") onChange(""); 
+        }}
+        onFocus={() => setIsOpen(true)}
+        style={{ width: '100%', cursor: 'text', paddingRight: '30px' }}
+      />
+      {/* Small clear button inside input */}
+      {value && (
+        <button 
+          onClick={(e) => { e.stopPropagation(); onChange(""); setSearch(""); }} 
+          style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}
+        >
+          <X size={14} />
+        </button>
+      )}
+
+      {isOpen && filtered.length > 0 && (
+        <ul style={{
+          position: 'absolute', top: '100%', left: 0, right: 0, 
+          background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', 
+          maxHeight: '220px', overflowY: 'auto', zIndex: 100, listStyle: 'none', 
+          padding: '4px', margin: '4px 0 0 0', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'
+        }}>
+          {filtered.map(agent => (
+            <li 
+              key={agent._id} 
+              style={{ padding: '10px 12px', cursor: 'pointer', fontSize: '13px', borderRadius: '4px', transition: 'background 0.2s' }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#f1f5f9'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+              onClick={() => {
+                onChange(agent._id);
+                setIsOpen(false);
+              }}
+            >
+              <strong style={{color: '#0f172a'}}>{agent.name}</strong> <br/>
+              <span style={{color: '#64748b', fontSize: '11px'}}>ID: {agent.agentCode}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+
 const AdminUserManagement = () => {
   const [users, setUsers] = useState([]);
-  const [agents, setAgents] = useState([]); // List of agents
   const [loading, setLoading] = useState(false); 
   const [processingId, setProcessingId] = useState(null); 
 
@@ -155,6 +241,7 @@ const AdminUserManagement = () => {
   // Dynamic Master Data States
   const [masterCommunities, setMasterCommunities] = useState([]); 
   const [availableSubCommunities, setAvailableSubCommunities] = useState([]);
+  const [masterAgents, setMasterAgents] = useState([]);
 
   const [masterCountries, setMasterCountries] = useState([]);
   const [masterEducations, setMasterEducations] = useState([]);
@@ -166,10 +253,9 @@ const AdminUserManagement = () => {
   const [advStates, setAdvStates] = useState([]);
   const [advCities, setAdvCities] = useState([]);
 
-  // Filters
   const [searchTerm, setSearchTerm] = useState("");
   const [referralFilter, setReferralFilter] = useState("all");
-  const [agentFilter, setAgentFilter] = useState(""); // Filter by specific Agent ID
+  const [selectedAgentId, setSelectedAgentId] = useState("");
   const [advFilters, setAdvFilters] = useState(INITIAL_FILTERS);
 
   // --- MAIN PAGE SCROLL INDICATOR LOGIC ---
@@ -177,21 +263,17 @@ const AdminUserManagement = () => {
 
   useEffect(() => {
     const checkMainScroll = () => {
-      // Don't show the main background scroll indicator if the modal popup is open
       if (selectedUser) {
         setShowMainScroll(false);
         return;
       }
-
       const scrollY = window.scrollY || document.documentElement.scrollTop;
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
-
-      // If the page has scrolling room and we aren't near the bottom, show the indicator
       setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
     };
 
-    const timer = setTimeout(checkMainScroll, 500); // Allow content to load before checking
+    const timer = setTimeout(checkMainScroll, 500); 
     window.addEventListener('scroll', checkMainScroll);
     window.addEventListener('resize', checkMainScroll);
 
@@ -204,9 +286,10 @@ const AdminUserManagement = () => {
   // ----------------------------------------
 
   useEffect(() => {
-    const fetchInitialMasterDataAndAgents = async () => {
+    const fetchInitialMasterData = async () => {
       try {
         const token = localStorage.getItem('adminToken');
+
         const [
           commRes, countryRes, eduRes, occRes, mtRes, starRes, moonRes, agentRes
         ] = await Promise.all([
@@ -227,49 +310,65 @@ const AdminUserManagement = () => {
         if (mtRes.data.success) setMasterMotherTongues(mtRes.data.data); 
         if (starRes.data.success) setMasterStars(starRes.data.data); 
         if (moonRes.data.success) setMasterMoonsigns(moonRes.data.data); 
-        
-        // Setup Agents for Dropdown
-        if (agentRes.data.success) setAgents(agentRes.data.agents || []);
+        if (agentRes.data.success) setMasterAgents(agentRes.data.agents || []);
 
       } catch (err) {
-        console.error("Failed to load initial data", err);
+        console.error("Failed to load master data", err);
       }
     };
 
-    fetchInitialMasterDataAndAgents();
+    fetchInitialMasterData();
   }, []);
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
+      
+      // If a specific agent is selected, use the dedicated endpoint
+      if (selectedAgentId) {
+          const response = await axios.get(`${API_BASE_URL}/admin/agents/${selectedAgentId}/users`, {
+              headers: { Authorization: token }
+          });
+          
+          if (response.data.success) {
+              let filteredData = response.data.data || [];
+              
+              // Apply local search filter
+              if (searchTerm) {
+                  const lowerSearch = searchTerm.toLowerCase();
+                  filteredData = filteredData.filter(u => 
+                      (u.firstName && u.firstName.toLowerCase().includes(lowerSearch)) ||
+                      (u.lastName && u.lastName.toLowerCase().includes(lowerSearch)) ||
+                      (u.uniqueId && u.uniqueId.toLowerCase().includes(lowerSearch)) ||
+                      (u.mobileNumber && u.mobileNumber.toLowerCase().includes(lowerSearch))
+                  );
+              }
+              
+              // Client-side pagination for this specific endpoint
+              const limit = 6;
+              const totalPgs = Math.ceil(filteredData.length / limit) || 1;
+              const paginatedData = filteredData.slice((page - 1) * limit, page * limit);
 
-      // Condition: Use dedicated agent fetch route if an agent is selected
-      if (agentFilter) {
-        const response = await axios.get(`${API_BASE_URL}/admin/agents/${agentFilter}/users`, {
-            headers: { Authorization: token }
-        });
-        
-        if (response.data.success) {
-            setUsers(response.data.data || []);
-            setTotalPages(1); // Specific agent fetch returns all matched un-paginated
-        }
-      } else {
-        // Fallback: Default advanced fetch
-        const response = await axios.get(`${API_BASE_URL}/admin/users/advanced`, {
-          headers: { Authorization: token },
-          params: {
-            search: searchTerm,
-            referralType: referralFilter === 'all' ? '' : referralFilter,
-            page: page,
-            limit: 6 
+              setUsers(paginatedData);
+              setTotalPages(totalPgs);
           }
-        });
+      } else {
+          // Default Advanced API with normal filters
+          const response = await axios.get(`${API_BASE_URL}/admin/users/advanced`, {
+            headers: { Authorization: token },
+            params: {
+              search: searchTerm,
+              referralType: referralFilter === 'all' ? '' : referralFilter,
+              page: page,
+              limit: 6 
+            }
+          });
 
-        if (response.data.success) {
-          setUsers(response.data.users);
-          setTotalPages(response.data.totalPages || 1);
-        }
+          if (response.data.success) {
+            setUsers(response.data.users);
+            setTotalPages(response.data.totalPages || 1);
+          }
       }
     } catch (error) {
       toast.error("Failed to fetch users");
@@ -283,7 +382,7 @@ const AdminUserManagement = () => {
         const timer = setTimeout(() => fetchUsers(), 500);
         return () => clearTimeout(timer);
     }
-  }, [searchTerm, referralFilter, agentFilter, page, showAdvanced]);
+  }, [searchTerm, referralFilter, selectedAgentId, page, showAdvanced]);
 
   const handleAdvChange = async (e) => {
     const { name, value } = e.target;
@@ -505,40 +604,22 @@ const AdminUserManagement = () => {
                 />
               </div>
               <div className="um-filters">
+                <AgentComboBox 
+                  agents={masterAgents} 
+                  value={selectedAgentId} 
+                  onChange={(val) => { setSelectedAgentId(val); setPage(1); }} 
+                  placeholder="Filter by Agent..."
+                />
                 <select 
                   value={referralFilter} 
-                  onChange={(e) => {
-                    setReferralFilter(e.target.value);
-                    setAgentFilter(''); // Reset agent filter when switching general referral types
-                    setPage(1);
-                  }} 
+                  onChange={(e) => { setReferralFilter(e.target.value); setPage(1); }} 
                   className="um-select"
-                  disabled={!!agentFilter}
+                  disabled={!!selectedAgentId}
                 >
                   <option value="all">Source: All</option>
                   <option value="self">Self (Direct)</option>
-                  <option value="agent">Agent Referred</option>
+                  <option value="agent">Any Agent</option>
                 </select>
-
-                {/* --- AGENT FILTER DROPDOWN --- */}
-                <select 
-                  value={agentFilter} 
-                  onChange={(e) => {
-                    const selectedId = e.target.value;
-                    setAgentFilter(selectedId);
-                    setPage(1);
-                    if(selectedId) {
-                      setReferralFilter('agent');
-                    }
-                  }} 
-                  className="um-select"
-                >
-                  <option value="">Filter by Agent (All)</option>
-                  {agents.map(a => (
-                    <option key={a._id} value={a._id}>{a.name} ({a.agentCode})</option>
-                  ))}
-                </select>
-
               </div>
             </div>
           )}
@@ -569,7 +650,7 @@ const AdminUserManagement = () => {
           )}
         </div>
 
-        {!loading && !showAdvanced && !agentFilter && users.length > 0 && (
+        {!loading && !showAdvanced && users.length > 0 && (
             <div className="um-pagination">
                 <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="um-page-btn"><ChevronLeft size={16} /></button>
                 <span className="um-page-info">Page {page} of {totalPages}</span>
@@ -1368,7 +1449,6 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
   );
 };
 
-// CLEANED UP THE INLINE STYLES HERE TO ALLOW PROPER TEXT WRAPPING
 const DataRow = ({ label, value }) => (
   <div className="um-row">
     <span className="um-lbl">{label}</span>
