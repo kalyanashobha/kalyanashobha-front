@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
@@ -188,13 +187,13 @@ const AgentComboBox = ({ agents, value, onChange, placeholder = "Search Agent...
           if (e.target.value === "") onChange(""); 
         }}
         onFocus={() => setIsOpen(true)}
-        style={{ width: '100%', cursor: 'text', paddingRight: '30px' }}
+        style={{ width: '100%', cursor: 'text', paddingRight: '54px' }}
       />
       {/* Small clear button inside input */}
       {value && (
         <button 
           onClick={(e) => { e.stopPropagation(); onChange(""); setSearch(""); }} 
-          style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}
+          style={{ position: 'absolute', right: '30px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}
         >
           <X size={14} />
         </button>
@@ -324,16 +323,16 @@ const AdminUserManagement = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
-      
+
       // If a specific agent is selected, use the dedicated endpoint
       if (selectedAgentId) {
           const response = await axios.get(`${API_BASE_URL}/admin/agents/${selectedAgentId}/users`, {
               headers: { Authorization: token }
           });
-          
+
           if (response.data.success) {
               let filteredData = response.data.data || [];
-              
+
               // Apply local search filter
               if (searchTerm) {
                   const lowerSearch = searchTerm.toLowerCase();
@@ -344,7 +343,7 @@ const AdminUserManagement = () => {
                       (u.mobileNumber && u.mobileNumber.toLowerCase().includes(lowerSearch))
                   );
               }
-              
+
               // Client-side pagination for this specific endpoint
               const limit = 6;
               const totalPgs = Math.ceil(filteredData.length / limit) || 1;
