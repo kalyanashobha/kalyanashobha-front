@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './AdminLogin.css';
 import AdminNavbar from "../Components/AdminNavbar.jsx";
 
@@ -9,13 +11,13 @@ const AdminLogin = () => {
 
     // State management
     const [view, setView] = useState('login'); // 'login', 'login-otp', 'forgot-email', 'forgot-otp', 'reset-password'
-    
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [otp, setOtp] = useState('');
-    
+
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
 
@@ -55,15 +57,42 @@ const AdminLogin = () => {
         try {
             const res = await axios.post(`${API_BASE}/login-verify`, { email: safeEmail, otp: safeOtp });
             if (res.data.success) {
-                // This will now properly save the permissions array from your live backend
+                
+                // --- ROLE VERIFICATION CHECK ---
+                if (res.data.admin.role !== 'SuperAdmin') {
+                    // Show professional toast error
+                    toast.error("Access Restricted: This portal is strictly for Super Administrators. Please use the Moderator login.", {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        theme: "colored",
+                    });
+                    
+                    // Clear the OTP field so they can't just click verify again
+                    setOtp('');
+                    setIsLoading(false);
+                    return; // Stop the function here so they don't get logged in
+                }
+
+                // If they ARE a SuperAdmin, proceed normally
                 localStorage.setItem('adminToken', res.data.token);
                 localStorage.setItem('adminInfo', JSON.stringify(res.data.admin));
 
+                toast.success('Authentication successful! Redirecting...', {
+                    position: "top-right",
+                    theme: "colored"
+                });
+                
                 setMessage({ type: 'success', text: 'Login Successful! Redirecting...' });
-                setTimeout(() => navigate('/admin/dashboard'), 1000);
+                setTimeout(() => navigate('/admin/dashboard'), 1500);
             }
         } catch (err) {
-            setMessage({ type: 'error', text: err.response?.data?.message || "Invalid OTP." });
+            const errorMsg = err.response?.data?.message || "Invalid OTP.";
+            toast.error(errorMsg, { theme: "colored" });
+            setMessage({ type: 'error', text: errorMsg });
         } finally {
             setIsLoading(false);
         }
@@ -127,7 +156,7 @@ const AdminLogin = () => {
             if (res.data.success) {
                 setMessage({ type: 'success', text: 'Password reset successfully! Please login.' });
                 setPassword(''); setNewPassword(''); setConfirmPassword(''); setOtp('');
-                
+
                 // Return to login after 2 seconds
                 setTimeout(() => setView('login'), 2000);
             }
@@ -148,6 +177,9 @@ const AdminLogin = () => {
     return (
       <>
         <AdminNavbar/>
+        
+        {/* Toast Container for notifications */}
+        <ToastContainer />
 
         <div className="admin-login-container">
             <div className="login-card">
