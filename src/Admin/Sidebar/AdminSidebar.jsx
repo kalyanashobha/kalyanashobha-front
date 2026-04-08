@@ -113,10 +113,7 @@ export default function AdminSidebar({ closeMobileMenu }) {
   const allLinks = [
     { id: "dashboard", path: "/admin/dashboard", icon: <LayoutDashboard size={18} />, iconColor: "#3B82F6", label: "Dashboard" },
     { id: "users", path: "/admin/users", icon: <Users size={18} />, iconColor: "#10B981", label: "User Registry" },
-    
-    // NEW ROUTE ADDED HERE
     { id: "premium-users", path: "/admin/premium-user", icon: <UserSearch size={18} />, iconColor: "#EF4444", label: "Premium Users" },
-    
     { id: "reg-approvals", path: "/admin/registration-approvals", icon: <CheckCircle size={18} />, iconColor: "#0EA5E9", label: "Reg. Approvals", badge: stats.pendingReg },
     { id: "interest-approvals", path: "/admin/interest-approvals", icon: <Heart size={18} />, iconColor: "#EC4899", label: "Interest Approvals", badge: totalPendingInterests },
     { id: "data-approval", path: "/admin/data-approval", icon: <FileCheck size={18} />, iconColor: "#8B5CF6", label: "Data Approval", badge: stats.pendingData },
@@ -160,11 +157,24 @@ export default function AdminSidebar({ closeMobileMenu }) {
     }
   }, [filteredLinks.length, checkScroll]); 
 
+  // --- UPDATED LOGOUT LOGIC ---
   const handleLogout = () => {
     if (closeMobileMenu) closeMobileMenu(); 
+    
+    // Fetch the role right before clearing to ensure correct routing
+    const info = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+    const isSuperAdmin = info.role === 'SuperAdmin';
+
+    // Clear local storage
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminInfo');
-    navigate('/admin/login');
+    
+    // Route based on role
+    if (isSuperAdmin) {
+      navigate('/admin/login');
+    } else {
+      navigate('/moderator');
+    }
   };
 
   const formatBadge = (count) => {
@@ -176,7 +186,9 @@ export default function AdminSidebar({ closeMobileMenu }) {
     <aside className="ks-sidebar-container">
       <div className="ks-sidebar-header">
         <h2 className="ks-sidebar-title">KalyanaShobha</h2>
-        <span className="ks-sidebar-subtitle">Admin Portal</span>
+        <span className="ks-sidebar-subtitle">
+          {adminInfo?.role === 'SuperAdmin' ? 'Admin Portal' : 'Moderator Portal'}
+        </span>
       </div>
 
       <div className="ks-nav-wrapper">
