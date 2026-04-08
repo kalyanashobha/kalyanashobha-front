@@ -12,18 +12,59 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [adminName, setAdminName] = useState('Admin'); // State for dynamic username
   const navigate = useNavigate();
 
   const API_BASE = "https://kalyanashobha-back.vercel.app/api/admin";
 
   useEffect(() => {
+    // 1. Get username for the welcome message
+    try {
+      const infoStr = localStorage.getItem('adminInfo');
+      if (infoStr) {
+        const info = JSON.parse(infoStr);
+        if (info.username) {
+          setAdminName(info.username);
+        }
+      }
+    } catch (e) {
+      console.error("Error parsing admin info", e);
+    }
+
+    // 2. Fetch Dashboard Stats
     fetchStats();
   }, []);
+
+  // Centralized redirect logic for expired/missing tokens
+  const handleAuthFailure = () => {
+    let role = 'SuperAdmin'; // Default fallback
+    
+    try {
+      const infoStr = localStorage.getItem('adminInfo');
+      if (infoStr) {
+        const info = JSON.parse(infoStr);
+        if (info.role) role = info.role;
+      }
+    } catch (e) {
+      console.error("Error checking role for redirect", e);
+    }
+
+    // Clear local storage to fully sign out
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminInfo');
+
+    // Route based on role
+    if (role === 'SuperAdmin') {
+      navigate('/admin/login', { replace: true });
+    } else {
+      navigate('/moderator', { replace: true });
+    }
+  };
 
   const fetchStats = async () => {
     const token = localStorage.getItem('adminToken');
     if (!token) {
-      navigate('/admin/login');
+      handleAuthFailure();
       return;
     }
 
@@ -34,10 +75,22 @@ const AdminDashboard = () => {
           'Authorization': token 
         }
       });
+
+      // If backend says Unauthorized (401) or Forbidden (403), token is likely expired
+      if (res.status === 401 || res.status === 403) {
+        handleAuthFailure();
+        return;
+      }
+
       const data = await res.json();
       if (data.success) {
         setStats(data.stats);
       } else {
+        // Fallback catch if backend returns 200 but sends success: false for token issues
+        if (data.message && data.message.toLowerCase().includes('token')) {
+          handleAuthFailure();
+          return;
+        }
         setError('Failed to load stats');
       }
     } catch (err) {
@@ -106,12 +159,13 @@ const AdminDashboard = () => {
 
   return (
     <div className="ks-dashboard-container">
-      
+
       {/* Header */}
       <header className="ks-page-header">
         <div>
           <h1 className="ks-title">Overview</h1>
-          <p className="ks-subtitle">Welcome back, Admin</p>
+          {/* UPDATED: Dynamic user greeting */}
+          <p className="ks-subtitle">Welcome back, {adminName}</p>
         </div>
         <div className="ks-date-pill">
           {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
@@ -121,7 +175,7 @@ const AdminDashboard = () => {
       {error && <div className="ks-alert-banner">{error}</div>}
 
       <div className="ks-grid-layout">
-        
+
         {/* SECTION: USER METRICS */}
         <div className="ks-section-wrapper">
           <h3 className="ks-section-title">User Registry</h3>
