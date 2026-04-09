@@ -125,9 +125,8 @@ const InputField = ({ label, name, type = "text", value, onChange }) => (
   </div>
 );
 
-// STRICT NATIVE DROPDOWN (Updated to prevent blank boxes when data is missing/loading)
+// STRICT NATIVE DROPDOWN 
 const SelectField = ({ label, name, value, options, onChange, disabled }) => {
-  // Check if current DB value exists in the options array
   const valueExists = value && options && options.some(opt => {
     const val = typeof opt === 'string' ? opt : (opt?.name || opt?.subCommunityName || opt?.value);
     return val === value;
@@ -138,7 +137,6 @@ const SelectField = ({ label, name, value, options, onChange, disabled }) => {
       <select className="mp-input" name={name} value={value || ''} onChange={onChange} disabled={disabled}>
         <option value="" disabled hidden></option>
         
-        {/* Fallback: Show the current value even if it's not in the dropdown list yet */}
         {value && !valueExists && (
           <option value={value}>{value}</option>
         )}
@@ -157,7 +155,7 @@ const SelectField = ({ label, name, value, options, onChange, disabled }) => {
   );
 };
 
-// TYPABLE + SELECTABLE COMBOBOX (Used for Country/State/City)
+// TYPABLE + SELECTABLE COMBOBOX 
 const ComboField = ({ label, name, value, options, onChange, disabled }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [filtered, setFiltered] = useState(options || []);
@@ -178,7 +176,6 @@ const ComboField = ({ label, name, value, options, onChange, disabled }) => {
     setIsOpen(true);
     const val = e.target.value.toLowerCase();
     
-    // If input is cleared, show all options. Otherwise, filter.
     if (!val.trim()) {
       setFiltered(options || []);
     } else {
@@ -192,7 +189,7 @@ const ComboField = ({ label, name, value, options, onChange, disabled }) => {
   const handleSelect = (val) => {
     onChange({ target: { name, value: val } });
     setIsOpen(false);
-    setFiltered(options || []); // Reset filter for next time
+    setFiltered(options || []); 
   };
 
   return (
@@ -217,7 +214,7 @@ const ComboField = ({ label, name, value, options, onChange, disabled }) => {
             e.stopPropagation();
             if(!disabled) {
                 setIsOpen(!isOpen);
-                setFiltered(options || []); // Always reset filter when arrow is clicked
+                setFiltered(options || []); 
             }
         }}
       >
@@ -275,7 +272,6 @@ const MyProfile = () => {
 
   const countOptions = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
-  // FIX: Synchronized loading to resolve race conditions
   useEffect(() => { 
     const loadAllData = async () => {
       setLoading(true);
@@ -455,9 +451,14 @@ const MyProfile = () => {
   const removeNewPhoto = (indexToRemove) => setNewPhotos(newPhotos.filter((_, index) => index !== indexToRemove));
   const calculateAge = (dob) => dob ? Math.abs(new Date(Date.now() - new Date(dob).getTime()).getUTCFullYear() - 1970) : "N/A";
 
-  // EXACT MATCH logic from your AdminUserManagement file
-  const selectedCommObj = masterData.communities.find(c => c.name === formData.community);
-  const editModeSubCommunities = selectedCommObj ? (selectedCommObj.subCommunities || []) : [];
+  // Makes matching case-insensitive just in case they type "brahmins" instead of selecting "Brahmins"
+  const selectedCommObj = masterData.communities.find(
+    c => c?.name?.trim().toLowerCase() === formData?.community?.trim().toLowerCase()
+  );
+  
+  const editModeSubCommunities = selectedCommObj 
+    ? (selectedCommObj.subCommunities || selectedCommObj.subCastes || selectedCommObj.subCaste || selectedCommObj.subcommunities || []) 
+    : [];
 
   return (
     <div className="mp-page-wrapper">
@@ -603,9 +604,9 @@ const MyProfile = () => {
                     <SelectField label="Diet" name="diet" value={formData.diet} options={["Veg", "Non-Veg", "Eggetarian"]} onChange={handleChange} />
                     <InputField label="Gothra" name="gothra" value={formData.gothra} onChange={handleChange} />
 
-                    {/* STRICT NATIVE SELECT FIELDS FOR COMMUNITY */}
-                    <SelectField label="Community" name="community" value={formData.community} options={masterData.communities} onChange={handleChange} />
-                    <SelectField label="Sub-Community / Caste" name="subCommunity" value={formData.subCommunity} options={editModeSubCommunities} onChange={handleChange} disabled={!formData.community} />
+                    {/* TYPABLE COMBOBOXES FOR COMMUNITY AND SUB-COMMUNITY */}
+                    <ComboField label="Community" name="community" value={formData.community} options={masterData.communities} onChange={handleChange} />
+                    <ComboField label="Sub-Community / Caste" name="subCommunity" value={formData.subCommunity} options={editModeSubCommunities} onChange={handleChange} disabled={!formData.community} />
                   </div>
                 </div>
 
