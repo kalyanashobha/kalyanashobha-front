@@ -258,8 +258,14 @@ const MyProfile = () => {
   const countOptions = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
   useEffect(() => { 
-    fetchInitialMasterData();
-    fetchProfile(); 
+    // FIXED RACE CONDITION: Wait for BOTH endpoints to finish before hiding skeleton loader
+    const loadAllData = async () => {
+      setLoading(true);
+      await Promise.all([fetchInitialMasterData(), fetchProfile()]);
+      setLoading(false);
+    };
+    loadAllData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchInitialMasterData = async () => {
@@ -294,7 +300,7 @@ const MyProfile = () => {
 
   const fetchProfile = async () => {
     const token = localStorage.getItem('token');
-    if (!token) { setLoading(false); return; }
+    if (!token) return; 
     try {
       const res = await fetch(`${API_BASE_URL}/user/my-profile`, {
         headers: { 'Content-Type': 'application/json', 'Authorization': token }
@@ -330,7 +336,7 @@ const MyProfile = () => {
       }
     } catch (err) {
       toast.error("Failed to load profile");
-    } finally { setLoading(false); }
+    }
   };
 
   const handleUpdate = async (e) => {
@@ -399,6 +405,7 @@ const MyProfile = () => {
         }
       }
       else if (name === 'community') {
+        // Clear subCommunity immediately when Community changes
         setFormData(prev => ({ ...prev, community: value, subCommunity: '' }));
       }
     }
@@ -431,8 +438,11 @@ const MyProfile = () => {
   const removeNewPhoto = (indexToRemove) => setNewPhotos(newPhotos.filter((_, index) => index !== indexToRemove));
   const calculateAge = (dob) => dob ? Math.abs(new Date(Date.now() - new Date(dob).getTime()).getUTCFullYear() - 1970) : "N/A";
 
-  const selectedCommObj = masterData.communities.find(c => c.name === formData.community);
-  const editModeSubCommunities = selectedCommObj ? selectedCommObj.subCommunities : [];
+  // FIXED CASE SENSITIVITY: Ensure it finds the exact community even if casing differs
+  const selectedCommObj = masterData.communities.find(
+    c => c.name && formData.community && c.name.toLowerCase() === formData.community.toLowerCase()
+  );
+  const editModeSubCommunities = selectedCommObj ? (selectedCommObj.subCommunities || []) : [];
 
   return (
     <div className="mp-page-wrapper">
