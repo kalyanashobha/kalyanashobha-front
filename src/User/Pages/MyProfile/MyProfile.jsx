@@ -22,9 +22,8 @@ const CustomTimePicker = ({ isOpen, onClose, onSet, initialTime }) => {
     }
   }, [isOpen, initialTime]);
 
-  // Optimized change handlers to prevent lagging
   const handleHourChange = (e) => {
-    let val = e.target.value.replace(/\D/g, ''); // Allow only numbers
+    let val = e.target.value.replace(/\D/g, ''); 
     if (val.length > 2) val = val.slice(-2);
     if (parseInt(val) > 12) val = '12';
     setHour(val);
@@ -132,6 +131,7 @@ const InputField = ({ label, name, type = "text", value, onChange }) => (
   </div>
 );
 
+// Strictly Dropdown Select Field
 const SelectField = ({ label, name, value, options, onChange }) => (
   <div className="mp-input-group">
     <select className="mp-input" name={name} value={value || ''} onChange={onChange}>
@@ -141,6 +141,29 @@ const SelectField = ({ label, name, value, options, onChange }) => (
         return val ? <option key={i} value={val}>{val}</option> : null;
       })}
     </select>
+    <label className={value ? 'mp-label-active' : ''}>{label}</label>
+  </div>
+);
+
+// Dropdown + Entering Field (Using HTML Datalist)
+const ComboField = ({ label, name, value, options, onChange, listId }) => (
+  <div className="mp-input-group">
+    <input 
+      type="text" 
+      name={name} 
+      list={listId}
+      className="mp-input" 
+      value={value || ''} 
+      onChange={onChange} 
+      placeholder=" " 
+      autoComplete="off"
+    />
+    <datalist id={listId}>
+      {options && options.map((opt, i) => {
+        const val = typeof opt === 'string' ? opt : opt?.name;
+        return val ? <option key={i} value={val} /> : null;
+      })}
+    </datalist>
     <label className={value ? 'mp-label-active' : ''}>{label}</label>
   </div>
 );
@@ -166,7 +189,6 @@ const MyProfile = () => {
 
   const API_BASE_URL = "https://kalyanashobha-back.vercel.app/api";
 
-  // Predefined array for Brother/Sister dropdowns (0 to 10)
   const countOptions = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
   useEffect(() => { 
@@ -456,7 +478,6 @@ const MyProfile = () => {
             <form onSubmit={handleUpdate} className="mp-fade-in">
               <div className="mp-grid">
 
-                {/* PHOTOS - Full Width */}
                 <div className="mp-card mp-card-full">
                   <h3 className="mp-card-title">Manage Photos (Max 2)</h3>
                   <div className="mp-photo-grid">
@@ -490,6 +511,7 @@ const MyProfile = () => {
                     <SelectField label="Diet" name="diet" value={formData.diet} options={["Veg", "Non-Veg", "Eggetarian"]} onChange={handleChange} />
                     <InputField label="Gothra" name="gothra" value={formData.gothra} onChange={handleChange} />
 
+                    {/* Community details are strictly SelectFields */}
                     <SelectField label="Community" name="community" value={formData.community} options={masterData.communities} onChange={handleChange} />
                     <SelectField label="Sub-Community / Caste" name="subCommunity" value={formData.subCommunity} options={editModeSubCommunities} onChange={handleChange} />
                   </div>
@@ -503,11 +525,10 @@ const MyProfile = () => {
                     <SelectField label="Job Role" name="jobRole" value={formData.jobRole} options={masterData.occupations} onChange={handleChange} />
                     <InputField label="Annual Income" name="annualIncome" value={formData.annualIncome} onChange={handleChange} />
 
-                    {/* Email and Phone number inputs removed from here */}
-
-                    <SelectField label="Country" name="country" value={formData.country} options={masterData.countries} onChange={handleChange} />
-                    <SelectField label="State" name="state" value={formData.state} options={dependentStates} onChange={handleChange} />
-                    <SelectField label="City" name="city" value={formData.city} options={dependentCities} onChange={handleChange} />
+                    {/* Geography details are ComboFields (Dropdown + Typing) */}
+                    <ComboField label="Country" name="country" value={formData.country} options={masterData.countries} onChange={handleChange} listId="country-datalist" />
+                    <ComboField label="State" name="state" value={formData.state} options={dependentStates} onChange={handleChange} listId="state-datalist" />
+                    <ComboField label="City" name="city" value={formData.city} options={dependentCities} onChange={handleChange} listId="city-datalist" />
                   </div>
                 </div>
 
@@ -535,7 +556,6 @@ const MyProfile = () => {
                     <InputField label="Mother's Name" name="familyDetails.motherName" value={formData.familyDetails?.motherName} onChange={handleChange} />
                     <SelectField label="Mother's Occ." name="familyDetails.motherOccupation" value={formData.familyDetails?.motherOccupation} options={masterData.occupations} onChange={handleChange} />
 
-                    {/* CHANGED TO DROPDOWNS 0-10 */}
                     <SelectField label="Total Brothers" name="familyDetails.noOfBrothers" value={formData.familyDetails?.noOfBrothers} options={countOptions} onChange={handleChange} />
                     <SelectField label="Brothers Married" name="familyDetails.noOfBrothersMarried" value={formData.familyDetails?.noOfBrothersMarried} options={countOptions} onChange={handleChange} />
                     <SelectField label="Total Sisters" name="familyDetails.noOfSisters" value={formData.familyDetails?.noOfSisters} options={countOptions} onChange={handleChange} />
