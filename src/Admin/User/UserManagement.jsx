@@ -877,7 +877,6 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
         } catch(e) {}
       }
     };
-    // Re-run locations check when form Data Country/State is initially set
     if(formData.country) {
       loadInitialLocations();
     }
@@ -1037,6 +1036,32 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // --- HELPER TO INJECT CUSTOM VALUES INTO DROPDOWNS ---
+  const renderDropdownOptions = (dataArray, currentValue) => {
+    const optionsList = Array.isArray(dataArray) ? dataArray : [];
+    
+    // Check if the current value already exists in the standard options
+    const hasValue = optionsList.some(item => {
+      const val = typeof item === 'object' ? item.name : item;
+      return String(val) === String(currentValue); 
+    });
+
+    // Generate standard options
+    const optionsElements = optionsList.map((item, idx) => {
+      const val = typeof item === 'object' ? item.name : item;
+      return <option key={`opt-${idx}`} value={val}>{val}</option>;
+    });
+
+    // If the value is missing (custom entry), prepend it to the list
+    if (currentValue && !hasValue) {
+      optionsElements.unshift(
+        <option key="custom-val" value={currentValue}>{currentValue}</option>
+      );
+    }
+
+    return optionsElements;
   };
 
   if (!user) return null;
@@ -1202,14 +1227,14 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
               <FormGroup label="Last Name"><input name="lastName" value={formData.lastName || ''} onChange={handleInputChange} placeholder="Last Name" className="um-input" /></FormGroup>
               <FormGroup label="Gender">
                 <select name="gender" value={formData.gender || ''} onChange={handleInputChange} className="um-input">
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
+                  {renderDropdownOptions(['Male', 'Female'], formData.gender)}
                 </select>
               </FormGroup>
               <FormGroup label="Date of Birth"><input type="date" name="dob" value={formData.dob || ''} onChange={handleInputChange} className="um-input" /></FormGroup>
               <FormGroup label="Marital Status">
                 <select name="maritalStatus" value={formData.maritalStatus || ''} onChange={handleInputChange} className="um-input">
-                    {MARITAL_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                    <option value="">Select Marital Status</option>
+                    {renderDropdownOptions(MARITAL_STATUSES, formData.maritalStatus)}
                 </select>
               </FormGroup>
               <FormGroup label="Height (cm)"><input type="number" name="height" value={formData.height || ''} onChange={handleInputChange} placeholder="Height (cm)" className="um-input" /></FormGroup>
@@ -1220,17 +1245,14 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
               <FormGroup label="Community">
                 <select name="community" value={formData.community || ''} onChange={handleInputChange} className="um-input">
                   <option value="">Select Community</option>
-                  {masterData?.communities.map((c, i) => <option key={i} value={c.name}>{c.name}</option>)}
+                  {renderDropdownOptions(masterData?.communities, formData.community)}
                 </select>
               </FormGroup>
 
               <FormGroup label="Sub-Community / Caste">
                 <select name="subCommunity" value={formData.subCommunity || ''} onChange={handleInputChange} className="um-input" disabled={!formData.community}>
                   <option value="">Select Sub-Community</option>
-                  {editModeSubCommunities.map((sub, idx) => {
-                    const val = typeof sub === 'string' ? sub : sub.name;
-                    return <option key={idx} value={val}>{val}</option>;
-                  })}
+                  {renderDropdownOptions(editModeSubCommunities, formData.subCommunity)}
                 </select>
               </FormGroup>
 
@@ -1239,9 +1261,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
               <FormGroup label="Diet">
                 <select name="diet" value={formData.diet || ''} onChange={handleInputChange} className="um-input">
                   <option value="">Select Diet</option>
-                  <option value="Vegetarian">Vegetarian</option>
-                  <option value="Non-Vegetarian">Non-Vegetarian</option>
-                  <option value="Eggetarian">Eggetarian</option>
+                  {renderDropdownOptions(['Vegetarian', 'Non-Vegetarian', 'Eggetarian'], formData.diet)}
                 </select>
               </FormGroup>
             </div>
@@ -1251,14 +1271,14 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
               <FormGroup label="Education">
                 <select name="highestQualification" value={formData.highestQualification || ''} onChange={handleInputChange} className="um-input">
                   <option value="">Select Education</option>
-                  {masterData?.educations.map((e, idx) => <option key={idx} value={e.name}>{e.name}</option>)}
+                  {renderDropdownOptions(masterData?.educations, formData.highestQualification)}
                 </select>
               </FormGroup>
 
               <FormGroup label="Occupation">
                 <select name="jobRole" value={formData.jobRole || ''} onChange={handleInputChange} className="um-input">
                   <option value="">Select Occupation</option>
-                  {masterData?.occupations.map((o, idx) => <option key={idx} value={o.name}>{o.name}</option>)}
+                  {renderDropdownOptions(masterData?.occupations, formData.jobRole)}
                 </select>
               </FormGroup>
 
@@ -1269,31 +1289,28 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
               <FormGroup label="Country">
                 <select name="country" value={formData.country || ''} onChange={handleInputChange} className="um-input">
                   <option value="">Select Country</option>
-                  {masterData?.countries.map((c, idx) => <option key={idx} value={c.name}>{c.name}</option>)}
+                  {renderDropdownOptions(masterData?.countries, formData.country)}
                 </select>
               </FormGroup>
 
               <FormGroup label="State">
                 <select name="state" value={formData.state || ''} onChange={handleInputChange} className="um-input" disabled={!formData.country}>
                   <option value="">Select State</option>
-                  {editStates.map((s, idx) => <option key={idx} value={s.name}>{s.name}</option>)}
+                  {renderDropdownOptions(editStates, formData.state)}
                 </select>
               </FormGroup>
 
               <FormGroup label="City">
                 <select name="city" value={formData.city || ''} onChange={handleInputChange} className="um-input" disabled={!formData.state}>
                   <option value="">Select City</option>
-                  {editCities.map((c, idx) => <option key={idx} value={c.name}>{c.name}</option>)}
+                  {renderDropdownOptions(editCities, formData.city)}
                 </select>
               </FormGroup>
 
               <FormGroup label="Residing In">
                  <select name="residentsIn" value={formData.residentsIn || ''} onChange={handleInputChange} className="um-input">
                     <option value="">Select Residing Status</option>
-                    <option value="Family">Family</option>
-                    <option value="Friends">Friends</option>
-                    <option value="Alone">Alone</option>
-                    <option value="Rent">Rent</option>
+                    {renderDropdownOptions(['Family', 'Friends', 'Alone', 'Rent'], formData.residentsIn)}
                 </select>
               </FormGroup>
             </div>
@@ -1303,28 +1320,25 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
                <FormGroup label="Star">
                  <select name="star" value={formData.star || ''} onChange={handleInputChange} className="um-input">
                    <option value="">Select Star</option>
-                   {masterData?.stars?.map((s, idx) => <option key={idx} value={s.name}>{s.name}</option>)}
+                   {renderDropdownOptions(masterData?.stars, formData.star)}
                  </select>
                </FormGroup>
                <FormGroup label="Moonsign">
                  <select name="moonsign" value={formData.moonsign || ''} onChange={handleInputChange} className="um-input">
                    <option value="">Select Moonsign</option>
-                   {masterData?.moonsigns?.map((m, idx) => <option key={idx} value={m.name}>{m.name}</option>)}
+                   {renderDropdownOptions(masterData?.moonsigns, formData.moonsign)}
                  </select>
                </FormGroup>
                <FormGroup label="Pada">
                   <select name="pada" value={formData.pada || ''} onChange={handleInputChange} className="um-input">
                     <option value="">Select Pada</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
+                    {renderDropdownOptions(['1', '2', '3', '4'], formData.pada)}
                   </select>
                </FormGroup>
                <FormGroup label="Mother Tongue">
                  <select name="motherTongue" value={formData.motherTongue || ''} onChange={handleInputChange} className="um-input">
                    <option value="">Select Mother Tongue</option>
-                   {masterData?.motherTongues?.map((m, idx) => <option key={idx} value={m.name}>{m.name}</option>)}
+                   {renderDropdownOptions(masterData?.motherTongues, formData.motherTongue)}
                  </select>
                </FormGroup>
 
@@ -1348,10 +1362,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
                <FormGroup label="Complexion">
                   <select name="complexion" value={formData.complexion || ''} onChange={handleInputChange} className="um-input">
                     <option value="">Select Complexion</option>
-                    <option value="Very Fair">Very Fair</option>
-                    <option value="Fair">Fair</option>
-                    <option value="Wheatish">Wheatish</option>
-                    <option value="Dark">Dark</option>
+                    {renderDropdownOptions(['Very Fair', 'Fair', 'Wheatish', 'Dark'], formData.complexion)}
                   </select>
                </FormGroup>
             </div>
@@ -1362,9 +1373,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
                 <FormGroup label="Family Type">
                   <select name="familyType" value={formData.familyType || ''} onChange={handleInputChange} className="um-input">
                     <option value="">Select Family Type</option>
-                    <option value="Nuclear">Nuclear</option>
-                    <option value="Joint">Joint</option>
-                    <option value="Extended">Extended</option>
+                    {renderDropdownOptions(['Nuclear', 'Joint', 'Extended'], formData.familyType)}
                   </select>
                 </FormGroup>
 
@@ -1406,8 +1415,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
 
                 <FormGroup label="NRI Status">
                    <select name="nri" value={formData.nri || ''} onChange={handleInputChange} className="um-input">
-                     <option value="No">No</option>
-                     <option value="Yes">Yes</option>
+                     {renderDropdownOptions(['No', 'Yes'], formData.nri)}
                    </select>
                 </FormGroup>
             </div>
