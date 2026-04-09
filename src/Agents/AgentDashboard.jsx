@@ -204,7 +204,7 @@ const AgentDashboard = () => {
     // Check Window/Document scroll (Fallback)
     const winHeight = window.innerHeight || document.documentElement.clientHeight;
     const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-    
+
     if (!needsIndicator && docHeight > winHeight + 10) {
       const scrollY = Math.ceil(window.scrollY || document.documentElement.scrollTop);
       const winAtBottom = (scrollY + winHeight) >= (docHeight - BUFFER);
@@ -216,7 +216,7 @@ const AgentDashboard = () => {
 
   useEffect(() => {
     handleScrollCheck();
-    
+
     window.addEventListener('scroll', handleScrollCheck, { passive: true });
     window.addEventListener('resize', handleScrollCheck);
 
@@ -560,12 +560,17 @@ const AgentDashboard = () => {
         <button 
           className={`crm-burger-btn ${isMobileMenuOpen ? 'is-open' : ''}`} 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         >
-          <div className="crm-custom-burger">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
+          {isMobileMenuOpen ? (
+            <X size={26} color="#000" strokeWidth={2.5} />
+          ) : (
+            <svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="24" height="2" fill="#000000"/>
+              <rect y="8" width="24" height="2" fill="#000000"/>
+              <rect y="16" width="24" height="2" fill="#000000"/>
+            </svg>
+          )}
         </button>
       </header>
 
