@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Navbar from "../../Components/Navbar.jsx";
 import toast, { Toaster } from 'react-hot-toast'; 
 import imageCompression from 'browser-image-compression'; 
@@ -55,18 +55,12 @@ const CustomTimePicker = ({ isOpen, onClose, onSet, initialTime }) => {
         </div>
         <div className="mp-time-inputs">
           <div className="mp-time-col">
-            <input 
-              type="number" placeholder="12" value={hour}
-              onChange={handleHourChange}
-            />
+            <input type="number" placeholder="12" value={hour} onChange={handleHourChange} />
             <span>Hour</span>
           </div>
           <span className="mp-time-colon">:</span>
           <div className="mp-time-col">
-            <input 
-              type="number" placeholder="00" value={minute}
-              onChange={handleMinuteChange}
-            />
+            <input type="number" placeholder="00" value={minute} onChange={handleMinuteChange} />
             <span>Minute</span>
           </div>
           <div className="mp-time-col">
@@ -131,7 +125,7 @@ const InputField = ({ label, name, type = "text", value, onChange }) => (
   </div>
 );
 
-// Strictly Dropdown Select Field
+// STRICT NATIVE DROPDOWN (Used for Community/Sub-Community)
 const SelectField = ({ label, name, value, options, onChange }) => (
   <div className="mp-input-group">
     <select className="mp-input" name={name} value={value || ''} onChange={onChange}>
@@ -145,28 +139,100 @@ const SelectField = ({ label, name, value, options, onChange }) => (
   </div>
 );
 
-// Dropdown + Entering Field (Using HTML Datalist)
-const ComboField = ({ label, name, value, options, onChange, listId }) => (
-  <div className="mp-input-group">
-    <input 
-      type="text" 
-      name={name} 
-      list={listId}
-      className="mp-input" 
-      value={value || ''} 
-      onChange={onChange} 
-      placeholder=" " 
-      autoComplete="off"
-    />
-    <datalist id={listId}>
-      {options && options.map((opt, i) => {
-        const val = typeof opt === 'string' ? opt : opt?.name;
-        return val ? <option key={i} value={val} /> : null;
-      })}
-    </datalist>
-    <label className={value ? 'mp-label-active' : ''}>{label}</label>
-  </div>
-);
+// TYPABLE + SELECTABLE COMBOBOX (Used for Country/State/City)
+const ComboField = ({ label, name, value, options, onChange, disabled }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [filtered, setFiltered] = useState(options || []);
+  const wrapperRef = useRef(null);
+
+  useEffect(() => { setFiltered(options || []); }, [options]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) setIsOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleInputChange = (e) => {
+    onChange(e); 
+    setIsOpen(true);
+    const val = e.target.value.toLowerCase();
+    
+    // If input is cleared, show all options. Otherwise, filter.
+    if (!val.trim()) {
+      setFiltered(options || []);
+    } else {
+      setFiltered((options || []).filter(opt => {
+        const text = typeof opt === 'string' ? opt : opt.name;
+        return text.toLowerCase().includes(val);
+      }));
+    }
+  };
+
+  const handleSelect = (val) => {
+    onChange({ target: { name, value: val } });
+    setIsOpen(false);
+    setFiltered(options || []); // Reset filter for next time
+  };
+
+  return (
+    <div className="mp-input-group" ref={wrapperRef}>
+      <input
+        type="text"
+        name={name}
+        className="mp-input"
+        value={value || ''}
+        onChange={handleInputChange}
+        onFocus={() => { if(!disabled) { setIsOpen(true); setFiltered(options || []); } }}
+        disabled={disabled}
+        placeholder=" "
+        autoComplete="off"
+        style={{ paddingRight: '40px', opacity: disabled ? 0.6 : 1 }}
+      />
+      <label className={value || isOpen ? 'mp-label-active' : ''}>{label}</label>
+
+      <div
+        style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', cursor: disabled ? 'not-allowed' : 'pointer', zIndex: 2, padding: '4px' }}
+        onClick={(e) => {
+            e.stopPropagation();
+            if(!disabled) {
+                setIsOpen(!isOpen);
+                setFiltered(options || []); // Always reset filter when arrow is clicked
+            }
+        }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+
+      {isOpen && !disabled && (
+        <ul style={{
+          position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
+          backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px',
+          maxHeight: '200px', overflowY: 'auto', zIndex: 1000, padding: '4px', margin: 0,
+          listStyle: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'
+        }}>
+          {filtered.length > 0 ? filtered.map((opt, idx) => {
+            const text = typeof opt === 'string' ? opt : opt.name;
+            return (
+              <li key={idx}
+                  onClick={() => handleSelect(text)}
+                  style={{ padding: '10px 12px', cursor: 'pointer', borderRadius: '6px', color: '#1e293b', fontSize: '0.9rem', transition: 'background 0.2s' }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+              >
+                {text}
+              </li>
+            )
+          }) : (
+            <li style={{ padding: '10px 12px', color: '#94a3b8', fontSize: '0.9rem', textAlign: 'center' }}>No matches found</li>
+          )}
+        </ul>
+      )}
+    </div>
+  );
+};
 
 // --- MAIN PROFILE COMPONENT ---
 const MyProfile = () => {
@@ -478,6 +544,7 @@ const MyProfile = () => {
             <form onSubmit={handleUpdate} className="mp-fade-in">
               <div className="mp-grid">
 
+                {/* PHOTOS - Full Width */}
                 <div className="mp-card mp-card-full">
                   <h3 className="mp-card-title">Manage Photos (Max 2)</h3>
                   <div className="mp-photo-grid">
@@ -511,7 +578,7 @@ const MyProfile = () => {
                     <SelectField label="Diet" name="diet" value={formData.diet} options={["Veg", "Non-Veg", "Eggetarian"]} onChange={handleChange} />
                     <InputField label="Gothra" name="gothra" value={formData.gothra} onChange={handleChange} />
 
-                    {/* Community details are strictly SelectFields */}
+                    {/* STRICT NATIVE SELECT FIELDS FOR COMMUNITY */}
                     <SelectField label="Community" name="community" value={formData.community} options={masterData.communities} onChange={handleChange} />
                     <SelectField label="Sub-Community / Caste" name="subCommunity" value={formData.subCommunity} options={editModeSubCommunities} onChange={handleChange} />
                   </div>
@@ -525,10 +592,10 @@ const MyProfile = () => {
                     <SelectField label="Job Role" name="jobRole" value={formData.jobRole} options={masterData.occupations} onChange={handleChange} />
                     <InputField label="Annual Income" name="annualIncome" value={formData.annualIncome} onChange={handleChange} />
 
-                    {/* Geography details are ComboFields (Dropdown + Typing) */}
-                    <ComboField label="Country" name="country" value={formData.country} options={masterData.countries} onChange={handleChange} listId="country-datalist" />
-                    <ComboField label="State" name="state" value={formData.state} options={dependentStates} onChange={handleChange} listId="state-datalist" />
-                    <ComboField label="City" name="city" value={formData.city} options={dependentCities} onChange={handleChange} listId="city-datalist" />
+                    {/* COMBO (TYPABLE) FIELDS FOR LOCATION */}
+                    <ComboField label="Country" name="country" value={formData.country} options={masterData.countries} onChange={handleChange} />
+                    <ComboField label="State" name="state" value={formData.state} options={dependentStates} onChange={handleChange} disabled={!formData.country} />
+                    <ComboField label="City" name="city" value={formData.city} options={dependentCities} onChange={handleChange} disabled={!formData.state} />
                   </div>
                 </div>
 
