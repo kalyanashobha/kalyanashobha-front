@@ -8,26 +8,19 @@ const AdminHelpCenter = () => {
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Modal state for resolving an issue
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [adminReply, setAdminReply] = useState('');
   const [resolving, setResolving] = useState(false);
-
-  // State to toggle inline image viewing
   const [showImage, setShowImage] = useState(false);
 
-  // --- PAGINATION STATES ---
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4; // Set to 4 items per page
-
-  // Mobile Scroll Indicator State
+  const itemsPerPage = 4; 
   const [showMainScroll, setShowMainScroll] = useState(false);
 
   useEffect(() => {
     fetchIssues();
   }, []);
 
-  // --- PAGINATION LOGIC ---
   const totalPages = Math.ceil(issues.length / itemsPerPage) || 1;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -35,16 +28,12 @@ const AdminHelpCenter = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // --- MOBILE ONLY SCROLL INDICATOR LOGIC ---
   useEffect(() => {
     const checkMainScroll = () => {
-        // 1. Hide on desktop entirely
         if (window.innerWidth > 768) {
             setShowMainScroll(false);
             return;
         }
-
-        // 2. Hide if there is 1 or fewer items, OR if the modal is currently open
         if (currentItems.length <= 1 || selectedIssue) {
             setShowMainScroll(false);
             return;
@@ -53,15 +42,9 @@ const AdminHelpCenter = () => {
         const scrollY = window.scrollY || document.documentElement.scrollTop;
         const windowHeight = window.innerHeight;
         const documentHeight = document.documentElement.scrollHeight;
-
-        // 3. Check if the document is taller than the viewport. 
-        // We use an 80px buffer to account for padding and margins.
         const isScrollable = documentHeight > windowHeight + 80;
-
-        // 4. Check if we haven't scrolled to the very bottom yet
         const isNotAtBottom = scrollY + windowHeight < documentHeight - 30;
 
-        // 5. Only show the indicator if it's scrollable AND we aren't at the bottom
         setShowMainScroll(isScrollable && isNotAtBottom);
     };
 
@@ -158,7 +141,6 @@ const AdminHelpCenter = () => {
     <div className="kah-layout">
       <ToastContainer position="top-right" theme="colored" />
 
-      {/* Header */}
       <div className="kah-header">
         <div className="kah-title-group">
           <h2>Help Center Management</h2>
@@ -169,7 +151,6 @@ const AdminHelpCenter = () => {
         </button>
       </div>
 
-      {/* Issues Table Content */}
       <div className="kah-data-card">
         <div className="kah-table-wrapper">
           <table className="kah-table">
@@ -184,24 +165,38 @@ const AdminHelpCenter = () => {
             </thead>
             <tbody>
               {loading ? (
-                /* Skeleton Loading Rows - reduced to 4 items */
-                <tr>
-                    <td colSpan="5" className="kah-empty-cell">
-                        <div className="kah-skeleton-stack">
-                            {[1, 2, 3, 4].map((i) => (
-                                <div key={i} className="kah-skeleton-row">
-                                    <div className="kah-sk-box kah-sk-date"></div>
-                                    <div className="kah-sk-box kah-sk-user"></div>
-                                    <div className="kah-sk-box kah-sk-subject"></div>
-                                    <div className="kah-sk-box kah-sk-status"></div>
-                                    <div className="kah-sk-box kah-sk-action"></div>
-                                </div>
-                            ))}
-                        </div>
+                /* CORRECTED SKELETON: Rendered exactly like real data rows */
+                [1, 2, 3, 4].map((i) => (
+                  <tr key={i}>
+                    <td data-label="Date">
+                      <div className="kah-date-cell">
+                          <div className="kah-sk-box" style={{ width: '14px', height: '14px', borderRadius: '50%' }}></div>
+                          <div className="kah-sk-box" style={{ width: '70px' }}></div>
+                      </div>
                     </td>
-                </tr>
+                    <td data-label="User Details">
+                      <div className="kah-info-stack">
+                          <div className="kah-sk-box" style={{ width: '120px', height: '14px' }}></div>
+                          <div className="kah-sk-box" style={{ width: '80px', height: '12px' }}></div>
+                      </div>
+                    </td>
+                    <td data-label="Subject">
+                      <div className="kah-info-stack">
+                        <div className="kah-sk-box" style={{ width: '160px', height: '14px' }}></div>
+                        <div className="kah-sk-box" style={{ width: '220px', height: '12px' }}></div>
+                      </div>
+                    </td>
+                    <td data-label="Status">
+                      <div className="kah-sk-box" style={{ width: '70px', height: '24px', borderRadius: '20px' }}></div>
+                    </td>
+                    <td data-label="Action" className="kah-text-right">
+                      <div className="kah-action-group">
+                        <div className="kah-sk-box" style={{ width: '110px', height: '34px', borderRadius: '8px' }}></div>
+                      </div>
+                    </td>
+                  </tr>
+                ))
               ) : issues.length === 0 ? (
-                /* Empty State */
                 <tr>
                   <td colSpan="5" className="kah-empty-cell">
                     <div className="kah-state-view empty">
@@ -212,7 +207,6 @@ const AdminHelpCenter = () => {
                   </td>
                 </tr>
               ) : (
-                /* Actual Data Rows (mapped to currentItems) */
                 currentItems.map((issue) => (
                   <tr key={issue._id}>
                     <td data-label="Date">
@@ -258,7 +252,6 @@ const AdminHelpCenter = () => {
           </table>
         </div>
 
-        {/* ALWAYS VISIBLE CIRCULAR PAGINATION DESIGN */}
         {!loading && totalPages >= 1 && (
             <div className="kah-pagination-container">
                 <button 
@@ -285,7 +278,6 @@ const AdminHelpCenter = () => {
 
       </div>
 
-      {/* MOBILE ONLY SCROLL INDICATOR */}
       {showMainScroll && (
           <div className="kah-scroll-indicator">
               <ChevronDown size={18} />
@@ -293,7 +285,6 @@ const AdminHelpCenter = () => {
           </div>
       )}
 
-      {/* Resolution Modal */}
       {selectedIssue && (
         <div className="kah-modal-overlay" onClick={closeModal}>
           <div className="kah-modal-content" onClick={e => e.stopPropagation()}>
@@ -323,7 +314,6 @@ const AdminHelpCenter = () => {
                 <h4 className="kah-issue-title">{selectedIssue.subject}</h4>
                 <p className="kah-issue-summary-full">{selectedIssue.summary}</p>
 
-                {/* Inline Image Viewer Toggle */}
                 {selectedIssue.screenshotUrl && (
                   <div className="kah-attachment-wrap">
                     <button 
@@ -334,7 +324,6 @@ const AdminHelpCenter = () => {
                       <Paperclip size={14} /> {showImage ? 'Hide Attached Screenshot' : 'View Attached Screenshot'}
                     </button>
 
-                    {/* Render Image below if toggled on */}
                     {showImage && (
                       <div className="kah-image-preview-box">
                         <img 
