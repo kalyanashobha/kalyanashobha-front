@@ -185,34 +185,43 @@ const AgentDashboard = () => {
     navigate('/agent', { replace: true });
   }, [navigate]);
 
-  // --- BULLETPROOF SCROLL HIDING LOGIC ---
+  // --- FIXED SCROLL LOGIC FOR SHORT PAGES ---
   const handleScrollCheck = useCallback(() => {
-    // Increased buffer specifically for production layout shifts / mobile nav bars
-    const BUFFER = activeTab === 'register' ? 300 : 250; 
     let needsIndicator = false;
 
     // Check <main> element scroll
     if (mainScrollRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = mainScrollRef.current;
-      if (scrollHeight > clientHeight + 10) {
-        // Math.ceil secures sub-pixel rendering in production environments
-        const mainAtBottom = Math.ceil(scrollTop + clientHeight) >= (scrollHeight - BUFFER);
-        if (!mainAtBottom) needsIndicator = true;
+      
+      // Is there actually enough content to scroll? (Added a 5px tolerance)
+      if (scrollHeight > clientHeight + 5) {
+        // Find exact distance from current position to the absolute bottom
+        const distanceToBottom = scrollHeight - (Math.ceil(scrollTop) + clientHeight);
+        
+        // Hide if we are within 50px of the absolute bottom
+        if (distanceToBottom > 50) {
+          needsIndicator = true;
+        }
       }
     }
 
-    // Check Window/Document scroll (Fallback)
-    const winHeight = window.innerHeight || document.documentElement.clientHeight;
-    const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-    
-    if (!needsIndicator && docHeight > winHeight + 10) {
-      const scrollY = Math.ceil(window.scrollY || document.documentElement.scrollTop);
-      const winAtBottom = (scrollY + winHeight) >= (docHeight - BUFFER);
-      if (!winAtBottom) needsIndicator = true;
+    // Check Window/Document scroll (Fallback for body-level scrolling)
+    if (!needsIndicator) {
+      const winHeight = window.innerHeight || document.documentElement.clientHeight;
+      const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+      
+      if (docHeight > winHeight + 5) {
+        const scrollY = Math.ceil(window.scrollY || document.documentElement.scrollTop);
+        const distanceToBottom = docHeight - (scrollY + winHeight);
+        
+        if (distanceToBottom > 50) {
+          needsIndicator = true;
+        }
+      }
     }
 
     setShowScroll(needsIndicator);
-  }, [activeTab]);
+  }, []);
 
   useEffect(() => {
     handleScrollCheck();
@@ -245,7 +254,6 @@ const AgentDashboard = () => {
     };
   }, [handleScrollCheck, activeTab, regStep, dashboardLoading, stats, usersList, interestsStatus, memPayments, premiumUsers]);
 
-  // --- FIXED: Scrolls completely to the bottom instead of just 400px ---
   const scrollToBottom = () => {
     const el = mainScrollRef.current;
     if (el && el.scrollHeight > el.clientHeight + 5) {
