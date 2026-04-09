@@ -185,38 +185,36 @@ const AgentDashboard = () => {
     navigate('/agent', { replace: true });
   }, [navigate]);
 
-  // --- GUARANTEED SCROLL HIDING LOGIC ---
+  // --- GUARANTEED SCROLL HIDING LOGIC (UPDATED FOR PRODUCTION) ---
   const handleScrollCheck = useCallback(() => {
-    let isScrollable = false;
-    let isAtBottom = false;
+    let show = false;
+    
+    // Increased buffer specifically to accommodate mobile nav bars & production layouts
+    const BUFFER = activeTab === 'register' ? 300 : 250; 
 
-    const BUFFER = activeTab === 'register' ? 220 : 180; 
+    // 1. Check fallback Window/Document scroll
+    const winHeight = window.innerHeight;
+    const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    const scrollY = Math.ceil(window.scrollY || document.documentElement.scrollTop);
 
-    // 1. Check if the internal <main> container is the one scrolling
-    if (mainScrollRef.current && mainScrollRef.current.scrollHeight > mainScrollRef.current.clientHeight + 10) {
-      isScrollable = true;
-      const { scrollTop, scrollHeight, clientHeight } = mainScrollRef.current;
-      
-      if (scrollTop + clientHeight >= scrollHeight - BUFFER) {
-        isAtBottom = true;
-      }
-    } 
-    // 2. ONLY check the global window if the main container is NOT scrolling
-    else {
-      const winHeight = window.innerHeight;
-      const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-
-      if (docHeight > winHeight + 10) {
-        isScrollable = true;
-        const scrollY = Math.ceil(window.scrollY || document.documentElement.scrollTop);
-
-        if (scrollY + winHeight >= docHeight - BUFFER) {
-          isAtBottom = true;
-        }
+    if (docHeight > winHeight + 20) { // 20px tolerance for sub-pixel accuracy
+      if (docHeight - winHeight - scrollY > BUFFER) {
+        show = true;
       }
     }
 
-    setShowScroll(isScrollable && !isAtBottom);
+    // 2. Main Scroll Container Check (Prioritized)
+    if (mainScrollRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = mainScrollRef.current;
+      
+      // If the main area is the true scroller
+      if (scrollHeight > clientHeight + 20) {
+        // Evaluate based on the element's actual scroll distance
+        show = (scrollHeight - clientHeight - Math.ceil(scrollTop)) > BUFFER;
+      }
+    }
+
+    setShowScroll(show);
   }, [activeTab]);
 
   useEffect(() => {
