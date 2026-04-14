@@ -1,13 +1,79 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap');
 
 /* --- MAIN LAYOUT --- */
 .ks-dashboard-container {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background-color: #f8fafc; /* Professional subtle gray background */
   min-height: 100vh;
-  padding: 32px;
   color: #0f172a;
   box-sizing: border-box;
+  padding: 0; /* Removed padding so hero image can span full width */
+}
+
+/* --- HERO SECTION --- */
+.ks-hero-section {
+  position: relative;
+  width: 100%;
+  height: 380px; 
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+.ks-hero-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%; /* Focus on faces */
+  z-index: 1;
+}
+
+/* Bottom fade effect blending into the dashboard background */
+.ks-hero-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60%;
+  background: linear-gradient(to top, #f8fafc 15%, transparent 100%);
+  z-index: 2;
+}
+
+.ks-hero-content {
+  position: relative;
+  z-index: 3;
+  padding: 0 24px 32px;
+  max-width: 800px;
+}
+
+.ks-hero-title {
+  font-family: 'Playfair Display', serif; /* Elegant serif font matching the screenshot */
+  font-size: 36px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+.ks-hero-subtitle {
+  font-size: 16px;
+  color: #475569;
+  line-height: 1.5;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* --- DASHBOARD CONTENT PADDING --- */
+.ks-dashboard-content {
+  padding: 0 32px 32px 32px; /* Restored padding for the inner content */
+  max-width: 1440px;
+  margin: 0 auto;
 }
 
 /* --- HEADER --- */
@@ -90,7 +156,6 @@
   box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.02);
 }
 
-/* Hover effect leveraging CSS variables set in React */
 .ks-stat-card.clickable {
   cursor: pointer;
 }
@@ -193,7 +258,19 @@
 }
 
 @media (max-width: 600px) {
-  .ks-dashboard-container {
+  .ks-hero-section {
+    height: 300px;
+  }
+  
+  .ks-hero-title {
+    font-size: 26px;
+  }
+
+  .ks-hero-subtitle {
+    font-size: 14px;
+  }
+
+  .ks-dashboard-content {
     padding: 16px;
   }
 
@@ -204,7 +281,7 @@
     margin-bottom: 24px;
     padding-bottom: 16px;
   }
-  
+
   .ks-title {
       font-size: 24px;
   }
@@ -213,11 +290,11 @@
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
   .ks-section-wrapper {
       margin-bottom: 32px;
   }
-  
+
   .ks-stat-card {
       padding: 20px;
   }
