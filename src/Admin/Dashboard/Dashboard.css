@@ -3,27 +3,38 @@
 /* --- MAIN LAYOUT --- */
 .ks-dashboard-container {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #f8fafc; /* Professional subtle gray background */
+  background-color: #f8fafc; 
   min-height: 100vh;
   color: #0f172a;
   box-sizing: border-box;
   padding: 0; 
+  position: relative; /* Needed for the absolute scroll indicator reference if changed */
 }
 
 /* --- HERO SECTION --- */
 .ks-hero-section {
   position: relative;
   width: 100%;
-  /* Max-width and margin added to prevent aggressive zooming on ultrawide monitors */
-  max-width: 1440px; 
-  margin: 0 auto;
-  height: 380px; 
+  max-width: 1440px; /* Constrain max width to match content so it doesn't over-zoom */
+  margin: 0 auto;    /* Center the banner on ultra-wide monitors */
+  height: 320px;     /* Slightly reduced height to make it more compact */
   display: flex;
   align-items: flex-end;
   justify-content: center;
   text-align: center;
   overflow: hidden;
-  background-color: #e2e8f0; /* Fallback color for wider screens */
+}
+
+/* Background wrapper for large monitors so the sides aren't empty if the window is wider than 1440px */
+.ks-dashboard-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 320px;
+  background: #0f172a; /* A solid dark color behind the hero image just in case */
+  z-index: 0;
 }
 
 .ks-hero-image {
@@ -33,7 +44,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 20%; /* Focus on faces */
+  object-position: center 20%; 
   z-index: 1;
 }
 
@@ -52,12 +63,12 @@
 .ks-hero-content {
   position: relative;
   z-index: 3;
-  padding: 0 24px 60px; /* Increased bottom padding to make room for scroll indicator */
+  padding: 0 24px 32px;
   max-width: 800px;
 }
 
 .ks-hero-title {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Playfair Display', serif; 
   font-size: 36px;
   font-weight: 700;
   color: #1e293b;
@@ -73,55 +84,13 @@
   margin: 0;
 }
 
-/* --- SCROLL DOWN INDICATOR --- */
-.ks-scroll-indicator {
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #475569;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.ks-scroll-indicator span {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 2px;
-}
-
-.ks-scroll-indicator:hover {
-  color: #0f172a;
-}
-
-.ks-scroll-indicator svg {
-  animation: ks-bounce 2s infinite;
-}
-
-@keyframes ks-bounce {
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-6px);
-  }
-  60% {
-    transform: translateY(-3px);
-  }
-}
-
 /* --- DASHBOARD CONTENT PADDING --- */
 .ks-dashboard-content {
-  padding: 0 32px 32px 32px; 
+  position: relative;
+  z-index: 3;
+  padding: 0 32px 64px 32px; /* Added extra bottom padding to account for scroll indicator */
   max-width: 1440px;
   margin: 0 auto;
-  scroll-margin-top: 24px; /* Gives some breathing room when scrolling down */
 }
 
 /* --- HEADER --- */
@@ -262,6 +231,60 @@
   font-size: 14px;
 }
 
+/* --- FLOATING SCROLL INDICATOR --- */
+.ks-scroll-indicator {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #cbd5e1;
+  padding: 12px 24px;
+  border-radius: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  animation: ks-bounce 2.5s infinite;
+  backdrop-filter: blur(8px);
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.ks-scroll-indicator:hover {
+  background: #ffffff;
+  animation: none;
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.ks-scroll-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.ks-scroll-icon {
+  color: #2563EB;
+}
+
+/* Custom bounce animation */
+@keyframes ks-bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  40% {
+    transform: translateX(-50%) translateY(-10px);
+  }
+  60% {
+    transform: translateX(-50%) translateY(-5px);
+  }
+}
+
 /* --- SKELETON ANIMATION --- */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
@@ -307,7 +330,11 @@
 
 @media (max-width: 600px) {
   .ks-hero-section {
-    height: 300px;
+    height: 280px;
+  }
+  
+  .ks-dashboard-container::before {
+    height: 280px;
   }
   
   .ks-hero-title {
@@ -320,6 +347,7 @@
 
   .ks-dashboard-content {
     padding: 16px;
+    padding-bottom: 80px; /* Extra room for scroll indicator on mobile */
   }
 
   .ks-page-header {
@@ -345,5 +373,10 @@
 
   .ks-stat-card {
       padding: 20px;
+  }
+
+  .ks-scroll-indicator {
+    bottom: 20px;
+    padding: 10px 20px;
   }
 }
