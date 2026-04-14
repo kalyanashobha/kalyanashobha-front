@@ -5,15 +5,14 @@ import './Dashboard.css';
 import { 
   Users, UserCheck, UserX, 
   CheckCircle, Heart, Briefcase, Share2, Activity,
-  ShieldAlert, Star, ChevronDown
+  ShieldAlert, Star
 } from 'lucide-react';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [adminName, setAdminName] = useState('Admin'); 
-  const [showScrollIndicator, setShowScrollIndicator] = useState(false);
+  const [adminName, setAdminName] = useState('Admin'); // State for dynamic username
   const navigate = useNavigate();
 
   const API_BASE = "https://kalyanashobha-back.vercel.app/api/admin";
@@ -35,33 +34,6 @@ const AdminDashboard = () => {
     // 2. Fetch Dashboard Stats
     fetchStats();
   }, []);
-
-  // 3. Scroll Listener for the Indicator
-  useEffect(() => {
-    const handleScroll = () => {
-      // Calculate how close we are to the bottom of the page
-      const scrollPosition = window.innerHeight + window.scrollY;
-      const threshold = document.body.offsetHeight - 100; // 100px buffer before bottom
-      
-      // Show indicator if the page is scrollable AND we are not at the bottom
-      if (document.body.offsetHeight > window.innerHeight && scrollPosition < threshold) {
-        setShowScrollIndicator(true);
-      } else {
-        setShowScrollIndicator(false);
-      }
-    };
-
-    // Check initially after stats load
-    handleScroll();
-    
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('resize', handleScroll); // Handle screen resizing
-    
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
-    };
-  }, [stats]); // Re-run effect when stats load and change page height
 
   // Centralized redirect logic for expired/missing tokens
   const handleAuthFailure = () => {
@@ -104,6 +76,7 @@ const AdminDashboard = () => {
         }
       });
 
+      // If backend says Unauthorized (401) or Forbidden (403), token is likely expired
       if (res.status === 401 || res.status === 403) {
         handleAuthFailure();
         return;
@@ -113,6 +86,7 @@ const AdminDashboard = () => {
       if (data.success) {
         setStats(data.stats);
       } else {
+        // Fallback catch if backend returns 200 but sends success: false for token issues
         if (data.message && data.message.toLowerCase().includes('token')) {
           handleAuthFailure();
           return;
@@ -126,12 +100,9 @@ const AdminDashboard = () => {
     }
   };
 
-  const scrollDown = () => {
-    window.scrollBy({ top: window.innerHeight / 2, behavior: 'smooth' });
-  };
-
   // Reusable Card Component with Navigation and Unique Colors
   const StatCard = ({ label, value, icon: Icon, path, colorType }) => {
+    // Unique color definitions for a vibrant, premium dashboard
     const styles = {
       blue:   { color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE', shadow: 'rgba(37, 99, 235, 0.15)' },
       emerald:{ color: '#059669', bg: '#F0FDF4', border: '#A7F3D0', shadow: 'rgba(5, 150, 105, 0.15)' },
@@ -188,136 +159,110 @@ const AdminDashboard = () => {
 
   return (
     <div className="ks-dashboard-container">
-      
-      {/* PERFECT REPLICA: HERO BANNER SECTION */}
-      <div className="ks-hero-section">
-        <img 
-          src="https://res.cloudinary.com/dppiuypop/image/upload/v1773852088/uploads/m7apo90xh8znxsahepis.png" 
-          alt="Happy Couple" 
-          className="ks-hero-image"
-        />
-        <div className="ks-hero-content">
-          <h1 className="ks-hero-title">Welcome to the Admin Portal</h1>
-          <p className="ks-hero-subtitle">
-            Manage your user profiles, track referrals, and monitor match activities effortlessly.
-          </p>
+
+      {/* Header */}
+      <header className="ks-page-header">
+        <div>
+          <h1 className="ks-title">Overview</h1>
+          {/* UPDATED: Dynamic user greeting */}
+          <p className="ks-subtitle">Welcome back, {adminName}</p>
         </div>
+        <div className="ks-date-pill">
+          {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+        </div>
+      </header>
+
+      {error && <div className="ks-alert-banner">{error}</div>}
+
+      <div className="ks-grid-layout">
+
+        {/* SECTION: USER METRICS */}
+        <div className="ks-section-wrapper">
+          <h3 className="ks-section-title">User Registry</h3>
+          <div className="ks-metrics-grid">
+            {loading ? (
+              <>
+                <SkeletonCard /> <SkeletonCard /> <SkeletonCard /> <SkeletonCard />
+              </>
+            ) : (
+              <>
+                <StatCard 
+                  label="Total Users" 
+                  value={stats?.users?.total} 
+                  icon={Users} 
+                  path="/admin/users"
+                  colorType="blue"
+                />
+                <StatCard 
+                  label="Male Profiles" 
+                  value={stats?.users?.males} 
+                  icon={UserCheck} 
+                  path="/admin/users" 
+                  colorType="cyan"
+                />
+                <StatCard 
+                  label="Female Profiles" 
+                  value={stats?.users?.females} 
+                  icon={Star} 
+                  path="/admin/users" 
+                  colorType="rose"
+                />
+                <StatCard 
+                  label="Restricted / Blocked" 
+                  value={stats?.users?.blocked} 
+                  icon={ShieldAlert} 
+                  path="/admin/users" 
+                  colorType="amber"
+                />
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* SECTION: BUSINESS HEALTH */}
+        <div className="ks-section-wrapper">
+          <h3 className="ks-section-title">Business & Activity</h3>
+          <div className="ks-metrics-grid">
+            {loading ? (
+              <>
+                <SkeletonCard /> <SkeletonCard /> <SkeletonCard /> <SkeletonCard />
+              </>
+            ) : (
+              <>
+                <StatCard 
+                  label="Active Agents" 
+                  value={stats?.referrals?.totalAgents} 
+                  icon={Briefcase} 
+                  path="/admin/agents" 
+                  colorType="purple"
+                />
+                <StatCard 
+                  label="Interests Sent" 
+                  value={stats?.platformHealth?.totalInterestsSent} 
+                  icon={Heart} 
+                  path="/admin/interest-approvals" 
+                  colorType="emerald"
+                />
+                <StatCard 
+                  label="Successful Matches" 
+                  value={stats?.platformHealth?.successfulMatches} 
+                  icon={CheckCircle} 
+                  path="/admin/registration-approvals" 
+                  colorType="teal"
+                />
+                <StatCard 
+                  label="Referrals Made" 
+                  value={stats?.referrals?.totalReferredUsers} 
+                  icon={Share2} 
+                  path="/admin/agents" 
+                  colorType="indigo"
+                />
+              </>
+            )}
+          </div>
+        </div>
+
       </div>
-
-      {/* DASHBOARD CONTENT WRAPPER */}
-      <div className="ks-dashboard-content">
-        
-        {/* Header matched to screenshot's layout */}
-        <header className="ks-page-header">
-          <div>
-            <h1 className="ks-title">Dashboard</h1>
-            <p className="ks-subtitle">Welcome back, {adminName}. Here is what's happening.</p>
-          </div>
-          <div className="ks-date-pill">
-            {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-          </div>
-        </header>
-
-        {error && <div className="ks-alert-banner">{error}</div>}
-
-        <div className="ks-grid-layout">
-
-          {/* SECTION: USER METRICS */}
-          <div className="ks-section-wrapper">
-            <h3 className="ks-section-title">User Registry</h3>
-            <div className="ks-metrics-grid">
-              {loading ? (
-                <>
-                  <SkeletonCard /> <SkeletonCard /> <SkeletonCard /> <SkeletonCard />
-                </>
-              ) : (
-                <>
-                  <StatCard 
-                    label="Total Users" 
-                    value={stats?.users?.total} 
-                    icon={Users} 
-                    path="/admin/users"
-                    colorType="blue"
-                  />
-                  <StatCard 
-                    label="Male Profiles" 
-                    value={stats?.users?.males} 
-                    icon={UserCheck} 
-                    path="/admin/users" 
-                    colorType="cyan"
-                  />
-                  <StatCard 
-                    label="Female Profiles" 
-                    value={stats?.users?.females} 
-                    icon={Star} 
-                    path="/admin/users" 
-                    colorType="rose"
-                  />
-                  <StatCard 
-                    label="Restricted / Blocked" 
-                    value={stats?.users?.blocked} 
-                    icon={ShieldAlert} 
-                    path="/admin/users" 
-                    colorType="amber"
-                  />
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* SECTION: BUSINESS HEALTH */}
-          <div className="ks-section-wrapper">
-            <h3 className="ks-section-title">Business & Activity</h3>
-            <div className="ks-metrics-grid">
-              {loading ? (
-                <>
-                  <SkeletonCard /> <SkeletonCard /> <SkeletonCard /> <SkeletonCard />
-                </>
-              ) : (
-                <>
-                  <StatCard 
-                    label="Active Agents" 
-                    value={stats?.referrals?.totalAgents} 
-                    icon={Briefcase} 
-                    path="/admin/agents" 
-                    colorType="purple"
-                  />
-                  <StatCard 
-                    label="Interests Sent" 
-                    value={stats?.platformHealth?.totalInterestsSent} 
-                    icon={Heart} 
-                    path="/admin/interest-approvals" 
-                    colorType="emerald"
-                  />
-                  <StatCard 
-                    label="Successful Matches" 
-                    value={stats?.platformHealth?.successfulMatches} 
-                    icon={CheckCircle} 
-                    path="/admin/registration-approvals" 
-                    colorType="teal"
-                  />
-                  <StatCard 
-                    label="Referrals Made" 
-                    value={stats?.referrals?.totalReferredUsers} 
-                    icon={Share2} 
-                    path="/admin/agents" 
-                    colorType="indigo"
-                  />
-                </>
-              )}
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      {/* FLOATING SCROLL INDICATOR */}
-      {showScrollIndicator && (
-        <div className="ks-scroll-indicator" onClick={scrollDown}>
-          <span className="ks-scroll-text">Scroll to see all stats</span>
-          <ChevronDown size={20} className="ks-scroll-icon" />
-        </div>
-      )}
     </div>
   );
 };
