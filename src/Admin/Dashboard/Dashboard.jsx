@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import './Dashboard.css'; 
 
 import { 
-  Users, UserCheck, ShieldAlert, Star,
+  Users, UserCheck, UserX, 
   CheckCircle, Heart, Briefcase, Share2, Activity,
-  ChevronDown
+  ShieldAlert, Star, ChevronDown
 } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -18,6 +18,7 @@ const AdminDashboard = () => {
   const API_BASE = "https://kalyanashobha-back.vercel.app/api/admin";
 
   useEffect(() => {
+    // 1. Get username for the welcome message
     try {
       const infoStr = localStorage.getItem('adminInfo');
       if (infoStr) {
@@ -30,6 +31,7 @@ const AdminDashboard = () => {
       console.error("Error parsing admin info", e);
     }
 
+    // 2. Fetch Dashboard Stats
     fetchStats();
   }, []);
 
@@ -125,7 +127,6 @@ const AdminDashboard = () => {
           </div>
           <Activity size={18} className="ks-trend-indicator" style={{color: currentStyle.color, opacity: 0.5}} />
         </div>
-
         <div className="ks-card-body">
           <h2 className="ks-stat-value">
             {value !== undefined ? value.toLocaleString() : '0'}
@@ -151,45 +152,40 @@ const AdminDashboard = () => {
   return (
     <div className="ks-dashboard-container">
       
-      {/* PERFECT REPLICA: HERO BANNER SECTION */}
+      {/* CONTAINED HERO BANNER SECTION */}
       <div className="ks-hero-section">
         <img 
           src="https://res.cloudinary.com/dppiuypop/image/upload/v1773852088/uploads/m7apo90xh8znxsahepis.png" 
           alt="Happy Couple" 
           className="ks-hero-image"
         />
-        <div className="ks-hero-overlay"></div>
+        <div className="ks-hero-gradient"></div>
         <div className="ks-hero-content">
           <h1 className="ks-hero-title">Welcome to the Admin Portal</h1>
           <p className="ks-hero-subtitle">
             Manage your user profiles, track referrals, and monitor match activities effortlessly.
           </p>
         </div>
-        {/* Scroll Indicator */}
+        {/* Scroll Indicator Added */}
         <div className="ks-scroll-indicator">
           <ChevronDown size={32} strokeWidth={2.5} />
         </div>
       </div>
 
-      {/* DASHBOARD CONTENT WRAPPER */}
       <div className="ks-dashboard-content">
-        
-        {/* Header matched to screenshot's layout */}
         <header className="ks-page-header">
           <div>
             <h1 className="ks-title">Dashboard</h1>
             <p className="ks-subtitle">Welcome back, {adminName}. Here is what's happening.</p>
           </div>
           <div className="ks-date-pill">
-            {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}
+            {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
           </div>
         </header>
 
         {error && <div className="ks-alert-banner">{error}</div>}
 
         <div className="ks-grid-layout">
-
-          {/* SECTION: USER METRICS */}
           <div className="ks-section-wrapper">
             <h3 className="ks-section-title">User Registry</h3>
             <div className="ks-metrics-grid">
@@ -199,40 +195,15 @@ const AdminDashboard = () => {
                 </>
               ) : (
                 <>
-                  <StatCard 
-                    label="Total Users" 
-                    value={stats?.users?.total} 
-                    icon={Users} 
-                    path="/admin/users"
-                    colorType="blue"
-                  />
-                  <StatCard 
-                    label="Male Profiles" 
-                    value={stats?.users?.males} 
-                    icon={UserCheck} 
-                    path="/admin/users" 
-                    colorType="cyan"
-                  />
-                  <StatCard 
-                    label="Female Profiles" 
-                    value={stats?.users?.females} 
-                    icon={Star} 
-                    path="/admin/users" 
-                    colorType="rose"
-                  />
-                  <StatCard 
-                    label="Restricted / Blocked" 
-                    value={stats?.users?.blocked} 
-                    icon={ShieldAlert} 
-                    path="/admin/users" 
-                    colorType="amber"
-                  />
+                  <StatCard label="Total Users" value={stats?.users?.total} icon={Users} path="/admin/users" colorType="blue" />
+                  <StatCard label="Male Profiles" value={stats?.users?.males} icon={UserCheck} path="/admin/users" colorType="cyan" />
+                  <StatCard label="Female Profiles" value={stats?.users?.females} icon={Star} path="/admin/users" colorType="rose" />
+                  <StatCard label="Restricted / Blocked" value={stats?.users?.blocked} icon={ShieldAlert} path="/admin/users" colorType="amber" />
                 </>
               )}
             </div>
           </div>
 
-          {/* SECTION: BUSINESS HEALTH */}
           <div className="ks-section-wrapper">
             <h3 className="ks-section-title">Business & Activity</h3>
             <div className="ks-metrics-grid">
@@ -242,39 +213,14 @@ const AdminDashboard = () => {
                 </>
               ) : (
                 <>
-                  <StatCard 
-                    label="Active Agents" 
-                    value={stats?.referrals?.totalAgents} 
-                    icon={Briefcase} 
-                    path="/admin/agents" 
-                    colorType="purple"
-                  />
-                  <StatCard 
-                    label="Interests Sent" 
-                    value={stats?.platformHealth?.totalInterestsSent} 
-                    icon={Heart} 
-                    path="/admin/interest-approvals" 
-                    colorType="emerald"
-                  />
-                  <StatCard 
-                    label="Successful Matches" 
-                    value={stats?.platformHealth?.successfulMatches} 
-                    icon={CheckCircle} 
-                    path="/admin/registration-approvals" 
-                    colorType="teal"
-                  />
-                  <StatCard 
-                    label="Referrals Made" 
-                    value={stats?.referrals?.totalReferredUsers} 
-                    icon={Share2} 
-                    path="/admin/agents" 
-                    colorType="indigo"
-                  />
+                  <StatCard label="Active Agents" value={stats?.referrals?.totalAgents} icon={Briefcase} path="/admin/agents" colorType="purple" />
+                  <StatCard label="Interests Sent" value={stats?.platformHealth?.totalInterestsSent} icon={Heart} path="/admin/interest-approvals" colorType="emerald" />
+                  <StatCard label="Successful Matches" value={stats?.platformHealth?.successfulMatches} icon={CheckCircle} path="/admin/registration-approvals" colorType="teal" />
+                  <StatCard label="Referrals Made" value={stats?.referrals?.totalReferredUsers} icon={Share2} path="/admin/agents" colorType="indigo" />
                 </>
               )}
             </div>
           </div>
-
         </div>
       </div>
     </div>
