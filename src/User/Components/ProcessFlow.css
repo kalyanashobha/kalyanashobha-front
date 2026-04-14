@@ -16,34 +16,33 @@
 }
 
 .auto-process-section {
-  padding: 100px 20px;
+  padding: 80px 20px; /* Slightly tighter padding for mobile */
   background-color: var(--auto-bg);
   font-family: 'Inter', sans-serif;
-  /* Ultra-subtle dot grid for texture */
   background-image: radial-gradient(var(--auto-light) 1px, transparent 1px);
   background-size: 32px 32px;
   background-position: center;
 }
 
 .auto-container {
-  max-width: 500px; /* Constrained for mobile readability */
+  max-width: 500px;
   margin: 0 auto;
   width: 100%;
 }
 
 .auto-header {
   text-align: center;
-  margin-bottom: 80px;
+  margin-bottom: 60px; /* Tighter margin for mobile */
 }
 
+/* Reduced Mobile Font Sizes */
 .auto-title {
-  font-size: 2.2rem;
+  font-size: 1.7rem; 
   font-weight: 800;
   color: var(--auto-dark);
   letter-spacing: -0.03em;
 }
 
-/* Gradient Text for the Header & Tags */
 .gradient-text {
   background: var(--auto-gradient);
   -webkit-background-clip: text;
@@ -51,7 +50,6 @@
   background-clip: text;
 }
 
-/* --- MAIN LAYOUT --- */
 .timeline-layout {
   position: relative;
   display: flex;
@@ -65,7 +63,7 @@
 
 .mobile-line-container {
   position: absolute;
-  left: 31px; /* Center aligned with icons */
+  left: 28px; /* Adjusted for slightly smaller mobile icon if needed, or keep center */
   top: 32px;
   bottom: 80px;
   width: 2px;
@@ -98,16 +96,16 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 56px; 
+  gap: 40px; /* Tighter gap for mobile */
   position: relative; 
 }
 
 .step-row {
   display: flex;
   align-items: flex-start;
-  gap: 32px;
+  gap: 20px; /* Tighter gap between icon and text */
   position: relative;
-  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); /* Faster fade transition */
   opacity: 0.35; 
   filter: grayscale(100%); 
   z-index: 1; 
@@ -128,35 +126,34 @@
 }
 
 .step-icon-box {
-  width: 64px;
-  height: 64px;
+  width: 56px; /* Slightly smaller icon box for mobile */
+  height: 56px;
   background: var(--auto-bg);
   border: 1.5px solid var(--auto-light);
-  border-radius: 20px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--auto-gray);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
   position: relative;
-  transition: all 0.4s ease;
+  transition: all 0.3s ease;
 }
 
-/* Premium Gradient Border Trick for Active State */
 .step-row.active .step-icon-box {
   color: var(--auto-red);
   border-color: transparent;
   box-shadow: 
-    0 15px 30px -5px var(--auto-glow),
-    0 5px 15px -5px var(--auto-amber-glow);
+    0 12px 24px -5px var(--auto-glow),
+    0 4px 12px -5px var(--auto-amber-glow);
 }
 
 .step-row.active .step-icon-box::before {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 20px;
-  padding: 2px; /* Stroke width of the gradient */
+  border-radius: 16px;
+  padding: 2px;
   background: var(--auto-gradient);
   -webkit-mask: 
     linear-gradient(#fff 0 0) content-box, 
@@ -167,28 +164,28 @@
 }
 
 .step-icon-box svg {
-  width: 26px;
-  height: 26px;
-  transition: stroke-width 0.3s ease;
-  z-index: 2; /* Keep above gradient pseudo-element */
+  width: 24px;
+  height: 24px;
+  transition: stroke-width 0.2s ease;
+  z-index: 2;
 }
 
-/* --- TEXT STYLES --- */
+/* --- TEXT STYLES (Reduced for Mobile) --- */
 .step-content {
-  padding-top: 6px;
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  padding-top: 4px;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .step-row.active .step-content {
-  transform: translateX(6px);
+  transform: translateX(4px);
 }
 
 .step-tag {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.8rem;
+  font-size: 0.7rem; /* Smaller tag */
   font-weight: 700;
   color: var(--auto-gray);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   display: inline-block;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -201,26 +198,54 @@
 }
 
 .step-title {
-  font-size: 1.35rem;
+  font-size: 1.15rem; /* Smaller title */
   font-weight: 700;
   color: var(--auto-dark);
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   letter-spacing: -0.01em;
 }
 
 .step-desc {
-  font-size: 1rem;
+  font-size: 0.9rem; /* Smaller description */
   color: var(--auto-gray);
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 /* ========================================= */
-/* DESKTOP VIEW (Horizontal) */
+/* DESKTOP VIEW (Horizontal & Larger Fonts) */
 /* ========================================= */
 
 @media (min-width: 860px) { 
+  .auto-process-section {
+    padding: 100px 20px;
+  }
+
   .auto-container {
-    max-width: 1200px; /* Expand for horizontal layout */
+    max-width: 1200px;
+  }
+
+  .auto-header {
+    margin-bottom: 80px;
+  }
+
+  /* Restore Larger Font Sizes for Desktop */
+  .auto-title { font-size: 2.2rem; }
+  .step-tag { font-size: 0.8rem; margin-bottom: 12px; }
+  .step-title { font-size: 1.35rem; margin-bottom: 10px; }
+  .step-desc { font-size: 1rem; line-height: 1.6; }
+
+  /* Restore Larger Icons for Desktop */
+  .step-icon-box {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+  }
+  .step-row.active .step-icon-box::before {
+    border-radius: 20px;
+  }
+  .step-icon-box svg {
+    width: 26px;
+    height: 26px;
   }
 
   .timeline-layout {
@@ -243,9 +268,9 @@
   .desktop-line-container {
     display: block;
     position: absolute;
-    top: 36px; /* Align with center of icons */
-    left: 12.5%; /* Start at center of first icon */
-    width: 75%; /* Span to center of last icon */
+    top: 36px; 
+    left: 12.5%; 
+    width: 75%; 
     height: 2px;
     z-index: 0;
   }
@@ -284,6 +309,6 @@
   }
 
   .step-row.active .step-content {
-    transform: translateY(6px); /* Nudge down instead of right on desktop */
+    transform: translateY(6px); 
   }
 }
