@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css'; 
@@ -35,8 +36,9 @@ const AdminDashboard = () => {
     fetchStats();
   }, []);
 
+  // Centralized redirect logic for expired/missing tokens
   const handleAuthFailure = () => {
-    let role = 'SuperAdmin'; 
+    let role = 'SuperAdmin'; // Default fallback
 
     try {
       const infoStr = localStorage.getItem('adminInfo');
@@ -48,9 +50,11 @@ const AdminDashboard = () => {
       console.error("Error checking role for redirect", e);
     }
 
+    // Clear local storage to fully sign out
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminInfo');
 
+    // Route based on role
     if (role === 'SuperAdmin') {
       navigate('/admin/login', { replace: true });
     } else {
@@ -95,6 +99,14 @@ const AdminDashboard = () => {
     }
   };
 
+  const scrollToStats = () => {
+    const statsSection = document.getElementById('stats-section');
+    if (statsSection) {
+      statsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  // Reusable Card Component with Navigation and Unique Colors
   const StatCard = ({ label, value, icon: Icon, path, colorType }) => {
     const styles = {
       blue:   { color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE', shadow: 'rgba(37, 99, 235, 0.15)' },
@@ -127,6 +139,7 @@ const AdminDashboard = () => {
           </div>
           <Activity size={18} className="ks-trend-indicator" style={{color: currentStyle.color, opacity: 0.5}} />
         </div>
+
         <div className="ks-card-body">
           <h2 className="ks-stat-value">
             {value !== undefined ? value.toLocaleString() : '0'}
@@ -152,27 +165,31 @@ const AdminDashboard = () => {
   return (
     <div className="ks-dashboard-container">
       
-      {/* CONTAINED HERO BANNER SECTION */}
+      {/* HERO BANNER SECTION */}
       <div className="ks-hero-section">
         <img 
           src="https://res.cloudinary.com/dppiuypop/image/upload/v1773852088/uploads/m7apo90xh8znxsahepis.png" 
           alt="Happy Couple" 
           className="ks-hero-image"
         />
-        <div className="ks-hero-gradient"></div>
         <div className="ks-hero-content">
           <h1 className="ks-hero-title">Welcome to the Admin Portal</h1>
           <p className="ks-hero-subtitle">
             Manage your user profiles, track referrals, and monitor match activities effortlessly.
           </p>
         </div>
-        {/* Scroll Indicator Added */}
-        <div className="ks-scroll-indicator">
-          <ChevronDown size={32} strokeWidth={2.5} />
+        
+        {/* Scroll Indicator */}
+        <div className="ks-scroll-indicator" onClick={scrollToStats}>
+          <span>View Stats</span>
+          <ChevronDown size={28} strokeWidth={2.5} />
         </div>
       </div>
 
-      <div className="ks-dashboard-content">
+      {/* DASHBOARD CONTENT WRAPPER */}
+      <div className="ks-dashboard-content" id="stats-section">
+        
+        {/* Header */}
         <header className="ks-page-header">
           <div>
             <h1 className="ks-title">Dashboard</h1>
@@ -186,6 +203,8 @@ const AdminDashboard = () => {
         {error && <div className="ks-alert-banner">{error}</div>}
 
         <div className="ks-grid-layout">
+
+          {/* SECTION: USER METRICS */}
           <div className="ks-section-wrapper">
             <h3 className="ks-section-title">User Registry</h3>
             <div className="ks-metrics-grid">
@@ -195,15 +214,40 @@ const AdminDashboard = () => {
                 </>
               ) : (
                 <>
-                  <StatCard label="Total Users" value={stats?.users?.total} icon={Users} path="/admin/users" colorType="blue" />
-                  <StatCard label="Male Profiles" value={stats?.users?.males} icon={UserCheck} path="/admin/users" colorType="cyan" />
-                  <StatCard label="Female Profiles" value={stats?.users?.females} icon={Star} path="/admin/users" colorType="rose" />
-                  <StatCard label="Restricted / Blocked" value={stats?.users?.blocked} icon={ShieldAlert} path="/admin/users" colorType="amber" />
+                  <StatCard 
+                    label="Total Users" 
+                    value={stats?.users?.total} 
+                    icon={Users} 
+                    path="/admin/users"
+                    colorType="blue"
+                  />
+                  <StatCard 
+                    label="Male Profiles" 
+                    value={stats?.users?.males} 
+                    icon={UserCheck} 
+                    path="/admin/users" 
+                    colorType="cyan"
+                  />
+                  <StatCard 
+                    label="Female Profiles" 
+                    value={stats?.users?.females} 
+                    icon={Star} 
+                    path="/admin/users" 
+                    colorType="rose"
+                  />
+                  <StatCard 
+                    label="Restricted / Blocked" 
+                    value={stats?.users?.blocked} 
+                    icon={ShieldAlert} 
+                    path="/admin/users" 
+                    colorType="amber"
+                  />
                 </>
               )}
             </div>
           </div>
 
+          {/* SECTION: BUSINESS HEALTH */}
           <div className="ks-section-wrapper">
             <h3 className="ks-section-title">Business & Activity</h3>
             <div className="ks-metrics-grid">
@@ -213,14 +257,39 @@ const AdminDashboard = () => {
                 </>
               ) : (
                 <>
-                  <StatCard label="Active Agents" value={stats?.referrals?.totalAgents} icon={Briefcase} path="/admin/agents" colorType="purple" />
-                  <StatCard label="Interests Sent" value={stats?.platformHealth?.totalInterestsSent} icon={Heart} path="/admin/interest-approvals" colorType="emerald" />
-                  <StatCard label="Successful Matches" value={stats?.platformHealth?.successfulMatches} icon={CheckCircle} path="/admin/registration-approvals" colorType="teal" />
-                  <StatCard label="Referrals Made" value={stats?.referrals?.totalReferredUsers} icon={Share2} path="/admin/agents" colorType="indigo" />
+                  <StatCard 
+                    label="Active Agents" 
+                    value={stats?.referrals?.totalAgents} 
+                    icon={Briefcase} 
+                    path="/admin/agents" 
+                    colorType="purple"
+                  />
+                  <StatCard 
+                    label="Interests Sent" 
+                    value={stats?.platformHealth?.totalInterestsSent} 
+                    icon={Heart} 
+                    path="/admin/interest-approvals" 
+                    colorType="emerald"
+                  />
+                  <StatCard 
+                    label="Successful Matches" 
+                    value={stats?.platformHealth?.successfulMatches} 
+                    icon={CheckCircle} 
+                    path="/admin/registration-approvals" 
+                    colorType="teal"
+                  />
+                  <StatCard 
+                    label="Referrals Made" 
+                    value={stats?.referrals?.totalReferredUsers} 
+                    icon={Share2} 
+                    path="/admin/agents" 
+                    colorType="indigo"
+                  />
                 </>
               )}
             </div>
           </div>
+
         </div>
       </div>
     </div>
