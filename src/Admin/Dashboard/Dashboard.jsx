@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css'; 
@@ -14,6 +13,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [adminName, setAdminName] = useState('Admin'); 
+  const [showScrollIndicator, setShowScrollIndicator] = useState(false);
   const navigate = useNavigate();
 
   const API_BASE = "https://kalyanashobha-back.vercel.app/api/admin";
@@ -35,6 +35,33 @@ const AdminDashboard = () => {
     // 2. Fetch Dashboard Stats
     fetchStats();
   }, []);
+
+  // 3. Scroll Listener for the Indicator
+  useEffect(() => {
+    const handleScroll = () => {
+      // Calculate how close we are to the bottom of the page
+      const scrollPosition = window.innerHeight + window.scrollY;
+      const threshold = document.body.offsetHeight - 100; // 100px buffer before bottom
+      
+      // Show indicator if the page is scrollable AND we are not at the bottom
+      if (document.body.offsetHeight > window.innerHeight && scrollPosition < threshold) {
+        setShowScrollIndicator(true);
+      } else {
+        setShowScrollIndicator(false);
+      }
+    };
+
+    // Check initially after stats load
+    handleScroll();
+    
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll); // Handle screen resizing
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [stats]); // Re-run effect when stats load and change page height
 
   // Centralized redirect logic for expired/missing tokens
   const handleAuthFailure = () => {
@@ -99,11 +126,8 @@ const AdminDashboard = () => {
     }
   };
 
-  const scrollToStats = () => {
-    const statsSection = document.getElementById('stats-section');
-    if (statsSection) {
-      statsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  const scrollDown = () => {
+    window.scrollBy({ top: window.innerHeight / 2, behavior: 'smooth' });
   };
 
   // Reusable Card Component with Navigation and Unique Colors
@@ -165,7 +189,7 @@ const AdminDashboard = () => {
   return (
     <div className="ks-dashboard-container">
       
-      {/* HERO BANNER SECTION */}
+      {/* PERFECT REPLICA: HERO BANNER SECTION */}
       <div className="ks-hero-section">
         <img 
           src="https://res.cloudinary.com/dppiuypop/image/upload/v1773852088/uploads/m7apo90xh8znxsahepis.png" 
@@ -178,18 +202,12 @@ const AdminDashboard = () => {
             Manage your user profiles, track referrals, and monitor match activities effortlessly.
           </p>
         </div>
-        
-        {/* Scroll Indicator */}
-        <div className="ks-scroll-indicator" onClick={scrollToStats}>
-          <span>View Stats</span>
-          <ChevronDown size={28} strokeWidth={2.5} />
-        </div>
       </div>
 
       {/* DASHBOARD CONTENT WRAPPER */}
-      <div className="ks-dashboard-content" id="stats-section">
+      <div className="ks-dashboard-content">
         
-        {/* Header */}
+        {/* Header matched to screenshot's layout */}
         <header className="ks-page-header">
           <div>
             <h1 className="ks-title">Dashboard</h1>
@@ -292,6 +310,14 @@ const AdminDashboard = () => {
 
         </div>
       </div>
+
+      {/* FLOATING SCROLL INDICATOR */}
+      {showScrollIndicator && (
+        <div className="ks-scroll-indicator" onClick={scrollDown}>
+          <span className="ks-scroll-text">Scroll to see all stats</span>
+          <ChevronDown size={20} className="ks-scroll-icon" />
+        </div>
+      )}
     </div>
   );
 };
