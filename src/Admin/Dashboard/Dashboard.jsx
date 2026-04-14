@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import './Dashboard.css'; 
 
 import { 
-  Users, UserCheck, UserX, 
+  Users, UserCheck, ShieldAlert, Star,
   CheckCircle, Heart, Briefcase, Share2, Activity,
-  ShieldAlert, Star
+  ChevronDown
 } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -18,7 +18,6 @@ const AdminDashboard = () => {
   const API_BASE = "https://kalyanashobha-back.vercel.app/api/admin";
 
   useEffect(() => {
-    // 1. Get username for the welcome message
     try {
       const infoStr = localStorage.getItem('adminInfo');
       if (infoStr) {
@@ -31,13 +30,11 @@ const AdminDashboard = () => {
       console.error("Error parsing admin info", e);
     }
 
-    // 2. Fetch Dashboard Stats
     fetchStats();
   }, []);
 
-  // Centralized redirect logic for expired/missing tokens
   const handleAuthFailure = () => {
-    let role = 'SuperAdmin'; // Default fallback
+    let role = 'SuperAdmin'; 
 
     try {
       const infoStr = localStorage.getItem('adminInfo');
@@ -49,11 +46,9 @@ const AdminDashboard = () => {
       console.error("Error checking role for redirect", e);
     }
 
-    // Clear local storage to fully sign out
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminInfo');
 
-    // Route based on role
     if (role === 'SuperAdmin') {
       navigate('/admin/login', { replace: true });
     } else {
@@ -98,7 +93,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // Reusable Card Component with Navigation and Unique Colors
   const StatCard = ({ label, value, icon: Icon, path, colorType }) => {
     const styles = {
       blue:   { color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE', shadow: 'rgba(37, 99, 235, 0.15)' },
@@ -164,11 +158,16 @@ const AdminDashboard = () => {
           alt="Happy Couple" 
           className="ks-hero-image"
         />
+        <div className="ks-hero-overlay"></div>
         <div className="ks-hero-content">
           <h1 className="ks-hero-title">Welcome to the Admin Portal</h1>
           <p className="ks-hero-subtitle">
             Manage your user profiles, track referrals, and monitor match activities effortlessly.
           </p>
+        </div>
+        {/* Scroll Indicator */}
+        <div className="ks-scroll-indicator">
+          <ChevronDown size={32} strokeWidth={2.5} />
         </div>
       </div>
 
@@ -182,7 +181,7 @@ const AdminDashboard = () => {
             <p className="ks-subtitle">Welcome back, {adminName}. Here is what's happening.</p>
           </div>
           <div className="ks-date-pill">
-            {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+            {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase()}
           </div>
         </header>
 
