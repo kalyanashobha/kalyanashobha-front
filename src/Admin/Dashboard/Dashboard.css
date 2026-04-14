@@ -3,23 +3,26 @@
 /* --- MAIN LAYOUT --- */
 .ks-dashboard-container {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #f8fafc; /* Professional subtle gray background */
+  background-color: #f8fafc; 
   min-height: 100vh;
   color: #0f172a;
   box-sizing: border-box;
-  padding: 0; /* Removed padding so hero image can span full width */
+  padding: 24px; /* Default desktop padding around everything */
 }
 
-/* --- HERO SECTION --- */
+/* --- HERO SECTION (DESKTOP/LAPTOP DEFAULT) --- */
 .ks-hero-section {
   position: relative;
   width: 100%;
   height: 380px; 
+  border-radius: 20px; /* Rounded corners strictly for large screens */
   display: flex;
-  align-items: flex-end;
+  align-items: center; /* Centered vertically on desktop */
   justify-content: center;
   text-align: center;
   overflow: hidden;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
 }
 
 .ks-hero-image {
@@ -29,49 +32,67 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 20%; /* Focus on faces */
+  object-position: center 20%; 
   z-index: 1;
 }
 
-/* Bottom fade effect blending into the dashboard background */
-.ks-hero-section::after {
-  content: '';
+/* Gradient overlay ensures text is ALWAYS readable over the dark image */
+.ks-hero-overlay {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 60%;
-  background: linear-gradient(to top, #f8fafc 15%, transparent 100%);
+  inset: 0;
   z-index: 2;
+  background: linear-gradient(to top, rgba(248, 250, 252, 0.95) 0%, rgba(248, 250, 252, 0.4) 40%, transparent 100%),
+              radial-gradient(circle at center, rgba(255, 255, 255, 0.6) 0%, transparent 60%);
 }
 
 .ks-hero-content {
   position: relative;
   z-index: 3;
-  padding: 0 24px 32px;
+  padding: 0 24px;
   max-width: 800px;
+  margin-top: 40px; /* Push down slightly towards center-bottom */
 }
 
 .ks-hero-title {
-  font-family: 'Playfair Display', serif; /* Elegant serif font matching the screenshot */
-  font-size: 36px;
+  font-family: 'Playfair Display', serif; 
+  font-size: 38px;
   font-weight: 700;
-  color: #1e293b;
+  color: #0f172a;
   margin-bottom: 12px;
   letter-spacing: -0.5px;
+  /* Text shadow adds a bright white glow around text making it highly visible */
+  text-shadow: 0 0 15px rgba(255, 255, 255, 1), 0 0 30px rgba(255, 255, 255, 0.8);
 }
 
 .ks-hero-subtitle {
   font-size: 16px;
-  color: #475569;
+  color: #334155;
   line-height: 1.5;
   font-weight: 500;
   margin: 0;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 1);
 }
 
-/* --- DASHBOARD CONTENT PADDING --- */
+/* --- SCROLL DOWN INDICATOR --- */
+.ks-scroll-indicator {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  color: #1e293b;
+  opacity: 0.7;
+  animation: ks-bounce 2s infinite;
+}
+
+@keyframes ks-bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+  40% { transform: translateY(-10px) translateX(-50%); }
+  60% { transform: translateY(-5px) translateX(-50%); }
+}
+
+/* --- DASHBOARD CONTENT ALIGNMENT --- */
 .ks-dashboard-content {
-  padding: 0 32px 32px 32px; /* Restored padding for the inner content */
   max-width: 1440px;
   margin: 0 auto;
 }
@@ -257,13 +278,23 @@
   }
 }
 
-@media (max-width: 600px) {
+/* --- MOBILE SPECIFIC (IMAGE 2 TARGET) --- */
+@media (max-width: 768px) {
+  .ks-dashboard-container {
+    padding: 0; /* Remove padding entirely to allow FULL WIDTH bleeding */
+  }
+
   .ks-hero-section {
-    height: 300px;
+    height: 400px;
+    border-radius: 0; /* Ensures full width without borders on mobile */
+    margin-bottom: 24px;
+    align-items: flex-end; /* Push text down just above scroll indicator */
+    padding-bottom: 50px;
+    box-shadow: none;
   }
   
   .ks-hero-title {
-    font-size: 26px;
+    font-size: 28px;
   }
 
   .ks-hero-subtitle {
@@ -271,7 +302,7 @@
   }
 
   .ks-dashboard-content {
-    padding: 16px;
+    padding: 0 16px 24px 16px; /* Return padding to the actual dashboard data */
   }
 
   .ks-page-header {
