@@ -150,11 +150,6 @@
     animation: scroll-testimonials 40s linear infinite; 
 }
 
-/* Pause the animation when the user hovers over it to read/play video */
-.story-testimonials-track:hover {
-    animation-play-state: paused;
-}
-
 /* Static layout if it's still loading the skeletons */
 .story-testimonials-track.is-loading {
     animation: none;
