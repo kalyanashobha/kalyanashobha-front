@@ -8,30 +8,30 @@ import {
 } from 'react-icons/fi';
 
 const TrustSlider = () => {
-  // 22 Unique trust and security features
+  // 22 Unique trust and security features with individual icon colors
   const trustFeatures = [
-    { text: "100% Verified", icon: <FiUserCheck /> },
-    { text: "Email Auth", icon: <FiMail /> },
-    { text: "Strict Privacy", icon: <FiLock /> },
-    { text: "Data Encryption", icon: <FiShield /> },
-    { text: "RM Support", icon: <FiUsers /> },
-    { text: "Manual Screening", icon: <FiSearch /> },
-    { text: "Anti-Spam", icon: <FiSlash /> },
-    { text: "Photo Privacy", icon: <FiImage /> },
-    { text: "24/7 Support", icon: <FiHeadphones /> },
-    { text: "Fraud Detection", icon: <FiAlertCircle /> },
-    { text: "Secure Messaging", icon: <FiMessageSquare /> },
-    { text: "Identity Protection", icon: <FiUserMinus /> },
-    { text: "Guidelines", icon: <FiBookOpen /> },
-    { text: "Confidential", icon: <FiHeart /> },
-    { text: "SSL Certified", icon: <FiKey /> },
-    { text: "Transparent", icon: <FiFileText /> },
-    { text: "Block & Report", icon: <FiXOctagon /> },
-    { text: "Trusted Platform", icon: <FiAward /> },
-    { text: "Security Audits", icon: <FiActivity /> },
-    { text: "Secure OTPs", icon: <FiInbox /> },
-    { text: "Ad-Free", icon: <FiMonitor /> },
-    { text: "Safe Browsing", icon: <FiCheckCircle /> },
+    { text: "100% Verified", icon: <FiUserCheck />, color: "#4285F4" }, // Blue
+    { text: "Email Auth", icon: <FiMail />, color: "#EA4335" }, // Red
+    { text: "Strict Privacy", icon: <FiLock />, color: "#FBBC04" }, // Yellow
+    { text: "Data Encryption", icon: <FiShield />, color: "#34A853" }, // Green
+    { text: "RM Support", icon: <FiUsers />, color: "#8E24AA" }, // Purple
+    { text: "Manual Screening", icon: <FiSearch />, color: "#FF6D00" }, // Orange
+    { text: "Anti-Spam", icon: <FiSlash />, color: "#E91E63" }, // Pink
+    { text: "Photo Privacy", icon: <FiImage />, color: "#00ACC1" }, // Cyan
+    { text: "24/7 Support", icon: <FiHeadphones />, color: "#3949AB" }, // Indigo
+    { text: "Fraud Detection", icon: <FiAlertCircle />, color: "#D81B60" }, // Deep Pink
+    { text: "Secure Messaging", icon: <FiMessageSquare />, color: "#00897B" }, // Teal
+    { text: "Identity Protection", icon: <FiUserMinus />, color: "#5E35B1" }, // Deep Purple
+    { text: "Guidelines", icon: <FiBookOpen />, color: "#F4511E" }, // Deep Orange
+    { text: "Confidential", icon: <FiHeart />, color: "#E53935" }, // Red
+    { text: "SSL Certified", icon: <FiKey />, color: "#FDD835" }, // Yellow
+    { text: "Transparent", icon: <FiFileText />, color: "#43A047" }, // Green
+    { text: "Block & Report", icon: <FiXOctagon />, color: "#D32F2F" }, // Dark Red
+    { text: "Trusted Platform", icon: <FiAward />, color: "#1E88E5" }, // Blue
+    { text: "Security Audits", icon: <FiActivity />, color: "#8E24AA" }, // Purple
+    { text: "Secure OTPs", icon: <FiInbox />, color: "#00ACC1" }, // Cyan
+    { text: "Ad-Free", icon: <FiMonitor />, color: "#7CB342" }, // Light Green
+    { text: "Safe Browsing", icon: <FiCheckCircle />, color: "#039BE5" }, // Light Blue
   ];
 
   return (
@@ -39,7 +39,7 @@ const TrustSlider = () => {
       <style>{`
         .trust-slider-section {
           padding: 80px 20px;
-          background-color: #fdfdfd; /* Very subtle off-white to match the screenshot */
+          background-color: #fdfdfd;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -66,7 +66,6 @@ const TrustSlider = () => {
           position: relative;
         }
 
-        /* Stronger fade effect on the left and right edges */
         .slider-container::before,
         .slider-container::after {
           content: "";
@@ -90,24 +89,26 @@ const TrustSlider = () => {
 
         .slide-track {
           display: flex;
-          gap: 60px; /* Wider gap to look like distinct logos */
+          gap: 60px;
           width: max-content;
-          animation: scrollTrack 35s linear infinite;
+          /* Increased time from 35s to 80s for slower movement */
+          animation: scrollTrack 80s linear infinite;
+          /* Force hardware acceleration for smoother scrolling */
+          will-change: transform;
         }
 
-        /* Minimalist "logo" style items without boxes */
         .slide-item {
           display: flex;
           align-items: center;
           gap: 12px;
           white-space: nowrap;
-          opacity: 0.65; /* Slightly faded to look like inactive logos */
+          opacity: 0.65;
           transition: opacity 0.3s ease, transform 0.3s ease;
           cursor: default;
         }
 
         .slide-item:hover {
-          opacity: 1; /* Highlights when hovered */
+          opacity: 1;
           transform: scale(1.02);
         }
 
@@ -115,23 +116,23 @@ const TrustSlider = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #111111; /* Dark icon */
           font-size: 1.6rem;
+          /* Color is now applied via inline styles in the map function */
         }
 
         .slide-text {
           font-size: 1.4rem;
-          color: #111111; /* Dark bold text */
-          font-weight: 800; /* Extra bold to look like a brand mark */
+          color: #111111;
+          font-weight: 800;
           letter-spacing: -0.5px;
         }
 
+        /* Used translate3d instead of translateX to prevent jittering */
         @keyframes scrollTrack {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(calc(-50% - 30px)); }
+          0% { transform: translate3d(0, 0, 0); }
+          100% { transform: translate3d(calc(-50% - 30px), 0, 0); }
         }
 
-        /* Responsive Adjustments */
         @media (max-width: 768px) {
           .trust-slider-section {
             padding: 50px 15px;
@@ -157,10 +158,12 @@ const TrustSlider = () => {
 
       <div className="slider-container">
         <div className="slide-track">
-          {/* Duplicated array for seamless infinite scrolling */}
           {[...trustFeatures, ...trustFeatures].map((feature, index) => (
             <div className="slide-item" key={index}>
-              <div className="slide-icon">{feature.icon}</div>
+              {/* Added the inline style for color here */}
+              <div className="slide-icon" style={{ color: feature.color }}>
+                {feature.icon}
+              </div>
               <span className="slide-text">{feature.text}</span>
             </div>
           ))}
