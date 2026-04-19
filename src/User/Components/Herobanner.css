@@ -28,6 +28,7 @@
   justify-content: flex-start; 
   align-items: center; 
   overflow: hidden;
+  padding-bottom: 50px; /* Added space so content doesn't hit the bottom slider */
 }
 
 /* =========================================
@@ -240,15 +241,98 @@
 }
 
 /* =========================================
-   6. MOBILE OPTIMIZATION
+   6. TRUSTED COMMUNITIES SLIDER
+   ========================================= */
+.premium-hero-community-slider {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 55px;
+  background: rgba(3, 3, 3, 0.6); /* Glassy dark background */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  z-index: 20; 
+}
+
+/* Fading Gradients on Edges to blend into black */
+.premium-hero-community-slider::before,
+.premium-hero-community-slider::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 80px;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+.premium-hero-community-slider::before {
+  left: 0;
+  background: linear-gradient(to right, var(--premium-hero-black) 0%, rgba(3,3,3,0) 100%);
+}
+.premium-hero-community-slider::after {
+  right: 0;
+  background: linear-gradient(to left, var(--premium-hero-black) 0%, rgba(3,3,3,0) 100%);
+}
+
+.community-slider-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: heroCommunityScroll 40s linear infinite;
+}
+
+.community-slider-track:hover {
+  animation-play-state: paused;
+}
+
+.community-slide-item {
+  display: flex;
+  align-items: center;
+  padding-right: 40px; /* Spacing between the items */
+  cursor: default;
+}
+
+.community-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5); /* Muted white text */
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+
+.community-slide-item:hover .community-name {
+  color: #BF953F; /* Highlights to gold on hover */
+}
+
+.community-separator {
+  color: rgba(191, 149, 63, 0.5); /* Dim gold star separator */
+  font-size: 0.6rem;
+  margin-left: 40px; /* Space between name and star */
+}
+
+@keyframes heroCommunityScroll {
+  0% { transform: translateX(0); }
+  /* Shifts exactly half the track width (one complete set of the array) */
+  100% { transform: translateX(-50%); } 
+}
+
+/* =========================================
+   7. MOBILE OPTIMIZATION
    ========================================= */
 @media screen and (max-width: 900px) {
-  
+
   .premium-hero-container {
     height: 90vh; 
     align-items: flex-end; 
     justify-content: center;
-    padding-bottom: 60px; 
+    padding-bottom: 90px; /* Increased bottom padding for mobile so text isn't hidden by slider */
   }
 
   .premium-hero-background-img {
@@ -270,36 +354,35 @@
     align-items: center;
     text-align: center;
     padding: 0 20px;
-    width: 100%; /* FIX: Ensure container spans full screen width */
+    width: 100%; 
   }
 
   .premium-hero-title {
     font-size: clamp(3rem, 10vw, 4rem);
     text-shadow: 0 4px 20px rgba(0,0,0,0.9);
-    width: 100%; /* FIX: Force H1 to take full width for true centering */
+    width: 100%; 
     text-align: center;
   }
 
   .premium-hero-text-mask { 
-    display: flex; /* FIX: Flex centering controls animated blocks perfectly */
+    display: flex; 
     justify-content: center; 
   }
 
   .premium-hero-gold-text {
-    padding-right: 0; /* FIX: Remove the right-heavy padding */
-    padding: 0 5px;   /* Add tiny symmetrical padding to prevent italic clipping */
+    padding-right: 0; 
+    padding: 0 5px;   
   }
 
   .premium-hero-subtitle {
     font-size: 1rem;
     margin-top: 15px;
     max-width: 90%;
-    text-align: center; /* Ensure subtitle follows suit */
+    text-align: center; 
   }
 
   .premium-hero-desktop-break { display: none; }
 
-  /* FIX: Ensure the button wrapper centers the link inside it */
   .premium-hero-action-wrapper {
     display: flex;
     justify-content: center;
@@ -307,15 +390,24 @@
   }
 
   .premium-hero-glass-btn {
-    width: auto; /* Kept pill shape */
+    width: auto; 
     justify-content: center;
     padding: 16px 40px;
     background: rgba(0,0,0,0.4);
   }
+
+  /* Slider adjustments for mobile */
+  .premium-hero-community-slider {
+    height: 45px;
+  }
+  
+  .community-name {
+    font-size: 0.7rem; /* Slightly smaller text */
+  }
 }
 
 /* =========================================
-   7. DESKTOP PERFECT ALIGNMENT FIX 
+   8. DESKTOP PERFECT ALIGNMENT FIX 
    ========================================= */
 @media screen and (min-width: 901px) {
   .premium-hero-container {
