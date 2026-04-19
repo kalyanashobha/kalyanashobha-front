@@ -11,6 +11,8 @@ import Refund from "./User/Components/Refund";
 import AboutUs from "./User/Components/About";
 import Testimonials from "./User/Components/Testimonials.jsx";
 import ProcessFlow from "./User/Components/ProcessFlow.jsx";
+import TrustSlider from "./User/Components/TrustSlider.jsx";
+
 import Registration from "./User/Pages/Registration/Registration.jsx";
 import Login from "./User/Pages/Login/Login.jsx";
 import HelpCenter from "./User/Pages/HelpCenter/HelpCenter.jsx";
@@ -136,6 +138,7 @@ function App() {
               <Navbar />
               <Herobanner />
               <ProcessFlow />
+<TrustSlider/>
               <AboutUs/>
               <Testimonials/>
               <Footer />
