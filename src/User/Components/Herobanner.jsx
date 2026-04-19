@@ -3,9 +3,16 @@ import './Herobanner.css';
 import { Link } from "react-router-dom";
 
 const HeroBanner = () => {
+  // Array of top communities for the slider
+  const communities = [
+    "Reddy", "Kamma", "Brahmin", "Kapu", "Vysya", "Velama", 
+    "Padmashali", "Yadav", "Goud", "Mudiraj", "Munnuru Kapu", 
+    "Rajus", "Balija", "Naidu", "Gowda"
+  ];
+
   return (
     <div className="premium-hero-container">
-      
+
       {/* 1. TEXTURE & BACKGROUND */}
       <div className="premium-hero-texture-grain"></div>
 
@@ -58,8 +65,22 @@ const HeroBanner = () => {
             </button>
           </Link>
         </div>
-        
+
       </div>
+
+      {/* 5. TRUSTED COMMUNITIES SLIDER (Bottom Banner) */}
+      <div className="premium-hero-community-slider premium-hero-fade-in premium-hero-delay-4">
+        <div className="community-slider-track">
+          {/* Duplicated array for seamless infinite scrolling */}
+          {[...communities, ...communities].map((community, index) => (
+            <div className="community-slide-item" key={index}>
+              <span className="community-name">{community}</span>
+              <span className="community-separator">✦</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
     </div>
   );
 };
