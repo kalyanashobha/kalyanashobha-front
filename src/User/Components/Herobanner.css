@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,500;1,600&family=Poppins:wght@200;300;400;500&display=swap');
 
 :root {
+  /* UPGRADE: A true luxury gold foil gradient */
   --premium-hero-gold-gradient: linear-gradient(
     to right, 
     #BF953F, 
@@ -9,8 +10,8 @@
     #FBF5B7, 
     #AA771C
   );
-  --premium-hero-black: #030303; 
-  --premium-hero-white: #FAFAFA; 
+  --premium-hero-black: #030303; /* Slightly deeper than #050505 */
+  --premium-hero-white: #FAFAFA; /* Off-white reduces eye strain and looks more elegant */
   --premium-hero-nav-height: 80px; 
 }
 
@@ -36,7 +37,7 @@
   position: absolute;
   top: 0; left: 0; width: 100%; height: 100%;
   z-index: 2;
-  opacity: 0.03; 
+  opacity: 0.03; /* UPGRADE: Reduced slightly for subtlety */
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
@@ -45,7 +46,7 @@
   position: absolute;
   top: 0; left: 0; width: 100%; height: 100%;
   z-index: 3;
-  opacity: 0.4; 
+  opacity: 0.4; /* UPGRADE: Less overpowering, lets the couple be the focus */
   pointer-events: none;
 }
 
@@ -53,7 +54,7 @@
   width: 1px; height: 1px;
   background: transparent;
   box-shadow: 10vw 20vh #fff, 30vw 80vh #fff, 80vw 10vh #fff, 50vw 50vh #fff;
-  animation: premiumHeroStarFloat 150s linear infinite; 
+  animation: premiumHeroStarFloat 150s linear infinite; /* UPGRADE: Slower movement */
 }
 
 .premium-hero-stars-md {
@@ -95,6 +96,7 @@
   opacity: 1; 
 }
 
+/* UPGRADE: Smoother gradient stops to prevent banding */
 .premium-hero-overlay-gradient {
   position: absolute;
   top: 0; left: 0; width: 100%; height: 100%;
@@ -126,10 +128,10 @@
 
 .premium-hero-title {
   font-family: 'Cormorant Garamond', serif;
-  font-weight: 500; 
+  font-weight: 500; /* UPGRADE: Dropped to 500 for a more elegant, high-fashion serif */
   margin: 0;
   line-height: 1.05;
-  font-size: clamp(3.5rem, 7vw, 6.5rem); 
+  font-size: clamp(3.5rem, 7vw, 6.5rem); /* Slightly larger scaling */
   color: var(--premium-hero-white);
   letter-spacing: -0.03em;
   text-shadow: 0 10px 30px rgba(0,0,0,0.8);
@@ -141,6 +143,7 @@
   display: block;
   transform: translateY(110%);
   opacity: 0;
+  /* UPGRADE: Ultra-smooth easing curve mimicking Apple/luxury sites */
   animation: premiumHeroSlideUp 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
@@ -152,6 +155,7 @@
   color: transparent;
   font-style: italic;
   padding-right: 15px;
+  /* UPGRADE: Shimmering gold animation */
   animation: premiumHeroSlideUp 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards, premiumHeroGoldShimmer 6s linear infinite;
 }
 
@@ -188,7 +192,7 @@
 .premium-hero-action-wrapper {
   margin-top: 45px;
   opacity: 0;
-  transform: translateY(15px); 
+  transform: translateY(15px); /* UPGRADE: Slight upward float on fade in */
   animation: premiumHeroFadeIn 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
@@ -223,119 +227,20 @@
   line-height: 0;
 }
 
+/* UPGRADE: Elegant Hover State */
 .premium-hero-glass-btn:hover {
   background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(191, 149, 63, 0.6); 
+  border-color: rgba(191, 149, 63, 0.6); /* Gold border reveal */
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 0 15px rgba(191, 149, 63, 0.1);
   transform: translateY(-2px);
 }
 
 .premium-hero-glass-btn:hover .premium-hero-btn-arrow {
-  transform: translateX(5px); 
+  transform: translateX(5px); /* Arrow slides right gracefully */
 }
 
 /* =========================================
-   6. TRUSTED COMMUNITIES SLIDER
-   ========================================= */
-.premium-hero-slider-wrapper {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  z-index: 20; 
-  padding: 25px 0;
-  background: linear-gradient(to top, rgba(3,3,3,0.9) 0%, rgba(3,3,3,0.5) 60%, rgba(3,3,3,0) 100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.premium-hero-slider-header {
-  margin-bottom: 12px;
-}
-
-.premium-hero-slider-header p {
-  color: rgba(255, 255, 255, 0.5);
-  font-family: 'Poppins', sans-serif;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  margin: 0;
-  font-weight: 300;
-}
-
-.premium-hero-slider-container {
-  width: 100%;
-  max-width: 1400px;
-  overflow: hidden;
-  position: relative;
-}
-
-/* Seamless blend into the dark background */
-.premium-hero-slider-container::before,
-.premium-hero-slider-container::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  width: 150px;
-  height: 100%;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.premium-hero-slider-container::before {
-  left: 0;
-  background: linear-gradient(to right, rgba(3,3,3,0.9) 0%, rgba(3,3,3,0) 100%);
-}
-
-.premium-hero-slider-container::after {
-  right: 0;
-  background: linear-gradient(to left, rgba(3,3,3,0.9) 0%, rgba(3,3,3,0) 100%);
-}
-
-.premium-hero-slide-track {
-  display: flex;
-  gap: 50px; 
-  width: max-content;
-  animation: premiumScrollTrack 40s linear infinite;
-}
-
-.premium-hero-slide-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  white-space: nowrap;
-  opacity: 0.4; 
-  transition: opacity 0.4s ease, transform 0.4s ease;
-  cursor: default;
-}
-
-.premium-hero-slide-item:hover {
-  opacity: 1; 
-  transform: scale(1.05);
-}
-
-.premium-hero-slide-icon {
-  color: #BF953F;
-  font-size: 0.9rem;
-  opacity: 0.8;
-}
-
-.premium-hero-slide-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.4rem;
-  color: var(--premium-hero-white);
-  font-weight: 400;
-  letter-spacing: 0.03em;
-}
-
-@keyframes premiumScrollTrack {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(calc(-50% - 25px)); }
-}
-
-/* =========================================
-   7. MOBILE OPTIMIZATION
+   6. MOBILE OPTIMIZATION
    ========================================= */
 @media screen and (max-width: 900px) {
 
@@ -343,7 +248,7 @@
     height: 90vh; 
     align-items: flex-end; 
     justify-content: center;
-    padding-bottom: 110px; /* Added padding so content doesn't overlap with the bottom slider */
+    padding-bottom: 60px; 
   }
 
   .premium-hero-background-img {
@@ -365,35 +270,36 @@
     align-items: center;
     text-align: center;
     padding: 0 20px;
-    width: 100%; 
+    width: 100%; /* FIX: Ensure container spans full screen width */
   }
 
   .premium-hero-title {
     font-size: clamp(3rem, 10vw, 4rem);
     text-shadow: 0 4px 20px rgba(0,0,0,0.9);
-    width: 100%; 
+    width: 100%; /* FIX: Force H1 to take full width for true centering */
     text-align: center;
   }
 
   .premium-hero-text-mask { 
-    display: flex; 
+    display: flex; /* FIX: Flex centering controls animated blocks perfectly */
     justify-content: center; 
   }
 
   .premium-hero-gold-text {
-    padding-right: 0; 
-    padding: 0 5px;   
+    padding-right: 0; /* FIX: Remove the right-heavy padding */
+    padding: 0 5px;   /* Add tiny symmetrical padding to prevent italic clipping */
   }
 
   .premium-hero-subtitle {
     font-size: 1rem;
     margin-top: 15px;
     max-width: 90%;
-    text-align: center; 
+    text-align: center; /* Ensure subtitle follows suit */
   }
 
   .premium-hero-desktop-break { display: none; }
 
+  /* FIX: Ensure the button wrapper centers the link inside it */
   .premium-hero-action-wrapper {
     display: flex;
     justify-content: center;
@@ -401,38 +307,15 @@
   }
 
   .premium-hero-glass-btn {
-    width: auto; 
+    width: auto; /* Kept pill shape */
     justify-content: center;
     padding: 16px 40px;
     background: rgba(0,0,0,0.4);
   }
-
-  /* Mobile adjustments for Slider */
-  .premium-hero-slider-wrapper {
-    padding: 15px 0;
-    background: linear-gradient(to top, rgba(3,3,3,1) 0%, rgba(3,3,3,0.8) 70%, rgba(3,3,3,0) 100%);
-  }
-  
-  .premium-hero-slider-header p {
-    font-size: 0.65rem;
-  }
-
-  .premium-hero-slide-track {
-    gap: 30px;
-  }
-
-  .premium-hero-slide-text {
-    font-size: 1.2rem;
-  }
-
-  .premium-hero-slider-container::before,
-  .premium-hero-slider-container::after {
-    width: 60px;
-  }
 }
 
 /* =========================================
-   8. DESKTOP PERFECT ALIGNMENT FIX 
+   7. DESKTOP PERFECT ALIGNMENT FIX 
    ========================================= */
 @media screen and (min-width: 901px) {
   .premium-hero-container {
