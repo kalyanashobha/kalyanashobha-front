@@ -3,11 +3,11 @@ import './Herobanner.css';
 import { Link } from "react-router-dom";
 
 const HeroBanner = () => {
-  // Array of top communities for the slider
+  // Premium community list to populate the slider
   const communities = [
-    "Reddy", "Kamma", "Brahmin", "Kapu", "Vysya", "Velama", 
-    "Padmashali", "Yadav", "Goud", "Mudiraj", "Munnuru Kapu", 
-    "Rajus", "Balija", "Naidu", "Gowda"
+    "Reddy", "Kamma", "Brahmin", "Kapu", "Arya Vysya", 
+    "Padmashali", "Goud", "Yadav", "Mudiraj", "Velama", 
+    "Munnuru Kapu", "Madiga", "Mala", "Gowda", "Naidu"
   ];
 
   return (
@@ -16,13 +16,13 @@ const HeroBanner = () => {
       {/* 1. TEXTURE & BACKGROUND */}
       <div className="premium-hero-texture-grain"></div>
 
-      {/* 2. MOVING STAR FIELD (Opacity reduced for elegance) */}
+      {/* 2. MOVING STAR FIELD */}
       <div className="premium-hero-star-layer">
         <div className="premium-hero-stars-sm"></div>
         <div className="premium-hero-stars-md"></div>
       </div>
 
-      {/* 3. BACKGROUND IMAGE (Cinematic Zoom Added) */}
+      {/* 3. BACKGROUND IMAGE */}
       <div className="premium-hero-image-wrapper">
         <picture>
           <source media="(max-width: 900px)" srcSet="/kalayanashobha11.png" />
@@ -37,7 +37,6 @@ const HeroBanner = () => {
 
       {/* 4. CONTENT LAYER */}
       <div className="premium-hero-content">
-
         {/* Main Title */}
         <h1 className="premium-hero-title">
           <div className="premium-hero-text-mask">
@@ -65,19 +64,24 @@ const HeroBanner = () => {
             </button>
           </Link>
         </div>
-
       </div>
 
-      {/* 5. TRUSTED COMMUNITIES SLIDER (Bottom Banner) */}
-      <div className="premium-hero-community-slider premium-hero-fade-in premium-hero-delay-4">
-        <div className="community-slider-track">
-          {/* Duplicated array for seamless infinite scrolling */}
-          {[...communities, ...communities].map((community, index) => (
-            <div className="community-slide-item" key={index}>
-              <span className="community-name">{community}</span>
-              <span className="community-separator">✦</span>
-            </div>
-          ))}
+      {/* 5. TRUSTED COMMUNITIES SLIDER */}
+      <div className="premium-hero-slider-wrapper">
+        <div className="premium-hero-slider-header">
+          <p>Trusted by thousands across communities</p>
+        </div>
+
+        <div className="premium-hero-slider-container">
+          <div className="premium-hero-slide-track">
+            {/* Duplicated array for seamless infinite scrolling */}
+            {[...communities, ...communities].map((community, index) => (
+              <div className="premium-hero-slide-item" key={index}>
+                <span className="premium-hero-slide-icon">✦</span>
+                <span className="premium-hero-slide-text">{community}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
