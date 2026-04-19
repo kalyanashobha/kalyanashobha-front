@@ -3,15 +3,14 @@
 ========================================= */
 .story-testimonials-section {
     position: relative;
-    padding: 100px 20px;
-    background-color: #FAFAFA; /* Extremely crisp off-white */
+    padding: 100px 0; /* Removed side padding so the slider can touch edges */
+    background-color: #FAFAFA; 
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     overflow: hidden;
     z-index: 1;
-    margin-top:30px;
+    margin-top: 30px;
 }
 
-/* Subtle architectural grid pattern */
 .story-test-bg-grid {
     position: absolute;
     inset: 0;
@@ -24,7 +23,6 @@
     -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
 }
 
-/* Floating ambient glows */
 .story-test-glow {
     position: absolute;
     width: 600px;
@@ -49,7 +47,7 @@
 }
 
 .story-test-container {
-    max-width: 1280px;
+    max-width: 100%; /* Changed from 1280px to full width for the slider */
     margin: 0 auto;
     position: relative;
     z-index: 10;
@@ -60,11 +58,11 @@
 ========================================= */
 .story-test-header {
     text-align: center;
-    margin-bottom: 70px;
+    margin-bottom: 50px;
+    padding: 0 20px; /* Keep header padded so it doesn't touch screen edges */
     animation: story-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Glassmorphism Badge */
 .story-test-badge {
     display: inline-flex;
     align-items: center;
@@ -92,7 +90,6 @@
     line-height: 1.1;
 }
 
-/* Stripe-inspired text gradient */
 .story-text-gradient {
     background: linear-gradient(135deg, #E53935 0%, #F59E0B 100%);
     -webkit-background-clip: text;
@@ -114,18 +111,61 @@
 }
 
 /* =========================================
-   Grid & Premium Card Layout
+   Infinite Slider Layout (Replaces Grid)
 ========================================= */
-.story-testimonials-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+.story-slider-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    padding: 20px 0 40px 0; /* Padding for hover shadows */
+}
+
+/* Fading gradients on the left and right edges */
+.story-slider-container::before,
+.story-slider-container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 150px;
+    height: 100%;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.story-slider-container::before {
+    left: 0;
+    background: linear-gradient(to right, #FAFAFA 0%, rgba(250, 250, 250, 0) 100%);
+}
+
+.story-slider-container::after {
+    right: 0;
+    background: linear-gradient(to left, #FAFAFA 0%, rgba(250, 250, 250, 0) 100%);
+}
+
+.story-testimonials-track {
+    display: flex;
     gap: 32px;
+    width: max-content;
+    /* 40 seconds for a full loop, adjust timing if it's too fast/slow */
+    animation: scroll-testimonials 40s linear infinite; 
+}
+
+/* Pause the animation when the user hovers over it to read/play video */
+.story-testimonials-track:hover {
+    animation-play-state: paused;
+}
+
+/* Static layout if it's still loading the skeletons */
+.story-testimonials-track.is-loading {
+    animation: none;
+    width: 100%;
+    justify-content: center;
+    overflow: hidden;
 }
 
 .story-testimonial-card {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: story-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    width: 380px; /* Fixed width so they don't squish */
+    flex-shrink: 0; /* Prevents flexbox from shrinking the cards */
 }
 
 .story-card-inner {
@@ -134,7 +174,6 @@
     -webkit-backdrop-filter: blur(12px);
     border-radius: 24px;
     overflow: hidden;
-    /* Stripe's famous ultra-soft layered box-shadow */
     box-shadow: 
         0 4px 6px -1px rgba(0, 0, 0, 0.05), 
         0 2px 4px -1px rgba(0, 0, 0, 0.03),
@@ -146,14 +185,19 @@
     flex-direction: column;
 }
 
-/* Lift and soft color-glow on hover */
-.story-testimonial-card:hover .story-card-inner {
+.story-card-inner:hover {
     transform: translateY(-6px);
     box-shadow: 
         0 20px 40px -10px rgba(183, 28, 28, 0.08), 
         0 10px 20px -5px rgba(0, 0, 0, 0.04),
         inset 0 0 0 1px rgba(255, 255, 255, 1);
     border: 1px solid rgba(183, 28, 28, 0.1);
+}
+
+@keyframes scroll-testimonials {
+    0% { transform: translateX(0); }
+    /* Shifts exactly half the track width minus half the gap */
+    100% { transform: translateX(calc(-50% - 16px)); }
 }
 
 /* =========================================
@@ -175,7 +219,7 @@
     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.story-testimonial-card:hover .story-test-media {
+.story-card-inner:hover .story-test-media {
     transform: scale(1.03); 
 }
 
@@ -194,7 +238,7 @@
     position: absolute;
     top: 32px;
     right: 32px;
-    color: #E5E7EB; /* Very faint quote mark */
+    color: #E5E7EB;
     z-index: 0;
 }
 
@@ -216,7 +260,6 @@
     z-index: 1;
 }
 
-/* Avatar Footer Layout */
 .story-testimonial-footer {
     display: flex;
     align-items: center;
@@ -261,7 +304,6 @@
    Skeleton Loading Animation
 ========================================= */
 .story-skeleton-card {
-    /* Ensures skeleton cards fade in immediately */
     animation: story-fade-up 0.3s ease-out forwards;
 }
 
@@ -269,13 +311,8 @@
 .story-skeleton-stars,
 .story-skeleton-line,
 .story-skeleton-avatar {
-    background: #E4E4E7; /* Light gray base */
-    background: linear-gradient(
-        90deg,
-        #E4E4E7 0%,
-        #F4F4F5 50%,
-        #E4E4E7 100%
-    );
+    background: #E4E4E7;
+    background: linear-gradient(90deg, #E4E4E7 0%, #F4F4F5 50%, #E4E4E7 100%);
     background-size: 200% 100%;
     animation: story-skeleton-shimmer 1.5s infinite linear;
 }
@@ -341,14 +378,8 @@
    Animations
 ========================================= */
 @keyframes story-fade-up {
-    0% {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
 }
 
 /* =========================================
@@ -356,19 +387,28 @@
 ========================================= */
 @media (max-width: 768px) {
     .story-testimonials-section {
-        padding: 60px 16px;
+        padding: 60px 0;
     }
 
     .story-test-title {
         font-size: 2.5rem;
     }
-    
+
     .story-mobile-break {
         display: block;
     }
 
     .story-test-subtitle {
         font-size: 1.05rem;
+    }
+
+    .story-slider-container::before,
+    .story-slider-container::after {
+        width: 50px; /* Smaller gradient fade on mobile */
+    }
+
+    .story-testimonial-card {
+        width: 300px; /* Slightly smaller cards on mobile */
     }
 
     .story-test-media-wrapper {
@@ -378,7 +418,7 @@
     .story-testimonial-content {
         padding: 24px;
     }
-    
+
     .story-test-glow {
         width: 300px;
         height: 300px;
