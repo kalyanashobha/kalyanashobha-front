@@ -1,346 +1,426 @@
 /* =========================================
-   Base Layout & Typography
+   Base Layout & Vercel/Stripe Background
 ========================================= */
-.premium-testimonials-section {
+.story-testimonials-section {
     position: relative;
-    padding: 120px 0;
-    background-color: #FFFFFF; /* Clean white background */
-    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    padding: 100px 0; /* Removed side padding so the slider can touch edges */
+    background-color: #FAFAFA; 
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     overflow: hidden;
+    z-index: 1;
+    margin-top: 30px;
 }
 
-.premium-test-container {
-    max-width: 100%;
+.story-test-bg-grid {
+    position: absolute;
+    inset: 0;
+    background-size: 40px 40px;
+    background-image: 
+        linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+    z-index: -2;
+    mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+}
+
+.story-test-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.4;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.story-glow-left {
+    background: radial-gradient(circle, rgba(183,28,28,0.15) 0%, rgba(255,255,255,0) 70%);
+    top: -100px;
+    left: -200px;
+}
+
+.story-glow-right {
+    background: radial-gradient(circle, rgba(255,179,0,0.15) 0%, rgba(255,255,255,0) 70%);
+    bottom: -100px;
+    right: -200px;
+}
+
+.story-test-container {
+    max-width: 100%; /* Changed from 1280px to full width for the slider */
     margin: 0 auto;
     position: relative;
     z-index: 10;
 }
 
-/* Very subtle ambient glows for depth, not overwhelming */
-.premium-ambient-glow {
-    position: absolute;
-    width: 800px;
-    height: 800px;
-    border-radius: 50%;
-    filter: blur(150px);
-    opacity: 0.15;
-    z-index: 1;
-    pointer-events: none;
-}
-.glow-left {
-    background: #e91e63; /* Soft matrimonial pink */
-    top: -200px;
-    left: -300px;
-}
-.glow-right {
-    background: #ffb300; /* Soft gold */
-    bottom: -200px;
-    right: -300px;
-}
-
 /* =========================================
-   High-End Header
+   Premium Header Styling
 ========================================= */
-.premium-header {
+.story-test-header {
     text-align: center;
-    margin-bottom: 70px;
-    padding: 0 20px;
+    margin-bottom: 50px;
+    padding: 0 20px; /* Keep header padded so it doesn't touch screen edges */
+    animation: story-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.premium-eyebrow {
-    display: inline-block;
-    font-size: 0.85rem;
+.story-test-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 16px;
+    background: rgba(255, 255, 255, 0.6);
+    color: #B71C1C;
+    border-radius: 9999px;
+    font-size: 0.8rem;
     font-weight: 600;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: #e91e63;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(183, 28, 28, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
-.premium-title {
-    font-size: 3.8rem;
+.story-test-title {
+    font-size: 3.5rem;
+    color: #0A0A0A;
     font-weight: 800;
-    color: #111111;
+    margin: 0 0 20px 0;
+    letter-spacing: -0.04em;
     line-height: 1.1;
-    margin: 0 0 24px 0;
-    letter-spacing: -0.03em;
 }
 
-.premium-gradient-text {
-    background: linear-gradient(135deg, #e91e63 0%, #ff8f00 100%);
+.story-text-gradient {
+    background: linear-gradient(135deg, #E53935 0%, #F59E0B 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
-.premium-subtitle {
-    font-size: 1.25rem;
-    color: #666666;
+.story-test-subtitle {
+    font-size: 1.15rem;
+    color: #52525B;
     max-width: 600px;
     margin: 0 auto;
     line-height: 1.6;
     font-weight: 400;
 }
 
+.story-mobile-break {
+    display: none;
+}
+
 /* =========================================
-   Borderless Slider Mechanism
+   Infinite Slider Layout (Replaces Grid)
 ========================================= */
-.premium-slider-viewport {
+.story-slider-container {
     width: 100%;
     overflow: hidden;
     position: relative;
-    padding: 20px 0 60px 0; /* Room for drop shadows */
-    z-index: 10;
+    padding: 20px 0 40px 0; /* Padding for hover shadows */
 }
 
-/* Heavy fading edges for the infinite illusion */
-.premium-slider-viewport::before,
-.premium-slider-viewport::after {
+/* Fading gradients on the left and right edges */
+.story-slider-container::before,
+.story-slider-container::after {
     content: "";
     position: absolute;
     top: 0;
-    width: 20vw;
+    width: 150px;
     height: 100%;
-    z-index: 20;
+    z-index: 5;
     pointer-events: none;
 }
-.premium-slider-viewport::before {
+
+.story-slider-container::before {
     left: 0;
-    background: linear-gradient(to right, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%);
+    background: linear-gradient(to right, #FAFAFA 0%, rgba(250, 250, 250, 0) 100%);
 }
-.premium-slider-viewport::after {
+
+.story-slider-container::after {
     right: 0;
-    background: linear-gradient(to left, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%);
+    background: linear-gradient(to left, #FAFAFA 0%, rgba(250, 250, 250, 0) 100%);
 }
 
-.premium-slider-track {
+.story-testimonials-track {
     display: flex;
-    gap: 48px; /* Wide gaps to emphasize independence of each item */
+    gap: 32px;
     width: max-content;
-    animation: premiumScroll 45s linear infinite;
-    padding: 0 48px;
+    /* 40 seconds for a full loop, adjust timing if it's too fast/slow */
+    animation: scroll-testimonials 40s linear infinite; 
 }
 
-.premium-slider-track:hover {
+/* Pause the animation when the user hovers over it to read/play video */
+.story-testimonials-track:hover {
     animation-play-state: paused;
 }
 
-.premium-slider-track.is-loading {
+/* Static layout if it's still loading the skeletons */
+.story-testimonials-track.is-loading {
     animation: none;
     width: 100%;
     justify-content: center;
+    overflow: hidden;
 }
 
-@keyframes premiumScroll {
+.story-testimonial-card {
+    width: 380px; /* Fixed width so they don't squish */
+    flex-shrink: 0; /* Prevents flexbox from shrinking the cards */
+}
+
+.story-card-inner {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.05), 
+        0 2px 4px -1px rgba(0, 0, 0, 0.03),
+        inset 0 0 0 1px rgba(255, 255, 255, 1);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.story-card-inner:hover {
+    transform: translateY(-6px);
+    box-shadow: 
+        0 20px 40px -10px rgba(183, 28, 28, 0.08), 
+        0 10px 20px -5px rgba(0, 0, 0, 0.04),
+        inset 0 0 0 1px rgba(255, 255, 255, 1);
+    border: 1px solid rgba(183, 28, 28, 0.1);
+}
+
+@keyframes scroll-testimonials {
     0% { transform: translateX(0); }
-    100% { transform: translateX(calc(-50% - 24px)); }
+    /* Shifts exactly half the track width minus half the gap */
+    100% { transform: translateX(calc(-50% - 16px)); }
 }
 
 /* =========================================
-   Editorial Story Item (NO CARDS)
+   Media Handling (Images & Videos)
 ========================================= */
-.premium-story-item {
-    width: 420px; /* Wider, more cinematic aspect */
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-    flex-shrink: 0;
-    cursor: default;
-    /* NO BACKGROUND, NO BORDER */
-}
-
-/* Elevated Image/Video container */
-.premium-media-wrapper {
+.story-test-media-wrapper {
     width: 100%;
-    height: 320px;
-    border-radius: 20px;
+    height: 220px;
+    background-color: #F4F4F5;
+    overflow: hidden;
     position: relative;
-    box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.15); /* Premium, deep shadow */
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease;
+    border-bottom: 1px solid rgba(0,0,0,0.03);
 }
 
-.premium-story-item:hover .premium-media-wrapper {
-    transform: translateY(-8px);
-    box-shadow: 0 32px 64px -12px rgba(233, 30, 99, 0.2);
-}
-
-.premium-media {
+.story-test-media {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 20px; /* Inherits the wrapper's radius */
-    background-color: #f8f8f8;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.premium-media.placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 4rem;
-    color: #ccc;
-    background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+.story-card-inner:hover .story-test-media {
+    transform: scale(1.03); 
 }
 
-/* Beautiful floating quote badge over the image */
-.premium-quote-badge {
-    position: absolute;
-    bottom: -20px;
-    right: 30px;
-    width: 48px;
-    height: 48px;
-    background: #111111;
-    color: #ffffff;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-    border: 4px solid #ffffff;
-}
-
-/* Clean text area beneath the image */
-.premium-story-content {
+/* =========================================
+   Card Content & Typography
+========================================= */
+.story-testimonial-content {
+    padding: 32px;
+    position: relative;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
-    padding: 0 10px; /* Slight indent so it aligns visually with the curved image */
 }
 
-.premium-stars {
+.story-quote-icon {
+    position: absolute;
+    top: 32px;
+    right: 32px;
+    color: #E5E7EB;
+    z-index: 0;
+}
+
+.story-stars {
     display: flex;
     gap: 4px;
     margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
 }
 
-.premium-quote-text {
-    font-size: 1.15rem;
+.story-testimonial-text {
+    color: #3F3F46;
+    font-size: 1rem;
     line-height: 1.7;
-    color: #222222;
-    font-weight: 400;
-    margin: 0 0 24px 0;
+    margin-bottom: 32px;
     flex-grow: 1;
-    /* Adding a slight italic for an editorial feel */
-    font-style: italic; 
+    position: relative;
+    z-index: 1;
 }
 
-/* Minimalist Avatar Footer */
-.premium-story-footer {
+.story-testimonial-footer {
     display: flex;
     align-items: center;
     gap: 16px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(0,0,0,0.04);
 }
 
-.premium-author-avatar {
-    width: 48px;
-    height: 48px;
+.story-author-avatar {
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    background: #fdf2f8; /* Soft pink */
-    color: #e91e63;
+    background: linear-gradient(135deg, #FEF2F2 0%, #FEF3C7 100%);
+    color: #B71C1C;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
     font-weight: 700;
+    font-size: 1.1rem;
+    border: 1px solid rgba(183, 28, 28, 0.1);
 }
 
-.premium-author-info {
+.story-author-details {
     display: flex;
     flex-direction: column;
-    gap: 4px;
 }
 
-.premium-author-name {
-    margin: 0;
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #111111;
-}
-
-.premium-verified {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.8rem;
+.story-testimonial-author {
+    color: #09090B;
     font-weight: 600;
-    color: #10b981; /* Emerald green */
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-size: 0.95rem;
+}
+
+.story-verified-badge {
+    color: #10B981;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 2px;
 }
 
 /* =========================================
-   Skeletons & Loading States
+   Skeleton Loading Animation
 ========================================= */
-.premium-skeleton-item .premium-media-wrapper {
-    box-shadow: none;
-    border: 1px solid #f0f0f0;
+.story-skeleton-card {
+    animation: story-fade-up 0.3s ease-out forwards;
 }
 
-.skeleton-shimmer {
-    background: #f6f7f8;
-    background-image: linear-gradient(
-        to right,
-        #f6f7f8 0%,
-        #edeef1 20%,
-        #f6f7f8 40%,
-        #f6f7f8 100%
-    );
-    background-repeat: no-repeat;
-    background-size: 800px 100%;
-    animation: shimmer 1.5s infinite linear forwards;
+.story-skeleton-media,
+.story-skeleton-stars,
+.story-skeleton-line,
+.story-skeleton-avatar {
+    background: #E4E4E7;
+    background: linear-gradient(90deg, #E4E4E7 0%, #F4F4F5 50%, #E4E4E7 100%);
+    background-size: 200% 100%;
+    animation: story-skeleton-shimmer 1.5s infinite linear;
 }
 
-.skeleton-line {
+@keyframes story-skeleton-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.story-skeleton-stars {
+    width: 80px;
     height: 14px;
-    margin-bottom: 12px;
-    border-radius: 8px;
+    border-radius: 4px;
+    margin-bottom: 20px;
 }
 
-.skeleton-avatar {
-    width: 48px;
-    height: 48px;
+.story-skeleton-text-block {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 32px;
+    flex-grow: 1;
+}
+
+.story-skeleton-line {
+    height: 12px;
+    border-radius: 4px;
+}
+
+.story-skeleton-avatar {
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
 }
 
-@keyframes shimmer {
-    0% { background-position: -400px 0; }
-    100% { background-position: 400px 0; }
+.story-skeleton-author-name {
+    width: 80%;
+    height: 14px;
+    margin-bottom: 6px;
+}
+
+.story-skeleton-badge {
+    width: 50%;
+    height: 10px;
 }
 
 /* =========================================
-   Error State
+   Error States
 ========================================= */
-.premium-error-msg {
+.story-test-error {
     text-align: center;
-    padding: 30px;
-    color: #d32f2f;
+    padding: 20px;
+    color: #DC2626;
+    background: #FEF2F2;
+    border: 1px solid #FCA5A5;
+    border-radius: 12px;
+    margin: 40px auto;
+    max-width: 500px;
     font-weight: 500;
 }
 
 /* =========================================
-   Responsive Tweaks
+   Animations
+========================================= */
+@keyframes story-fade-up {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   Responsive Design
 ========================================= */
 @media (max-width: 768px) {
-    .premium-testimonials-section {
-        padding: 80px 0;
-    }
-    
-    .premium-title {
-        font-size: 2.6rem;
-    }
-    
-    .premium-subtitle {
-        font-size: 1.05rem;
-    }
-    
-    .premium-story-item {
-        width: 320px; /* Smaller items for mobile */
+    .story-testimonials-section {
+        padding: 60px 0;
     }
 
-    .premium-media-wrapper {
-        height: 260px;
+    .story-test-title {
+        font-size: 2.5rem;
     }
-    
-    .premium-slider-viewport::before,
-    .premium-slider-viewport::after {
-        width: 10vw; /* Smaller fades on mobile */
+
+    .story-mobile-break {
+        display: block;
+    }
+
+    .story-test-subtitle {
+        font-size: 1.05rem;
+    }
+
+    .story-slider-container::before,
+    .story-slider-container::after {
+        width: 50px; /* Smaller gradient fade on mobile */
+    }
+
+    .story-testimonial-card {
+        width: 300px; /* Slightly smaller cards on mobile */
+    }
+
+    .story-test-media-wrapper {
+        height: 180px;
+    }
+
+    .story-testimonial-content {
+        padding: 24px;
+    }
+
+    .story-test-glow {
+        width: 300px;
+        height: 300px;
     }
 }
