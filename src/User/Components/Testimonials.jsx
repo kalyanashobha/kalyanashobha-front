@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Quote, Star, CheckCircle } from 'lucide-react';
+import { Quote, Star } from 'lucide-react';
 import './Testimonials.css'; 
 
 const Testimonials = () => {
@@ -28,20 +28,24 @@ const Testimonials = () => {
         fetchTestimonials();
     }, []);
 
-    // Premium Borderless Skeleton Loader
-    const SkeletonItem = () => (
-        <div className="premium-story-item premium-skeleton-item">
-            <div className="premium-media-wrapper skeleton-shimmer"></div>
-            <div className="premium-story-content">
-                <div className="skeleton-line skeleton-shimmer" style={{ width: '40px', marginBottom: '16px' }}></div>
-                <div className="skeleton-line skeleton-shimmer" style={{ width: '100%' }}></div>
-                <div className="skeleton-line skeleton-shimmer" style={{ width: '90%' }}></div>
-                <div className="skeleton-line skeleton-shimmer" style={{ width: '60%' }}></div>
-                <div className="premium-story-footer">
-                    <div className="skeleton-avatar skeleton-shimmer"></div>
-                    <div className="skeleton-author-details">
-                        <div className="skeleton-line skeleton-shimmer" style={{ width: '120px', height: '14px' }}></div>
-                        <div className="skeleton-line skeleton-shimmer" style={{ width: '80px', height: '10px' }}></div>
+    // Skeleton loader component
+    const SkeletonCard = () => (
+        <div className="story-testimonial-card story-skeleton-card">
+            <div className="story-card-inner">
+                <div className="story-test-media-wrapper story-skeleton-media"></div>
+                <div className="story-testimonial-content">
+                    <div className="story-skeleton-stars"></div>
+                    <div className="story-skeleton-text-block">
+                        <div className="story-skeleton-line" style={{ width: '90%' }}></div>
+                        <div className="story-skeleton-line" style={{ width: '100%' }}></div>
+                        <div className="story-skeleton-line" style={{ width: '75%' }}></div>
+                    </div>
+                    <div className="story-testimonial-footer">
+                        <div className="story-skeleton-avatar"></div>
+                        <div className="story-author-details" style={{ width: '60%' }}>
+                            <div className="story-skeleton-line story-skeleton-author-name"></div>
+                            <div className="story-skeleton-line story-skeleton-badge"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -49,7 +53,7 @@ const Testimonials = () => {
     );
 
     if (error) {
-        return <div className="premium-error-msg">{error}</div>;
+        return <div className="story-test-error">{error}</div>;
     }
 
     if (!isLoading && testimonials.length === 0) {
@@ -57,86 +61,84 @@ const Testimonials = () => {
     }
 
     return (
-        <section className="premium-testimonials-section">
-            {/* Minimalist Ambient Background */}
-            <div className="premium-ambient-glow glow-left"></div>
-            <div className="premium-ambient-glow glow-right"></div>
+        <section className="story-testimonials-section">
+            <div className="story-test-bg-grid"></div>
+            <div className="story-test-glow story-glow-left"></div>
+            <div className="story-test-glow story-glow-right"></div>
 
-            <div className="premium-test-container">
-                {/* High-End Typography Header */}
-                <div className="premium-header">
-                    <span className="premium-eyebrow">Success Stories</span>
-                    <h2 className="premium-title">
-                        Matches Made in <span className="premium-gradient-text">Heaven</span>
+            <div className="story-test-container">
+
+                {/* Premium Header */}
+                <div className="story-test-header">
+                    <div className="story-test-badge">Success Stories</div>
+                    <h2 className="story-test-title">
+                        Matches Made in <br className="story-mobile-break" />
+                        <span className="story-text-gradient">Heaven</span>
                     </h2>
-                    <p className="premium-subtitle">
-                        Discover the beautiful journeys of couples who found their forever on KalyanaShobha.
+                    <p className="story-test-subtitle">
+                        Read the beautiful journeys of couples who found their forever on KalyanaShobha.
                     </p>
                 </div>
 
-                {/* Borderless Infinite Slider */}
-                <div className="premium-slider-viewport">
-                    <div className={`premium-slider-track ${isLoading ? 'is-loading' : ''}`}>
+                {/* Infinite Slider Container */}
+                <div className="story-slider-container">
+                    <div className={`story-testimonials-track ${isLoading ? 'is-loading' : ''}`}>
                         {isLoading ? (
+                            /* Render 4 skeleton cards while loading */
                             <>
-                                <SkeletonItem />
-                                <SkeletonItem />
-                                <SkeletonItem />
-                                <SkeletonItem />
+                                <SkeletonCard />
+                                <SkeletonCard />
+                                <SkeletonCard />
+                                <SkeletonCard />
                             </>
                         ) : (
-                            /* Duplicate array for seamless infinite scroll */
+                            /* Duplicate the array to create the seamless infinite scrolling effect */
                             [...testimonials, ...testimonials].map((item, index) => (
-                                <div className="premium-story-item" key={`${item._id}-${index}`}>
-                                    
-                                    {/* Elevated Media Display (No Cards) */}
-                                    <div className="premium-media-wrapper">
+                                <div 
+                                    className="story-testimonial-card" 
+                                    key={`${item._id}-${index}`}
+                                >
+                                    <div className="story-card-inner">
+                                        {/* Media Section */}
                                         {item.mediaUrl && item.mediaType === 'video' ? (
-                                            <video 
-                                                className="premium-media" 
-                                                src={item.mediaUrl} 
-                                                controls 
-                                                preload="metadata"
-                                            />
+                                            <div className="story-test-media-wrapper">
+                                                <video 
+                                                    className="story-test-media" 
+                                                    src={item.mediaUrl} 
+                                                    controls 
+                                                    preload="metadata"
+                                                />
+                                            </div>
                                         ) : item.mediaUrl ? (
-                                            <img 
-                                                className="premium-media" 
-                                                src={item.mediaUrl} 
-                                                alt={`Story of ${item.authorName}`} 
-                                            />
-                                        ) : (
-                                            <div className="premium-media placeholder">
-                                                <span>{item.authorName.charAt(0)}</span>
+                                            <div className="story-test-media-wrapper">
+                                                <img 
+                                                    className="story-test-media" 
+                                                    src={item.mediaUrl} 
+                                                    alt={`Testimonial from ${item.authorName}`} 
+                                                />
                                             </div>
-                                        )}
-                                        {/* Floating Quote Icon on Image */}
-                                        <div className="premium-quote-badge">
-                                            <Quote size={20} strokeWidth={2} fill="currentColor" />
-                                        </div>
-                                    </div>
+                                        ) : null}
 
-                                    {/* Clean, Unboxed Content Area */}
-                                    <div className="premium-story-content">
-                                        <div className="premium-stars">
-                                            {[...Array(5)].map((_, i) => (
-                                                <Star key={i} size={16} fill="#F59E0B" color="#F59E0B" />
-                                            ))}
-                                        </div>
+                                        {/* Content Section */}
+                                        <div className="story-testimonial-content">
+                                            <Quote className="story-quote-icon" size={24} strokeWidth={1.5} />
 
-                                        <p className="premium-quote-text">
-                                            "{item.content}"
-                                        </p>
-
-                                        <div className="premium-story-footer">
-                                            <div className="premium-author-avatar">
-                                                {item.authorName.charAt(0)}
+                                            <div className="story-stars">
+                                                {[...Array(5)].map((_, i) => (
+                                                    <Star key={i} size={14} fill="#F59E0B" color="#F59E0B" />
+                                                ))}
                                             </div>
-                                            <div className="premium-author-info">
-                                                <h4 className="premium-author-name">{item.authorName}</h4>
-                                                <span className="premium-verified">
-                                                    <CheckCircle size={12} />
-                                                    Verified Match
-                                                </span>
+
+                                            <p className="story-testimonial-text">"{item.content}"</p>
+
+                                            <div className="story-testimonial-footer">
+                                                <div className="story-author-avatar">
+                                                    {item.authorName.charAt(0)}
+                                                </div>
+                                                <div className="story-author-details">
+                                                    <span className="story-testimonial-author">{item.authorName}</span>
+                                                    <span className="story-verified-badge">Verified Match</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
