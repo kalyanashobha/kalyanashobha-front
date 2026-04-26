@@ -23,7 +23,6 @@ const AboutUs = () => {
           const rawText = response.data.content;
           let colorIndex = 0;
 
-          // Updated bullet colors to match the warmer, traditional theme
           const bulletColors = [
             'linear-gradient(135deg, #D91624, #b9111c)', // Kunkuma Deep Red
             'linear-gradient(135deg, #FFC300, #e6b000)', // Pasupu Vibrant Yellow
@@ -100,6 +99,34 @@ const AboutUs = () => {
       overflow-x: hidden !important; 
     }
 
+    /* --- TOP SECTION WITH RESTRICTED BACKGROUND --- */
+    #ks-about-page-unique-wrapper .ks-top-section {
+      position: relative !important;
+      width: 100% !important;
+      padding-top: 4rem !important;
+      padding-bottom: 2rem !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+    }
+
+    /* Animated background constrained to the top section */
+    #ks-about-page-unique-wrapper .ks-top-section-bg {
+      content: '' !important;
+      position: absolute !important;
+      top: 0 !important; right: 0 !important; left: 0 !important; bottom: 0 !important;
+      background: linear-gradient(135deg, rgba(244, 143, 177, 0.15), rgba(128, 203, 196, 0.15)) !important;
+      border-bottom-left-radius: 40px !important;
+      border-bottom-right-radius: 40px !important;
+      z-index: 0 !important;
+      animation: pulseGlowBg 6s infinite alternate ease-in-out !important;
+    }
+
+    @keyframes pulseGlowBg {
+      0% { opacity: 0.6; background: linear-gradient(135deg, rgba(244, 143, 177, 0.1), rgba(128, 203, 196, 0.2)); }
+      100% { opacity: 1; background: linear-gradient(135deg, rgba(244, 143, 177, 0.25), rgba(128, 203, 196, 0.1)); }
+    }
+
     #ks-about-page-unique-wrapper .ks-about-content {
       position: relative !important;
       z-index: 10 !important; 
@@ -123,14 +150,16 @@ const AboutUs = () => {
     }
 
     #ks-about-page-unique-wrapper .ks-hero-header { 
-      padding: 4rem 0 2rem 0 !important; 
+      position: relative !important;
+      z-index: 2 !important;
+      padding: 0 0 2rem 0 !important; 
     }
 
     #ks-about-page-unique-wrapper .ks-pill-badge {
       display: inline-flex !important;
       padding: 0.35rem 1rem !important;
       border: 1px solid rgba(217, 22, 36, 0.3) !important;
-      background: rgba(255, 255, 255, 0.8) !important;
+      background: rgba(255, 255, 255, 0.9) !important;
       backdrop-filter: blur(4px) !important;
       border-radius: 50px !important;
       font-size: 0.65rem !important; 
@@ -150,7 +179,6 @@ const AboutUs = () => {
       color: #111 !important;
     }
 
-    /* Attractive Kunkuma & Pasupu Gradient */
     #ks-about-page-unique-wrapper .ks-text-gradient {
       background: linear-gradient(135deg, #D91624, #FFC300) !important;
       -webkit-background-clip: text !important;
@@ -168,34 +196,11 @@ const AboutUs = () => {
       font-weight: 400 !important;
     }
 
-    /* --- TOP IMAGE BACKGROUND ANIMATION --- */
-    #ks-about-page-unique-wrapper .ks-hero-glow-wrapper {
-      position: relative !important;
-      width: 100% !important;
-      max-width: 850px !important;
-      margin: 0 auto 3.5rem auto !important;
-    }
-
-    #ks-about-page-unique-wrapper .ks-hero-glow-wrapper::before {
-      content: '' !important;
-      position: absolute !important;
-      top: -20px !important; right: -20px !important; bottom: -20px !important; left: -20px !important;
-      background: linear-gradient(135deg, rgba(244, 143, 177, 0.4), rgba(128, 203, 196, 0.4)) !important;
-      filter: blur(30px) !important;
-      z-index: 0 !important;
-      border-radius: 30px !important;
-      animation: pulseGlow 4s infinite alternate ease-in-out !important;
-    }
-
-    @keyframes pulseGlow {
-      0% { transform: scale(0.96); opacity: 0.6; }
-      100% { transform: scale(1.04); opacity: 1; }
-    }
-
     #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper {
       position: relative !important;
-      z-index: 1 !important;
+      z-index: 2 !important;
       width: 100% !important; 
+      max-width: 850px !important;
       border-radius: 24px !important;
       overflow: hidden !important; 
       box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08) !important; 
@@ -211,9 +216,11 @@ const AboutUs = () => {
       object-position: center 20% !important; 
     }
 
+    /* --- TEXT SECTION --- */
     #ks-about-page-unique-wrapper .ks-rich-text-renderer {
       width: 100% !important;
       max-width: 800px !important;
+      padding-top: 3rem !important;
       padding-bottom: 2rem !important; 
       text-align: left !important; 
     }
@@ -277,12 +284,19 @@ const AboutUs = () => {
       font-family: 'Montserrat', sans-serif !important;
     }
 
-    /* --- BOTTOM IMAGE WAPPER & ANIMATED BADGE --- */
+    /* --- BOTTOM IMAGE & MULTIPLE ANIMATED BADGES --- */
+    #ks-about-page-unique-wrapper .ks-bottom-section {
+      width: 100% !important;
+      display: flex !important;
+      justify-content: center !important;
+      padding-top: 2rem !important;
+      padding-bottom: 6rem !important;
+    }
+
     #ks-about-page-unique-wrapper .ks-bottom-image-wrapper {
       position: relative !important;
       width: 100% !important;
-      max-width: 700px !important;
-      margin: 2rem auto 5rem auto !important;
+      max-width: 650px !important;
       display: flex !important;
       justify-content: center !important;
       align-items: center !important;
@@ -293,45 +307,68 @@ const AboutUs = () => {
       height: auto !important;
       object-fit: contain !important;
       border-radius: 16px !important;
+      position: relative !important;
+      z-index: 1 !important;
     }
 
+    /* Floating Badges Global Styles */
     #ks-about-page-unique-wrapper .ks-floating-badge {
       position: absolute !important;
-      top: 15% !important;
-      left: 2% !important;
-      background: rgba(255, 255, 255, 0.9) !important;
-      backdrop-filter: blur(8px) !important;
-      padding: 0.6rem 1.2rem !important;
+      background: rgba(255, 255, 255, 0.95) !important;
+      backdrop-filter: blur(10px) !important;
+      padding: 0.6rem 1.1rem !important;
       border-radius: 30px !important;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.08) !important;
       display: flex !important;
       align-items: center !important;
       gap: 8px !important;
       font-family: 'Montserrat', sans-serif !important;
       font-weight: 600 !important;
-      font-size: 0.9rem !important;
-      color: #111 !important;
+      font-size: 0.85rem !important;
+      color: #222 !important;
       z-index: 5 !important;
       animation: floatUpDown 3.5s ease-in-out infinite !important;
+      white-space: nowrap !important;
+      border: 1px solid rgba(0,0,0,0.03) !important;
     }
 
     @keyframes floatUpDown {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
+      50% { transform: translateY(-12px); }
+    }
+
+    /* Individual Badge Positions & Delays */
+    #ks-about-page-unique-wrapper .badge-1 {
+      top: 10% !important;
+      left: -5% !important;
+      animation-delay: 0s !important;
+    }
+    
+    #ks-about-page-unique-wrapper .badge-2 {
+      top: 25% !important;
+      right: -8% !important;
+      animation-delay: 1.2s !important;
+    }
+
+    #ks-about-page-unique-wrapper .badge-3 {
+      bottom: 25% !important;
+      left: -6% !important;
+      animation-delay: 0.8s !important;
+    }
+
+    #ks-about-page-unique-wrapper .badge-4 {
+      bottom: 12% !important;
+      right: -2% !important;
+      animation-delay: 1.8s !important;
     }
 
     /* --- MOBILE OPTIMIZATION --- */
     @media (max-width: 768px) {
-      #ks-about-page-unique-wrapper .ks-hero-header { 
-        padding: 3rem 0 1.5rem 0 !important; 
-        text-align: center !important; 
-      }
-
-      #ks-about-page-unique-wrapper .ks-pill-badge { font-size: 0.6rem !important; padding: 0.3rem 0.8rem !important; }
+      #ks-about-page-unique-wrapper .ks-top-section { padding-top: 3rem !important; padding-bottom: 1.5rem !important; }
+      #ks-about-page-unique-wrapper .ks-hero-header { text-align: center !important; padding: 0 1rem 1.5rem 1rem !important; }
       #ks-about-page-unique-wrapper .ks-hero-title { font-size: 2rem !important; }
       #ks-about-page-unique-wrapper .ks-hero-subtitle { font-size: 0.85rem !important; }
       
-      #ks-about-page-unique-wrapper .ks-hero-glow-wrapper { margin-bottom: 2rem !important; }
       #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper { border-radius: 16px !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06) !important; }
       #ks-about-page-unique-wrapper .ks-hero-img { height: 220px !important; object-position: center 15% !important; }
 
@@ -339,20 +376,20 @@ const AboutUs = () => {
       #ks-about-page-unique-wrapper .ks-editorial-body { font-size: 0.85rem !important; }
       #ks-about-page-unique-wrapper .ks-feature-text { font-size: 0.8rem !important; }
       #ks-about-page-unique-wrapper .ks-editorial-feature { padding: 1rem 1.2rem !important; }
-      #ks-about-page-unique-wrapper .ks-about-content { padding: 0 1.25rem !important; }
-
-      #ks-about-page-unique-wrapper .ks-floating-badge {
-        font-size: 0.75rem !important;
-        padding: 0.4rem 0.8rem !important;
-        top: 10% !important;
-        left: 0% !important;
-      }
-      #ks-about-page-unique-wrapper .ks-floating-badge svg {
-        width: 14px !important;
-        height: 14px !important;
-      }
       
-      #ks-about-page-unique-wrapper .ks-bottom-image-wrapper { margin: 1.5rem auto 4rem auto !important; }
+      /* Mobile adjustments for badges to avoid clipping off-screen */
+      #ks-about-page-unique-wrapper .ks-floating-badge {
+        font-size: 0.65rem !important;
+        padding: 0.4rem 0.8rem !important;
+      }
+      #ks-about-page-unique-wrapper .ks-floating-badge svg { width: 14px !important; height: 14px !important; }
+      
+      #ks-about-page-unique-wrapper .badge-1 { top: 5% !important; left: 0% !important; }
+      #ks-about-page-unique-wrapper .badge-2 { top: 18% !important; right: 0% !important; }
+      #ks-about-page-unique-wrapper .badge-3 { bottom: 20% !important; left: 2% !important; }
+      #ks-about-page-unique-wrapper .badge-4 { bottom: 8% !important; right: 2% !important; }
+      
+      #ks-about-page-unique-wrapper .ks-bottom-section { padding-bottom: 4rem !important; }
     }
   `;
 
@@ -360,19 +397,19 @@ const AboutUs = () => {
     <div id="ks-about-page-unique-wrapper">
       <style>{internalStyles}</style>
 
-      {/* Main Content Area */}
-      <div className="ks-about-content">
-        <header className="ks-hero-header reveal">
-          <div className="ks-pill-badge">Our Journey</div>
-          <h1 className="ks-hero-title">About <span className="ks-text-gradient">Us</span></h1>
-          <p className="ks-hero-subtitle">
-            Where Tradition Meets Modern Connection
-          </p>
-        </header>
+      {/* --- TOP SECTION WITH CONSTRAINED BACKGROUND --- */}
+      <div className="ks-top-section">
+        <div className="ks-top-section-bg"></div>
+        <div className="ks-about-content">
+          <header className="ks-hero-header reveal">
+            <div className="ks-pill-badge">Our Journey</div>
+            <h1 className="ks-hero-title">About <span className="ks-text-gradient">Us</span></h1>
+            <p className="ks-hero-subtitle">
+              Where Tradition Meets Modern Connection
+            </p>
+          </header>
 
-        {/* --- PREMIUM HERO IMAGE WITH ANIMATED GLOW --- */}
-        <div className="ks-hero-glow-wrapper reveal">
-          <div className="ks-hero-image-fullwidth-wrapper">
+          <div className="ks-hero-image-fullwidth-wrapper reveal">
             <img 
               src={HERO_IMAGE} 
               alt="Matrimony Discussion" 
@@ -380,7 +417,10 @@ const AboutUs = () => {
             />
           </div>
         </div>
+      </div>
 
+      {/* --- TEXT CONTENT AREA --- */}
+      <div className="ks-about-content">
         <div className="ks-rich-text-renderer">
           {isLoading ? (
             <div className="ks-skeleton-container">
@@ -392,24 +432,57 @@ const AboutUs = () => {
             <div dangerouslySetInnerHTML={{ __html: pageContent }} />
           )}
         </div>
-
-        {/* --- BOTTOM IMAGE COMPONENT WITH FLOATING BADGE --- */}
-        <div className="ks-bottom-image-wrapper reveal">
-          <div className="ks-floating-badge">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-              <polyline points="9 12 11 14 15 10"></polyline>
-            </svg>
-            Easy Verification
-          </div>
-          <img 
-            src={BOTTOM_IMAGE} 
-            alt="App Interface Preview" 
-            className="ks-bottom-img" 
-          />
-        </div>
-
       </div>
+
+      {/* --- BOTTOM SECTION WITH MULTIPLE ICONS --- */}
+      <div className="ks-bottom-section reveal">
+        <div className="ks-about-content">
+          <div className="ks-bottom-image-wrapper">
+            
+            {/* Badge 1: Easy Verification */}
+            <div className="ks-floating-badge badge-1">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <polyline points="9 12 11 14 15 10"></polyline>
+              </svg>
+              Easy Verification
+            </div>
+
+            {/* Badge 2: Elite Matches */}
+            <div className="ks-floating-badge badge-2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFC300" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+              Elite Matches
+            </div>
+
+            {/* Badge 3: 100% Secure */}
+            <div className="ks-floating-badge badge-3">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              100% Secure
+            </div>
+
+            {/* Badge 4: Privacy First */}
+            <div className="ks-floating-badge badge-4">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D91624" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              Privacy First
+            </div>
+
+            <img 
+              src={BOTTOM_IMAGE} 
+              alt="App Interface Preview" 
+              className="ks-bottom-img" 
+            />
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 };
