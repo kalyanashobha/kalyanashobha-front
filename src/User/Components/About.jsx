@@ -23,55 +23,53 @@ const AboutUs = () => {
           const rawText = response.data.content;
           let colorIndex = 0;
           
-          const bulletColors = [
-            'linear-gradient(135deg, #E11D48, #be123c)', // Red
-            'linear-gradient(135deg, #F59E0B, #d97706)', // Amber
-            'linear-gradient(135deg, #0ea5e9, #0284c7)', // Blue
+          // Premium gradient palettes for icons
+          const bulletStyles = [
+            { bg: 'linear-gradient(135deg, #ff4b6e, #f43f5e)', shadow: 'rgba(244, 63, 94, 0.3)', icon: 'ri-heart-3-fill' },
+            { bg: 'linear-gradient(135deg, #f59e0b, #d97706)', shadow: 'rgba(245, 158, 11, 0.3)', icon: 'ri-star-smile-fill' },
+            { bg: 'linear-gradient(135deg, #3b82f6, #2563eb)', shadow: 'rgba(59, 130, 246, 0.3)', icon: 'ri-shield-check-fill' },
+            { bg: 'linear-gradient(135deg, #8b5cf6, #7c3aed)', shadow: 'rgba(139, 92, 246, 0.3)', icon: 'ri-gemini-fill' },
           ];
-
-          // Premium App-Style SVG Icon for features
-          const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
 
           const formattedHtml = rawText
             .split('\n')
             .map(line => line.trim())
             .filter(line => line.length > 0)
             .map((line, index) => {
-              // Filters out 'About Us' and any 'Last updated' line
               if (line.toLowerCase() === 'about us' || line.toLowerCase().includes('last updated')) return '';
 
-              const delay = (index * 0.05).toFixed(2);
+              const delay = (index * 0.08).toFixed(2);
 
-              // Editorial Headings
+              // Premium Editorial Headings
               if (line.length < 35 && !line.match(/[.,!?]$/)) {
-                return `<h2 class="ks-bento-heading reveal" style="transition-delay: ${delay}s">${line}</h2>`;
+                return `<h2 class="ks-editorial-heading reveal" style="transition-delay: ${delay}s">${line}</h2>`;
               }
 
-              // Mini-Bento Feature Cards
+              // Premium Glassmorphic Feature Cards with Dynamic Icons
               if (/^([A-Za-z\s]+)( [-–:] | to )/.test(line)) {
-                let processedLine = line.replace(/^([A-Za-z\s]+)( [-–:] | to )/g, '<span class="ks-feature-title">$1</span><br/>');
-                const currentColor = bulletColors[colorIndex % bulletColors.length];
+                let processedLine = line.replace(/^([A-Za-z\s]+)( [-–:] | to )/g, '<span class="ks-feature-title">$1</span><span class="ks-feature-separator">$2</span>');
+                const styleConfig = bulletStyles[colorIndex % bulletStyles.length];
                 colorIndex++;
 
                 return `
-                  <div class="ks-mini-bento-feature reveal" style="transition-delay: ${delay}s">
-                    <div class="ks-feature-icon-box" style="background: ${currentColor} !important;">
-                      ${iconSvg}
+                  <div class="ks-editorial-feature reveal" style="transition-delay: ${delay}s">
+                    <div class="ks-feature-icon-wrapper" style="background: ${styleConfig.bg}; box-shadow: 0 4px 12px ${styleConfig.shadow};">
+                      <i class="${styleConfig.icon}"></i>
                     </div>
                     <p class="ks-feature-text">${processedLine}</p>
                   </div>
                 `;
               }
 
-              // Standard Body Text
-              return `<p class="ks-bento-body reveal" style="transition-delay: ${delay}s">${line}</p>`;
+              // Body text
+              return `<p class="ks-editorial-body reveal" style="transition-delay: ${delay}s">${line}</p>`;
             })
             .join('');
 
           setPageContent(formattedHtml);
         }
       } catch (error) {
-        setPageContent("<p class='ks-error-text'>Unable to load content.</p>");
+        setPageContent("<p class='ks-error-text'>Unable to load content. Please try again.</p>");
       } finally {
         setIsLoading(false);
       }
@@ -87,7 +85,7 @@ const AboutUs = () => {
           entry.target.classList.add('active');
         }
       });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
 
     const items = document.querySelectorAll('.reveal');
     items.forEach(item => observer.observe(item));
@@ -96,151 +94,107 @@ const AboutUs = () => {
   }, [pageContent, isLoading]);
 
   const internalStyles = `
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Montserrat:wght@400;500;600;700&display=swap') !important;
-
-    @keyframes floatApp {
-      0% { transform: translateY(0px) scale(1); }
-      50% { transform: translateY(-10px) scale(1.02); }
-      100% { transform: translateY(0px) scale(1); }
-    }
-
-    @keyframes shimmerPill {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
-    }
+    /* Import Premium Fonts & Remix Icons */
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap') !important;
+    @import url('https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css') !important;
 
     #ks-about-page-unique-wrapper {
       position: relative !important;
       min-height: 100vh !important;
-      background-color: #f4f5f7 !important; /* Premium App Dashboard Gray */
-      font-family: 'Montserrat', sans-serif !important;
+      background: linear-gradient(180deg, #fdfbfb 0%, #f4f4f6 100%) !important;
+      font-family: 'Plus Jakarta Sans', sans-serif !important;
       color: #1a1a1a !important;
+      text-align: center !important;
       overflow-x: hidden !important; 
-      padding: 4rem 1.5rem !important; /* Master padding for the page */
     }
 
-    /* --- BENTO GRID LAYOUT --- */
-    #ks-about-page-unique-wrapper .ks-bento-container {
-      max-width: 1150px !important; 
+    /* Subtle background pattern */
+    #ks-about-page-unique-wrapper::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: radial-gradient(rgba(220, 38, 38, 0.03) 1px, transparent 1px);
+      background-size: 30px 30px;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* --- CONTENT WRAPPER --- */
+    #ks-about-page-unique-wrapper .ks-about-content {
+      position: relative !important;
+      z-index: 10 !important; 
+      max-width: 850px !important; 
       margin: 0 auto !important;
-      display: grid !important;
-      grid-template-columns: repeat(12, 1fr) !important;
-      gap: 1.5rem !important; /* Space between bento boxes */
-      align-items: start !important;
-    }
-
-    /* Base style for all Bento Boxes */
-    #ks-about-page-unique-wrapper .ks-bento-box {
-      background: #ffffff !important;
-      border-radius: 32px !important;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02) !important;
-      overflow: hidden !important;
-      transition: transform 0.4s ease, box-shadow 0.4s ease !important;
-    }
-    
-    #ks-about-page-unique-wrapper .ks-bento-box:hover {
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06), 0 4px 10px rgba(0, 0, 0, 0.03) !important;
-    }
-
-    /* --- SPECIFIC BENTO BOX PLACEMENTS (DESKTOP) --- */
-    
-    /* 1. Header Box (Top Left) */
-    #ks-about-page-unique-wrapper .ks-box-header {
-      grid-column: 1 / 6 !important; /* Spans 5 columns */
-      padding: 4rem 3rem !important;
+      padding: 0 1.5rem !important;
       display: flex !important;
       flex-direction: column !important;
-      justify-content: center !important;
-      height: 100% !important;
-      text-align: left !important;
-    }
-
-    /* 2. Hero Image Box (Top Right) */
-    #ks-about-page-unique-wrapper .ks-box-hero-img {
-      grid-column: 6 / 13 !important; /* Spans 7 columns */
-      position: relative !important;
-      min-height: 380px !important;
-      height: 100% !important;
-      padding: 0 !important; /* Image goes edge-to-edge inside the box */
-    }
-
-    #ks-about-page-unique-wrapper .ks-box-hero-img img {
-      position: absolute !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: cover !important;
-      object-position: center 20% !important;
-    }
-
-    /* 3. Text Content Box (Bottom Left) */
-    #ks-about-page-unique-wrapper .ks-box-content {
-      grid-column: 1 / 8 !important; /* Spans 7 columns */
-      padding: 3.5rem 3rem !important;
-      text-align: left !important;
-    }
-
-    /* 4. App Image Box (Bottom Right - Sticky) */
-    #ks-about-page-unique-wrapper .ks-box-app-img {
-      grid-column: 8 / 13 !important; /* Spans 5 columns */
-      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
-      padding: 4rem 2rem !important;
-      display: flex !important;
-      justify-content: center !important;
       align-items: center !important;
-      position: sticky !important; /* Sticks while user reads content on the left */
-      top: 2rem !important; 
     }
 
-    #ks-about-page-unique-wrapper .ks-box-app-img img {
-      width: 100% !important;
-      max-width: 280px !important;
-      height: auto !important;
-      object-fit: contain !important;
-      filter: drop-shadow(0 25px 40px rgba(0,0,0,0.12)) !important;
-      animation: floatApp 7s ease-in-out infinite !important;
-    }
-
-    /* --- INNER BOX STYLING --- */
+    /* --- ANIMATIONS --- */
     #ks-about-page-unique-wrapper .reveal {
       opacity: 0 !important;
-      transform: translateY(20px) !important;
-      transition: all 0.7s cubic-bezier(0.2, 1, 0.3, 1) !important;
+      transform: translateY(30px) scale(0.98) !important;
+      transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1) !important;
     }
     #ks-about-page-unique-wrapper .reveal.active {
       opacity: 1 !important;
-      transform: translateY(0) !important;
+      transform: translateY(0) scale(1) !important;
+    }
+
+    @keyframes floating {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0px); }
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* --- HERO HEADER --- */
+    #ks-about-page-unique-wrapper .ks-hero-header { 
+      padding: 5rem 0 3rem 0 !important; 
     }
 
     #ks-about-page-unique-wrapper .ks-pill-badge {
       display: inline-flex !important;
+      align-items: center;
+      gap: 6px;
       padding: 0.4rem 1.2rem !important;
-      background: linear-gradient(90deg, #fff1f2, #ffe4e6, #fff1f2) !important;
-      background-size: 200% 100% !important;
-      animation: shimmerPill 3s infinite linear !important;
-      border: 1px solid rgba(225, 29, 72, 0.15) !important;
+      border: 1px solid rgba(220, 38, 38, 0.2) !important;
+      background: rgba(255, 255, 255, 0.6) !important;
+      backdrop-filter: blur(10px) !important;
       border-radius: 50px !important;
-      font-size: 0.7rem !important; 
-      font-weight: 700 !important;
-      color: #e11d48 !important;
+      font-size: 0.75rem !important; 
+      font-weight: 600 !important;
+      color: #dc2626 !important;
       text-transform: uppercase !important;
-      letter-spacing: 1.5px !important;
-      margin-bottom: 1.5rem !important;
-      align-self: flex-start !important; /* Keeps it tight to text */
+      letter-spacing: 2px !important;
+      margin-bottom: 2rem !important;
+      box-shadow: 0 4px 15px rgba(220, 38, 38, 0.05) !important;
+    }
+
+    #ks-about-page-unique-wrapper .ks-pill-badge i {
+      font-size: 1rem;
     }
 
     #ks-about-page-unique-wrapper .ks-hero-title {
       font-family: 'Playfair Display', serif !important;
-      font-size: clamp(2.2rem, 4vw, 3.2rem) !important; 
+      font-size: clamp(2.5rem, 6vw, 4rem) !important; 
       font-weight: 700 !important;
-      line-height: 1.15 !important;
-      margin-bottom: 1rem !important;
-      color: #111 !important;
+      line-height: 1.1 !important;
+      margin-bottom: 1.2rem !important;
+      color: #0f172a !important;
+      letter-spacing: -0.02em !important;
     }
 
     #ks-about-page-unique-wrapper .ks-text-gradient {
-      background: linear-gradient(135deg, #e11d48, #f59e0b) !important;
+      background: linear-gradient(270deg, #dc2626, #f43f5e, #f59e0b, #dc2626) !important;
+      background-size: 300% 300% !important;
+      animation: gradientShift 6s ease infinite !important;
       -webkit-background-clip: text !important;
       -webkit-text-fill-color: transparent !important;
       font-style: italic !important;
@@ -248,65 +202,123 @@ const AboutUs = () => {
     }
 
     #ks-about-page-unique-wrapper .ks-hero-subtitle {
-      font-size: clamp(0.95rem, 1.1vw, 1.05rem) !important; 
+      font-size: clamp(1rem, 1.5vw, 1.2rem) !important; 
       color: #64748b !important;
-      line-height: 1.6 !important;
-      font-weight: 500 !important;
-      margin: 0 !important;
+      max-width: 550px !important;
+      margin: 0 auto !important;
+      line-height: 1.7 !important;
+      font-weight: 400 !important;
     }
 
-    #ks-about-page-unique-wrapper .ks-bento-heading {
+    /* --- PREMIUM HERO IMAGE --- */
+    #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper {
+      position: relative !important;
+      width: 100% !important; 
+      margin: 0 auto 4rem auto !important;
+      border-radius: 30px !important;
+      overflow: visible !important; 
+      line-height: 0 !important; 
+    }
+
+    #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper::after {
+      content: '';
+      position: absolute;
+      top: 10%; left: 5%; right: 5%; bottom: -5%;
+      background: inherit;
+      filter: blur(25px);
+      z-index: -1;
+      opacity: 0.4;
+      background-image: url(${HERO_IMAGE});
+      background-size: cover;
+    }
+
+    #ks-about-page-unique-wrapper .ks-hero-img {
+      width: 100% !important;
+      height: 500px !important; 
+      display: block !important;
+      object-fit: cover !important; 
+      object-position: center 25% !important; 
+      border-radius: 30px !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important; 
+      border: 1px solid rgba(255,255,255,0.4);
+    }
+
+    /* --- TYPOGRAPHY & CONTENT --- */
+    #ks-about-page-unique-wrapper .ks-rich-text-renderer {
+      width: 100% !important;
+      padding-bottom: 2rem !important; 
+      text-align: left !important; 
+    }
+
+    #ks-about-page-unique-wrapper .ks-editorial-heading {
       font-family: 'Playfair Display', serif !important;
-      font-size: clamp(1.4rem, 2vw, 1.8rem) !important; 
+      font-size: clamp(1.6rem, 3vw, 2.2rem) !important; 
       color: #0f172a !important;
-      margin: 2.5rem 0 1.2rem 0 !important;
+      margin: 3.5rem 0 1.5rem 0 !important;
       font-weight: 700 !important;
-    }
-    #ks-about-page-unique-wrapper .ks-bento-heading:first-child {
-      margin-top: 0 !important;
+      position: relative;
+      padding-bottom: 0.8rem !important;
     }
 
-    #ks-about-page-unique-wrapper .ks-bento-body {
-      font-size: 1rem !important; 
-      line-height: 1.8 !important;
+    #ks-about-page-unique-wrapper .ks-editorial-heading::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, #dc2626, transparent);
+      border-radius: 2px;
+    }
+
+    #ks-about-page-unique-wrapper .ks-editorial-body {
+      font-size: 1.05rem !important; 
+      line-height: 1.85 !important;
       color: #475569 !important;
       margin-bottom: 1.5rem !important;
     }
 
-    /* Mini-Bento Feature Cards (Inside Content Box) */
-    #ks-about-page-unique-wrapper .ks-mini-bento-feature {
+    /* --- PREMIUM FEATURE CARDS (GLASSMORPHISM) --- */
+    #ks-about-page-unique-wrapper .ks-editorial-feature {
       display: flex !important;
-      align-items: flex-start !important;
-      background: #f8fafc !important; /* Very subtle inner box gray */
-      padding: 1.25rem 1.5rem !important;
+      align-items: center !important;
+      text-align: left !important;
+      background: rgba(255, 255, 255, 0.7) !important; 
+      backdrop-filter: blur(12px) !important;
+      padding: 1.5rem !important;
       border-radius: 20px !important; 
-      border: 1px solid #f1f5f9 !important;
-      margin-bottom: 1rem !important;
-      transition: all 0.2s ease !important;
+      border: 1px solid rgba(255, 255, 255, 1) !important;
+      margin-bottom: 1.2rem !important;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.03) !important;
     }
 
-    #ks-about-page-unique-wrapper .ks-mini-bento-feature:hover {
-      background: #ffffff !important;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.04) !important;
-      transform: translateY(-2px) !important;
-      border-color: rgba(225, 29, 72, 0.1) !important;
+    #ks-about-page-unique-wrapper .ks-editorial-feature:hover {
+      box-shadow: 0 15px 35px rgba(220, 38, 38, 0.08) !important;
+      transform: translateY(-5px) scale(1.01) !important;
+      background: rgba(255, 255, 255, 0.95) !important;
     }
 
-    #ks-about-page-unique-wrapper .ks-feature-icon-box {
-      width: 32px !important;
-      height: 32px !important;
-      border-radius: 10px !important;
+    #ks-about-page-unique-wrapper .ks-feature-icon-wrapper {
+      width: 45px !important;
+      height: 45px !important;
+      border-radius: 12px !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      margin-right: 1.2rem !important;
+      margin-right: 1.5rem !important;
       flex-shrink: 0 !important;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
+      color: white !important;
+      font-size: 1.3rem !important;
+      transition: transform 0.3s ease;
+    }
+
+    #ks-about-page-unique-wrapper .ks-editorial-feature:hover .ks-feature-icon-wrapper {
+      transform: rotate(8deg) scale(1.1);
     }
 
     #ks-about-page-unique-wrapper .ks-feature-text {
-      font-size: 0.95rem !important; 
-      color: #64748b !important;
+      font-size: 1rem !important; 
+      color: #334155 !important;
       line-height: 1.6 !important;
       margin: 0 !important;
     }
@@ -317,50 +329,79 @@ const AboutUs = () => {
       font-size: 1.05rem !important;
     }
 
+    /* --- BOTTOM IMAGE (FLOATING ANIMATION) --- */
+    #ks-about-page-unique-wrapper .ks-bottom-image-wrapper {
+      width: 100% !important;
+      max-width: 650px !important;
+      margin: 4rem auto 6rem auto !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      animation: floating 6s ease-in-out infinite !important;
+    }
+
+    #ks-about-page-unique-wrapper .ks-bottom-img {
+      width: 100% !important;
+      height: auto !important;
+      object-fit: contain !important;
+      filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1));
+    }
+
+    /* --- SHIMMER LOADER --- */
+    @keyframes shimmer {
+      0% { background-position: -1000px 0; }
+      100% { background-position: 1000px 0; }
+    }
+    
+    .ks-skeleton-pulse {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 1000px 100%;
+      animation: shimmer 2s infinite linear;
+      border-radius: 8px;
+    }
+
     /* --- MOBILE OPTIMIZATION --- */
-    @media (max-width: 992px) {
-      #ks-about-page-unique-wrapper { padding: 2rem 1.2rem !important; }
+    @media (max-width: 768px) {
+      #ks-about-page-unique-wrapper .ks-hero-header { 
+        padding: 4rem 0 2rem 0 !important; 
+      }
+
+      #ks-about-page-unique-wrapper .ks-pill-badge { 
+        font-size: 0.65rem !important; 
+        padding: 0.35rem 1rem !important; 
+      }
       
-      #ks-about-page-unique-wrapper .ks-bento-container {
-        display: flex !important;
+      #ks-about-page-unique-wrapper .ks-hero-img {
+        height: 300px !important; 
+        border-radius: 20px !important;
+      }
+      
+      #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper {
+        border-radius: 20px !important;
+      }
+
+      #ks-about-page-unique-wrapper .ks-editorial-heading { 
+        font-size: 1.4rem !important; 
+        margin: 2rem 0 1.2rem 0 !important; 
+      }
+
+      #ks-about-page-unique-wrapper .ks-editorial-body { 
+        font-size: 0.95rem !important; 
+      }
+      
+      #ks-about-page-unique-wrapper .ks-editorial-feature { 
+        padding: 1.2rem !important; 
         flex-direction: column !important;
-        gap: 1.2rem !important;
+        align-items: flex-start !important;
       }
 
-      #ks-about-page-unique-wrapper .ks-bento-box {
-        border-radius: 24px !important; /* Slightly tighter curves on mobile */
+      #ks-about-page-unique-wrapper .ks-feature-icon-wrapper {
+        margin-bottom: 1rem !important;
       }
 
-      /* Stack elements elegantly */
-      #ks-about-page-unique-wrapper .ks-box-header { 
-        padding: 3rem 2rem !important; 
-        text-align: center !important; 
-        align-items: center !important;
+      #ks-about-page-unique-wrapper .ks-bottom-image-wrapper {
+        margin: 2rem auto 4rem auto !important;
       }
-
-      #ks-about-page-unique-wrapper .ks-pill-badge { align-self: center !important; }
-      
-      #ks-about-page-unique-wrapper .ks-box-hero-img { 
-        min-height: 280px !important; /* Shorter height for mobile to save space */
-      }
-
-      #ks-about-page-unique-wrapper .ks-box-content { 
-        padding: 2.5rem 1.5rem !important; 
-      }
-      
-      #ks-about-page-unique-wrapper .ks-box-app-img { 
-        position: static !important; /* Remove sticky on mobile */
-        padding: 3rem 1.5rem !important; 
-      }
-
-      #ks-about-page-unique-wrapper .ks-box-app-img img {
-        max-width: 220px !important; /* Smaller app mock on mobile */
-      }
-
-      #ks-about-page-unique-wrapper .ks-bento-heading { font-size: 1.3rem !important; margin: 1.5rem 0 1rem 0 !important; }
-      #ks-about-page-unique-wrapper .ks-bento-body { font-size: 0.9rem !important; }
-      #ks-about-page-unique-wrapper .ks-mini-bento-feature { padding: 1rem 1.2rem !important; }
-      #ks-about-page-unique-wrapper .ks-feature-text { font-size: 0.85rem !important; }
     }
   `;
 
@@ -368,44 +409,49 @@ const AboutUs = () => {
     <div id="ks-about-page-unique-wrapper">
       <style>{internalStyles}</style>
 
-      {/* --- MASTER BENTO GRID --- */}
-      <div className="ks-bento-container">
-        
-        {/* Box 1: Header */}
-        <div className="ks-bento-box ks-box-header reveal">
-          <div className="ks-pill-badge">Our Journey</div>
+      {/* Main Content Area */}
+      <div className="ks-about-content">
+        <header className="ks-hero-header reveal">
+          <div className="ks-pill-badge">
+            <i className="ri-sparkling-fill"></i> Our Journey
+          </div>
           <h1 className="ks-hero-title">About <span className="ks-text-gradient">Us</span></h1>
           <p className="ks-hero-subtitle">
-            Where Tradition Meets Modern Connection
+            Where Tradition Meets Modern Connection. Discover the story behind the platform that brings hearts together.
           </p>
-        </div>
+        </header>
 
-        {/* Box 2: Hero Image */}
-        <div className="ks-bento-box ks-box-hero-img reveal">
+        {/* --- PREMIUM HERO IMAGE --- */}
+        <div className="ks-hero-image-fullwidth-wrapper reveal">
           <img 
             src={HERO_IMAGE} 
             alt="Matrimony Discussion" 
+            className="ks-hero-img" 
           />
         </div>
 
-        {/* Box 3: Rich Text Content */}
-        <div className="ks-bento-box ks-box-content">
+        <div className="ks-rich-text-renderer">
           {isLoading ? (
-            <div className="ks-skeleton-container">
-              <div className="ks-skeleton-pulse" style={{height: '30px', width: '50%', marginBottom: '1rem', background: '#e2e8f0', borderRadius: '8px'}}></div>
-              <div className="ks-skeleton-pulse" style={{height: '15px', width: '100%', marginBottom: '0.5rem', background: '#e2e8f0', borderRadius: '8px'}}></div>
-              <div className="ks-skeleton-pulse" style={{height: '15px', width: '80%', marginBottom: '2rem', background: '#e2e8f0', borderRadius: '8px'}}></div>
+            <div className="ks-skeleton-container" style={{paddingTop: '2rem'}}>
+              <div className="ks-skeleton-pulse" style={{height: '35px', width: '40%', marginBottom: '1.5rem'}}></div>
+              <div className="ks-skeleton-pulse" style={{height: '18px', width: '100%', marginBottom: '0.8rem'}}></div>
+              <div className="ks-skeleton-pulse" style={{height: '18px', width: '95%', marginBottom: '0.8rem'}}></div>
+              <div className="ks-skeleton-pulse" style={{height: '18px', width: '80%', marginBottom: '3rem'}}></div>
+              
+              <div className="ks-skeleton-pulse" style={{height: '80px', width: '100%', marginBottom: '1rem', borderRadius: '20px'}}></div>
+              <div className="ks-skeleton-pulse" style={{height: '80px', width: '100%', marginBottom: '1rem', borderRadius: '20px'}}></div>
             </div>
           ) : (
             <div dangerouslySetInnerHTML={{ __html: pageContent }} />
           )}
         </div>
 
-        {/* Box 4: App Image (Sticky) */}
-        <div className="ks-bento-box ks-box-app-img reveal">
+        {/* --- BOTTOM IMAGE COMPONENT --- */}
+        <div className="ks-bottom-image-wrapper reveal">
           <img 
             src={BOTTOM_IMAGE} 
             alt="App Interface Preview" 
+            className="ks-bottom-img" 
           />
         </div>
 
