@@ -4,7 +4,7 @@
 .story-testimonials-section {
     position: relative;
     padding: 100px 0; 
-    background-color: #FAFAFA; /* The background the cards will now blend into */
+    background-color: #FAFAFA;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     overflow: hidden;
     z-index: 1;
@@ -47,10 +47,11 @@
 }
 
 .story-test-container {
-    max-width: 100%; 
+    max-width: 1200px;
     margin: 0 auto;
     position: relative;
     z-index: 10;
+    padding: 0 20px;
 }
 
 /* =========================================
@@ -58,8 +59,7 @@
 ========================================= */
 .story-test-header {
     text-align: center;
-    margin-bottom: 50px;
-    padding: 0 20px; 
+    margin-bottom: 60px;
     animation: story-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -111,76 +111,34 @@
 }
 
 /* =========================================
-   Infinite Slider Layout 
+   Modern Grid Layout (3 Columns)
 ========================================= */
-.story-slider-container {
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-    padding: 20px 0 40px 0; 
-}
-
-/* Fading gradients on the left and right edges */
-.story-slider-container::before,
-.story-slider-container::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    width: 150px;
-    height: 100%;
-    z-index: 5;
-    pointer-events: none;
-}
-
-.story-slider-container::before {
-    left: 0;
-    background: linear-gradient(to right, #FAFAFA 0%, rgba(250, 250, 250, 0) 100%);
-}
-
-.story-slider-container::after {
-    right: 0;
-    background: linear-gradient(to left, #FAFAFA 0%, rgba(250, 250, 250, 0) 100%);
-}
-
-.story-testimonials-track {
-    display: flex;
+.story-masonry-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 32px;
-    width: max-content;
-    animation: scroll-testimonials 40s linear infinite; 
-}
-
-/* Static layout if it's still loading the skeletons */
-.story-testimonials-track.is-loading {
-    animation: none;
     width: 100%;
-    justify-content: center;
-    overflow: hidden;
+    align-items: start;
 }
 
 .story-testimonial-card {
-    width: 380px; 
-    flex-shrink: 0; 
+    width: 100%;
+    opacity: 0; 
+    animation: story-fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* BLENDED CARD STYLING */
 .story-card-inner {
-    background: transparent; /* Removed white background to blend */
-    border: none; /* Removed border */
-    box-shadow: none; /* Removed drop shadow */
+    background: transparent; 
+    border: none; 
+    box-shadow: none; 
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    height: 100%;
     display: flex;
     flex-direction: column;
 }
 
 .story-card-inner:hover {
-    transform: translateY(-6px); /* Keep the gentle lift on hover */
-    /* No shadow added on hover to maintain the fully blended look */
-}
-
-@keyframes scroll-testimonials {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(calc(-50% - 16px)); }
+    transform: translateY(-6px); 
 }
 
 /* =========================================
@@ -192,8 +150,7 @@
     background-color: #E4E4E7;
     overflow: hidden;
     position: relative;
-    border-radius: 24px; /* Applied rounded corners directly to the image container */
-    /* Removed the bottom border since it's floating now */
+    border-radius: 24px; 
 }
 
 .story-test-media {
@@ -211,7 +168,7 @@
    Card Content & Typography
 ========================================= */
 .story-testimonial-content {
-    padding: 24px 8px 12px 8px; /* Reduced padding since there's no bounding box */
+    padding: 24px 8px 12px 8px; 
     position: relative;
     flex-grow: 1;
     display: flex;
@@ -249,7 +206,7 @@
     align-items: center;
     gap: 16px;
     padding-top: 24px;
-    border-top: 1px solid rgba(0,0,0,0.06); /* Slightly darkened the divider line so it shows up on transparent background */
+    border-top: 1px solid rgba(0,0,0,0.06); 
 }
 
 .story-author-avatar {
@@ -285,25 +242,33 @@
 }
 
 /* =========================================
-   Skeleton Loading Animation
+   Skeleton Loading Animation (Enhanced)
 ========================================= */
 .story-skeleton-card {
-    animation: story-fade-up 0.3s ease-out forwards;
+    opacity: 1; 
+    animation: none;
 }
 
+/* Shared shimmer background */
 .story-skeleton-media,
 .story-skeleton-stars,
 .story-skeleton-line,
 .story-skeleton-avatar {
-    background: #E4E4E7;
-    background: linear-gradient(90deg, #E4E4E7 0%, #F4F4F5 50%, #E4E4E7 100%);
+    background: #f6f7f8;
+    background-image: linear-gradient(
+        110deg,
+        #ececec 8%,
+        #f5f5f5 18%,
+        #ececec 33%
+    );
     background-size: 200% 100%;
-    animation: story-skeleton-shimmer 1.5s infinite linear;
+    animation: 1.5s story-skeleton-shimmer linear infinite;
 }
 
 @keyframes story-skeleton-shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
+    to {
+        background-position-x: -200%;
+    }
 }
 
 .story-skeleton-stars {
@@ -316,26 +281,27 @@
 .story-skeleton-text-block {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px; /* Slightly larger gap for cleaner look */
     margin-bottom: 32px;
     flex-grow: 1;
 }
 
 .story-skeleton-line {
     height: 12px;
-    border-radius: 4px;
+    border-radius: 6px; /* Smoother rounded edges */
 }
 
 .story-skeleton-avatar {
     width: 44px;
     height: 44px;
     border-radius: 50%;
+    flex-shrink: 0; /* Prevents avatar from squishing */
 }
 
 .story-skeleton-author-name {
     width: 80%;
     height: 14px;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 .story-skeleton-badge {
@@ -362,14 +328,24 @@
    Animations
 ========================================= */
 @keyframes story-fade-up {
-    0% { opacity: 0; transform: translateY(20px); }
+    0% { opacity: 0; transform: translateY(30px); }
     100% { opacity: 1; transform: translateY(0); }
 }
 
 /* =========================================
    Responsive Design
 ========================================= */
+@media (max-width: 1024px) {
+    .story-masonry-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 768px) {
+    .story-masonry-grid {
+        grid-template-columns: 1fr;
+    }
+
     .story-testimonials-section {
         padding: 60px 0;
     }
@@ -386,21 +362,8 @@
         font-size: 1.05rem;
     }
 
-    .story-slider-container::before,
-    .story-slider-container::after {
-        width: 50px; 
-    }
-
-    .story-testimonial-card {
-        width: 300px; 
-    }
-
     .story-test-media-wrapper {
         height: 180px;
-    }
-
-    .story-testimonial-content {
-        padding: 20px 4px 8px 4px; /* Reduced further on mobile since card is smaller */
     }
 
     .story-test-glow {
