@@ -212,26 +212,28 @@ const AboutUs = () => {
       font-weight: 400 !important;
     }
 
-    /* --- PREMIUM ANIMATED HERO IMAGE (80% Width) --- */
+    /* --- PREMIUM ARCHED HERO IMAGE --- */
     #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper {
       position: relative !important;
-      width: 80vw !important; /* Forces image to be exactly 80% of the screen width */
-      max-width: 1000px !important; /* Prevents it from getting too massive on ultrawide monitors */
+      width: 80% !important; /* Changed to 80% width on Desktop */
       margin: 0 auto 3.5rem auto !important;
-      border-radius: 24px !important;
+      
+      /* UNIQUE ARCH SHAPE (Circle Top, Rounded Bottom) */
+      border-radius: 250px 250px 24px 24px !important; 
+      
       overflow: hidden !important; 
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1) !important; 
       transform: translateZ(0); 
       animation: float 6s ease-in-out infinite !important; 
-      border: 4px solid #fff !important; 
+      border: 6px solid #fff !important; /* Thick white border for premium framing */
     }
 
     #ks-about-page-unique-wrapper .ks-hero-img {
       width: 100% !important;
-      height: 450px !important; 
+      height: 480px !important; /* Slightly taller to accommodate the deep arch */
       display: block !important;
       object-fit: cover !important; 
-      object-position: center 20% !important; 
+      object-position: center 30% !important; /* Adjusted so faces aren't cut off by the top arch */
       transition: transform 0.5s ease !important;
     }
     
@@ -321,7 +323,7 @@ const AboutUs = () => {
       display: none !important; 
     }
 
-    /* --- BOTTOM IMAGE ANIMATED --- */
+    /* --- BOTTOM BLENDED IMAGE --- */
     #ks-about-page-unique-wrapper .ks-bottom-image-wrapper {
       width: 100% !important;
       max-width: 700px !important;
@@ -330,14 +332,17 @@ const AboutUs = () => {
       justify-content: center !important;
       align-items: center !important;
       animation: float 7s ease-in-out infinite reverse !important; 
+      position: relative !important;
     }
 
+    /* Blend Effect to make the image sink into the background smoothly */
     #ks-about-page-unique-wrapper .ks-bottom-img {
       width: 100% !important;
       height: auto !important;
       object-fit: contain !important;
       border-radius: 20px !important;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.12) !important;
+      mix-blend-mode: multiply !important; /* Seamlessly blends white backgrounds into the page */
+      filter: drop-shadow(0 25px 35px rgba(220, 38, 38, 0.05)) !important; /* Soft colored ambient shadow */
     }
 
     /* --- MOBILE OPTIMIZATION --- */
@@ -352,16 +357,17 @@ const AboutUs = () => {
       #ks-about-page-unique-wrapper .ks-hero-title { font-size: 2rem !important; }
       #ks-about-page-unique-wrapper .ks-hero-subtitle { font-size: 0.85rem !important; }
       
+      /* Mobile Hero adjustments */
       #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper {
-        width: 85vw !important; /* Slightly wider on mobile to make use of space while staying blended */
-        border-radius: 16px !important; 
-        margin-bottom: 2rem !important;
-        border-width: 3px !important;
+        width: 95% !important; /* Expanded to 95% width */
+        border-radius: 120px 120px 16px 16px !important; /* Adjusted arch for mobile proportion */
+        margin-bottom: 2.5rem !important;
+        border-width: 4px !important;
       }
 
       #ks-about-page-unique-wrapper .ks-hero-img {
-        height: 220px !important; 
-        object-position: center 15% !important; 
+        height: 260px !important; 
+        object-position: center 20% !important; 
       }
 
       #ks-about-page-unique-wrapper .ks-editorial-heading { font-size: 1.25rem !important; margin: 1.5rem 0 1rem 0 !important; }
@@ -373,10 +379,10 @@ const AboutUs = () => {
       #ks-about-page-unique-wrapper .ks-feature-text { font-size: 0.85rem !important; }
       
       #ks-about-page-unique-wrapper .ks-about-content { padding: 0 1.25rem !important; }
-
-      /* Reduced bottom image size specifically for mobile */
+      
+      /* Mobile Bottom Image adjustments */
       #ks-about-page-unique-wrapper .ks-bottom-image-wrapper { 
-        width: 70% !important; 
+        width: 75% !important; /* Drastically reduced size on mobile */
         margin: 1.5rem auto 4rem auto !important; 
       }
     }
@@ -400,7 +406,7 @@ const AboutUs = () => {
           </p>
         </header>
 
-        {/* --- PREMIUM FLOATING HERO IMAGE --- */}
+        {/* --- PREMIUM FLOATING ARCHED HERO IMAGE --- */}
         <div className="ks-hero-image-fullwidth-wrapper reveal">
           <img 
             src={HERO_IMAGE} 
@@ -421,7 +427,7 @@ const AboutUs = () => {
           )}
         </div>
 
-        {/* --- BOTTOM IMAGE ANIMATED --- */}
+        {/* --- BOTTOM BLENDED IMAGE --- */}
         <div className="ks-bottom-image-wrapper reveal">
           <img 
             src={BOTTOM_IMAGE} 
