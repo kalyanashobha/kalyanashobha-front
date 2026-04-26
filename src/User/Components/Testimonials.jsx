@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Quote, Star } from 'lucide-react';
+import { Quote } from 'lucide-react';
 import './Testimonials.css'; 
 
 const Testimonials = () => {
@@ -34,7 +34,6 @@ const Testimonials = () => {
             <div className="story-card-inner">
                 <div className="story-test-media-wrapper story-skeleton-media"></div>
                 <div className="story-testimonial-content">
-                    <div className="story-skeleton-stars"></div>
                     <div className="story-skeleton-text-block">
                         <div className="story-skeleton-line" style={{ width: '90%' }}></div>
                         <div className="story-skeleton-line" style={{ width: '100%' }}></div>
@@ -67,7 +66,6 @@ const Testimonials = () => {
             <div className="story-test-glow story-glow-right"></div>
 
             <div className="story-test-container">
-
                 {/* Premium Header */}
                 <div className="story-test-header">
                     <div className="story-test-badge">Success Stories</div>
@@ -80,72 +78,61 @@ const Testimonials = () => {
                     </p>
                 </div>
 
-                {/* Infinite Slider Container */}
-                <div className="story-slider-container">
-                    <div className={`story-testimonials-track ${isLoading ? 'is-loading' : ''}`}>
-                        {isLoading ? (
-                            /* Render 4 skeleton cards while loading */
-                            <>
-                                <SkeletonCard />
-                                <SkeletonCard />
-                                <SkeletonCard />
-                                <SkeletonCard />
-                            </>
-                        ) : (
-                            /* Duplicate the array to create the seamless infinite scrolling effect */
-                            [...testimonials, ...testimonials].map((item, index) => (
-                                <div 
-                                    className="story-testimonial-card" 
-                                    key={`${item._id}-${index}`}
-                                >
-                                    <div className="story-card-inner">
-                                        {/* Media Section */}
-                                        {item.mediaUrl && item.mediaType === 'video' ? (
-                                            <div className="story-test-media-wrapper">
-                                                <video 
-                                                    className="story-test-media" 
-                                                    src={item.mediaUrl} 
-                                                    controls 
-                                                    preload="metadata"
-                                                />
+                {/* Modern Grid */}
+                <div className="story-masonry-grid">
+                    {isLoading ? (
+                        /* Render exactly 3 skeleton cards for one perfect loading row */
+                        [...Array(3)].map((_, index) => (
+                            <SkeletonCard key={index} />
+                        ))
+                    ) : (
+                        testimonials.map((item, index) => (
+                            <div 
+                                className="story-testimonial-card" 
+                                key={item._id || index}
+                                style={{ animationDelay: `${index * 0.1}s` }} 
+                            >
+                                <div className="story-card-inner">
+                                    {/* Media Section */}
+                                    {item.mediaUrl && item.mediaType === 'video' ? (
+                                        <div className="story-test-media-wrapper">
+                                            <video 
+                                                className="story-test-media" 
+                                                src={item.mediaUrl} 
+                                                controls 
+                                                preload="metadata"
+                                            />
+                                        </div>
+                                    ) : item.mediaUrl ? (
+                                        <div className="story-test-media-wrapper">
+                                            <img 
+                                                className="story-test-media" 
+                                                src={item.mediaUrl} 
+                                                alt={`Testimonial from ${item.authorName}`} 
+                                            />
+                                        </div>
+                                    ) : null}
+
+                                    {/* Content Section */}
+                                    <div className="story-testimonial-content">
+                                        <Quote className="story-quote-icon" size={24} strokeWidth={1.5} />
+
+                                        <p className="story-testimonial-text">"{item.content}"</p>
+
+                                        <div className="story-testimonial-footer">
+                                            <div className="story-author-avatar">
+                                                {item.authorName.charAt(0)}
                                             </div>
-                                        ) : item.mediaUrl ? (
-                                            <div className="story-test-media-wrapper">
-                                                <img 
-                                                    className="story-test-media" 
-                                                    src={item.mediaUrl} 
-                                                    alt={`Testimonial from ${item.authorName}`} 
-                                                />
-                                            </div>
-                                        ) : null}
-
-                                        {/* Content Section */}
-                                        <div className="story-testimonial-content">
-                                            <Quote className="story-quote-icon" size={24} strokeWidth={1.5} />
-
-                                            <div className="story-stars">
-                                                {[...Array(5)].map((_, i) => (
-                                                    <Star key={i} size={14} fill="#F59E0B" color="#F59E0B" />
-                                                ))}
-                                            </div>
-
-                                            <p className="story-testimonial-text">"{item.content}"</p>
-
-                                            <div className="story-testimonial-footer">
-                                                <div className="story-author-avatar">
-                                                    {item.authorName.charAt(0)}
-                                                </div>
-                                                <div className="story-author-details">
-                                                    <span className="story-testimonial-author">{item.authorName}</span>
-                                                    <span className="story-verified-badge">Verified Match</span>
-                                                </div>
+                                            <div className="story-author-details">
+                                                <span className="story-testimonial-author">{item.authorName}</span>
+                                                <span className="story-verified-badge">Verified Match</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            ))
-                        )}
-                    </div>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
         </section>
