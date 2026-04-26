@@ -172,46 +172,24 @@ const AboutUs = () => {
       font-weight: 400 !important;
     }
 
-    /* --- FULL WIDTH HERO IMAGE WITH GRADIENT BLENDS --- */
+    /* --- PREMIUM HERO IMAGE (Contained, Rounded, Shadow) --- */
     #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper {
       position: relative !important;
-      width: 100vw !important; /* Forces full width of the screen */
-      max-width: 100vw !important;
-      margin-left: calc(-50vw + 50%) !important; /* Breaks out of the parent container */
-      margin-right: calc(-50vw + 50%) !important;
-      margin-bottom: 3rem !important;
-      line-height: 0 !important; /* removes bottom gap */
-    }
-
-    /* Top and Bottom Gradient Edge Blenders */
-    #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper::before,
-    #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper::after {
-      content: '' !important;
-      position: absolute !important;
-      left: 0 !important;
-      right: 0 !important;
-      height: 8px !important; 
-      z-index: 2 !important;
-      pointer-events: none !important;
-    }
-
-    #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper::before {
-      top: 0 !important;
-      background: linear-gradient(to bottom, #fcfcfc 0%, rgba(252,252,252,0) 100%) !important; 
-    }
-
-    #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper::after {
-      bottom: 0 !important;
-      background: linear-gradient(to top, #fcfcfc 0%, rgba(252,252,252,0) 100%) !important; 
+      width: 100% !important; 
+      margin: 0 auto 3.5rem auto !important;
+      border-radius: 24px !important;
+      overflow: hidden !important; /* Clips the image to the rounded corners */
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08) !important; /* Premium soft shadow */
+      line-height: 0 !important; 
+      transform: translateZ(0); /* Safari overflow-hidden bug fix */
     }
 
     #ks-about-page-unique-wrapper .ks-hero-img {
       width: 100% !important;
-      height: auto !important;
-      max-height: 60vh !important;
+      height: 450px !important; /* Gives a solid presence on desktop */
       display: block !important;
       object-fit: cover !important; 
-      object-position: center !important;
+      object-position: center 20% !important; /* Keeps the couple's faces in view nicely */
     }
 
     /* --- TYPOGRAPHY & CONTENT --- */
@@ -222,7 +200,6 @@ const AboutUs = () => {
       text-align: left !important; 
     }
 
-    /* ALL Headings now use the exact same Red/Amber Yellow gradient as "Us" */
     #ks-about-page-unique-wrapper .ks-editorial-heading {
       font-family: 'Playfair Display', serif !important;
       font-size: clamp(1.4rem, 2.5vw, 1.8rem) !important; 
@@ -286,7 +263,7 @@ const AboutUs = () => {
     /* --- BOTTOM IMAGE WAPPER --- */
     #ks-about-page-unique-wrapper .ks-bottom-image-wrapper {
       width: 100% !important;
-      max-width: 700px !important; /* Constrained width so the mobile mockup doesn't stretch too wide */
+      max-width: 700px !important;
       margin: 2rem auto 5rem auto !important;
       display: flex !important;
       justify-content: center !important;
@@ -308,17 +285,24 @@ const AboutUs = () => {
       }
 
       #ks-about-page-unique-wrapper .ks-pill-badge { font-size: 0.6rem !important; padding: 0.3rem 0.8rem !important; }
-      
-      /* Reduced Mobile Font Sizes */
       #ks-about-page-unique-wrapper .ks-hero-title { font-size: 2rem !important; }
       #ks-about-page-unique-wrapper .ks-hero-subtitle { font-size: 0.85rem !important; }
+      
+      /* Refined Mobile Image Styles */
+      #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper {
+        border-radius: 16px !important; /* Slightly smaller border radius for mobile */
+        margin-bottom: 2rem !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06) !important;
+      }
+
+      #ks-about-page-unique-wrapper .ks-hero-img {
+        height: 220px !important; /* Perfectly constrained height for mobile */
+        object-position: center 15% !important; 
+      }
+
       #ks-about-page-unique-wrapper .ks-editorial-heading { font-size: 1.15rem !important; margin: 1.5rem 0 1rem 0 !important; }
       #ks-about-page-unique-wrapper .ks-editorial-body { font-size: 0.85rem !important; }
       #ks-about-page-unique-wrapper .ks-feature-text { font-size: 0.8rem !important; }
-      
-      #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper {
-        margin-bottom: 2rem !important;
-      }
       
       #ks-about-page-unique-wrapper .ks-editorial-feature { padding: 1rem 1.2rem !important; }
       #ks-about-page-unique-wrapper .ks-about-content { padding: 0 1.25rem !important; }
@@ -343,7 +327,7 @@ const AboutUs = () => {
           </p>
         </header>
 
-        {/* --- FULL WIDTH HERO IMAGE WITH GRADIENT BLENDING EDGES --- */}
+        {/* --- PREMIUM HERO IMAGE --- */}
         <div className="ks-hero-image-fullwidth-wrapper reveal">
           <img 
             src={HERO_IMAGE} 
