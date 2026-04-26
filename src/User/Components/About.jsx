@@ -212,17 +212,18 @@ const AboutUs = () => {
       font-weight: 400 !important;
     }
 
-    /* --- PREMIUM ANIMATED HERO IMAGE --- */
+    /* --- PREMIUM ANIMATED HERO IMAGE (80% Width) --- */
     #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper {
       position: relative !important;
-      width: 100% !important; 
+      width: 80vw !important; /* Forces image to be exactly 80% of the screen width */
+      max-width: 1000px !important; /* Prevents it from getting too massive on ultrawide monitors */
       margin: 0 auto 3.5rem auto !important;
       border-radius: 24px !important;
       overflow: hidden !important; 
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1) !important; 
       transform: translateZ(0); 
-      animation: float 6s ease-in-out infinite !important; /* Floating animation added */
-      border: 4px solid #fff !important; /* Clean white border frame */
+      animation: float 6s ease-in-out infinite !important; 
+      border: 4px solid #fff !important; 
     }
 
     #ks-about-page-unique-wrapper .ks-hero-img {
@@ -235,7 +236,7 @@ const AboutUs = () => {
     }
     
     #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper:hover .ks-hero-img {
-      transform: scale(1.05) !important; /* Subtle zoom on hover */
+      transform: scale(1.05) !important; 
     }
 
     /* --- TYPOGRAPHY & CONTENT --- */
@@ -270,7 +271,7 @@ const AboutUs = () => {
     #ks-about-page-unique-wrapper .ks-editorial-feature {
       display: flex !important;
       text-align: left !important;
-      background: rgba(255, 255, 255, 0.7) !important; /* Frosted glass */
+      background: rgba(255, 255, 255, 0.7) !important; 
       backdrop-filter: blur(12px) !important;
       -webkit-backdrop-filter: blur(12px) !important;
       padding: 1.5rem !important;
@@ -278,7 +279,7 @@ const AboutUs = () => {
       border: 1px solid rgba(255, 255, 255, 1) !important;
       margin-bottom: 1.2rem !important;
       align-items: flex-start !important;
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; /* Bouncy transition */
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; 
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04) !important;
     }
 
@@ -288,7 +289,6 @@ const AboutUs = () => {
       background: rgba(255, 255, 255, 0.95) !important;
     }
 
-    /* Icon Box replacing the old dot */
     #ks-about-page-unique-wrapper .ks-feature-icon-box {
       width: 32px !important;
       height: 32px !important;
@@ -318,7 +318,7 @@ const AboutUs = () => {
     }
 
     #ks-about-page-unique-wrapper .ks-feature-separator {
-      display: none !important; /* Hide separator since title is now block level */
+      display: none !important; 
     }
 
     /* --- BOTTOM IMAGE ANIMATED --- */
@@ -329,7 +329,7 @@ const AboutUs = () => {
       display: flex !important;
       justify-content: center !important;
       align-items: center !important;
-      animation: float 7s ease-in-out infinite reverse !important; /* Counter-floating */
+      animation: float 7s ease-in-out infinite reverse !important; 
     }
 
     #ks-about-page-unique-wrapper .ks-bottom-img {
@@ -353,6 +353,7 @@ const AboutUs = () => {
       #ks-about-page-unique-wrapper .ks-hero-subtitle { font-size: 0.85rem !important; }
       
       #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper {
+        width: 85vw !important; /* Slightly wider on mobile to make use of space while staying blended */
         border-radius: 16px !important; 
         margin-bottom: 2rem !important;
         border-width: 3px !important;
@@ -372,7 +373,12 @@ const AboutUs = () => {
       #ks-about-page-unique-wrapper .ks-feature-text { font-size: 0.85rem !important; }
       
       #ks-about-page-unique-wrapper .ks-about-content { padding: 0 1.25rem !important; }
-      #ks-about-page-unique-wrapper .ks-bottom-image-wrapper { margin: 1.5rem auto 4rem auto !important; }
+
+      /* Reduced bottom image size specifically for mobile */
+      #ks-about-page-unique-wrapper .ks-bottom-image-wrapper { 
+        width: 70% !important; 
+        margin: 1.5rem auto 4rem auto !important; 
+      }
     }
   `;
 
