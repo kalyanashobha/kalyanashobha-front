@@ -29,22 +29,22 @@ const AboutUs = () => {
             'linear-gradient(135deg, #0ea5e9, #0284c7)', // Blue
           ];
 
+          // Sparkle/Star Icon SVG for feature cards
+          const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+
           const formattedHtml = rawText
             .split('\n')
             .map(line => line.trim())
             .filter(line => line.length > 0)
             .map((line, index) => {
-              // Filters out 'About Us' and any 'Last updated' line
               if (line.toLowerCase() === 'about us' || line.toLowerCase().includes('last updated')) return '';
 
               const delay = (index * 0.08).toFixed(2);
 
-              // Headings identified as dynamically rendered will now use the gradient style
               if (line.length < 35 && !line.match(/[.,!?]$/)) {
                 return `<h2 class="ks-editorial-heading reveal" style="transition-delay: ${delay}s">${line}</h2>`;
               }
 
-              // Feature Cards (List items) will remain visually clean card elements with red dots
               if (/^([A-Za-z\s]+)( [-–:] | to )/.test(line)) {
                 let processedLine = line.replace(/^([A-Za-z\s]+)( [-–:] | to )/g, '<span class="ks-feature-title">$1</span><span class="ks-feature-separator">$2</span>');
                 const currentColor = bulletColors[colorIndex % bulletColors.length];
@@ -52,7 +52,9 @@ const AboutUs = () => {
 
                 return `
                   <div class="ks-editorial-feature reveal" style="transition-delay: ${delay}s">
-                    <div class="ks-feature-indicator" style="background: ${currentColor} !important;"></div>
+                    <div class="ks-feature-icon-box" style="background: ${currentColor} !important;">
+                      ${iconSvg}
+                    </div>
                     <p class="ks-feature-text">${processedLine}</p>
                   </div>
                 `;
@@ -92,14 +94,50 @@ const AboutUs = () => {
   const internalStyles = `
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Montserrat:wght@400;500;600&display=swap') !important;
 
+    /* --- ANIMATION KEYFRAMES --- */
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.05); }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
     #ks-about-page-unique-wrapper {
       position: relative !important;
       min-height: 100vh !important;
-      background-color: #fcfcfc !important; /* Gentle off-white background */
+      background-color: #fafafa !important; 
       font-family: 'Montserrat', sans-serif !important;
       color: #1a1a1a !important;
       text-align: center !important;
-      overflow-x: hidden !important; 
+      overflow: hidden !important; /* Contains absolute blobs */
+    }
+
+    /* --- AMBIENT BACKGROUND BLOBS --- */
+    #ks-about-page-unique-wrapper .ks-bg-blob {
+      position: absolute !important;
+      border-radius: 50% !important;
+      filter: blur(80px) !important;
+      z-index: 0 !important;
+      animation: pulseGlow 8s infinite alternate ease-in-out !important;
+      pointer-events: none !important;
+    }
+    #ks-about-page-unique-wrapper .ks-blob-1 {
+      top: -5%; left: -10%; width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(225,29,72,0.15) 0%, transparent 70%) !important;
+    }
+    #ks-about-page-unique-wrapper .ks-blob-2 {
+      top: 40%; right: -15%; width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(245,158,11,0.15) 0%, transparent 70%) !important;
+      animation-delay: -4s !important;
     }
 
     /* --- CONTENT WRAPPER --- */
@@ -114,11 +152,10 @@ const AboutUs = () => {
       align-items: center !important;
     }
 
-    /* --- ANIMATIONS --- */
     #ks-about-page-unique-wrapper .reveal {
       opacity: 0 !important;
-      transform: translateY(20px) !important;
-      transition: all 0.7s cubic-bezier(0.2, 1, 0.3, 1) !important;
+      transform: translateY(25px) !important;
+      transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1) !important;
     }
     #ks-about-page-unique-wrapper .reveal.active {
       opacity: 1 !important;
@@ -130,31 +167,34 @@ const AboutUs = () => {
       padding: 4rem 0 2rem 0 !important; 
     }
 
+    /* Animated Shimmer Badge */
     #ks-about-page-unique-wrapper .ks-pill-badge {
       display: inline-flex !important;
-      padding: 0.35rem 1rem !important;
-      border: 1px solid rgba(220, 38, 38, 0.3) !important;
-      background: rgba(255, 255, 255, 0.8) !important;
-      backdrop-filter: blur(4px) !important;
+      padding: 0.4rem 1.2rem !important;
+      background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0.4), rgba(255,255,255,0.9)) !important;
+      background-size: 200% 100% !important;
+      animation: shimmer 3s infinite linear !important;
+      backdrop-filter: blur(8px) !important;
+      border: 1px solid rgba(220, 38, 38, 0.2) !important;
       border-radius: 50px !important;
       font-size: 0.65rem !important; 
-      font-weight: 600 !important;
+      font-weight: 700 !important;
       color: #dc2626 !important;
       text-transform: uppercase !important;
       letter-spacing: 1.5px !important;
       margin-bottom: 1.5rem !important;
+      box-shadow: 0 4px 15px rgba(220, 38, 38, 0.1) !important;
     }
 
     #ks-about-page-unique-wrapper .ks-hero-title {
       font-family: 'Playfair Display', serif !important;
-      font-size: clamp(2.2rem, 5vw, 3.5rem) !important; 
-      font-weight: 600 !important;
+      font-size: clamp(2.2rem, 5vw, 3.8rem) !important; 
+      font-weight: 700 !important;
       line-height: 1.2 !important;
       margin-bottom: 1rem !important;
       color: #111 !important;
     }
 
-    /* Unique gradient for "Us" */
     #ks-about-page-unique-wrapper .ks-text-gradient {
       background: linear-gradient(135deg, #dc2626, #f59e0b) !important;
       -webkit-background-clip: text !important;
@@ -165,31 +205,37 @@ const AboutUs = () => {
 
     #ks-about-page-unique-wrapper .ks-hero-subtitle {
       font-size: clamp(0.95rem, 1.2vw, 1.1rem) !important; 
-      color: #555 !important;
+      color: #666 !important;
       max-width: 600px !important;
       margin: 0 auto 2rem auto !important;
       line-height: 1.6 !important;
       font-weight: 400 !important;
     }
 
-    /* --- PREMIUM HERO IMAGE (Contained, Rounded, Shadow) --- */
+    /* --- PREMIUM ANIMATED HERO IMAGE --- */
     #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper {
       position: relative !important;
       width: 100% !important; 
       margin: 0 auto 3.5rem auto !important;
       border-radius: 24px !important;
-      overflow: hidden !important; /* Clips the image to the rounded corners */
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08) !important; /* Premium soft shadow */
-      line-height: 0 !important; 
-      transform: translateZ(0); /* Safari overflow-hidden bug fix */
+      overflow: hidden !important; 
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1) !important; 
+      transform: translateZ(0); 
+      animation: float 6s ease-in-out infinite !important; /* Floating animation added */
+      border: 4px solid #fff !important; /* Clean white border frame */
     }
 
     #ks-about-page-unique-wrapper .ks-hero-img {
       width: 100% !important;
-      height: 450px !important; /* Gives a solid presence on desktop */
+      height: 450px !important; 
       display: block !important;
       object-fit: cover !important; 
-      object-position: center 20% !important; /* Keeps the couple's faces in view nicely */
+      object-position: center 20% !important; 
+      transition: transform 0.5s ease !important;
+    }
+    
+    #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper:hover .ks-hero-img {
+      transform: scale(1.05) !important; /* Subtle zoom on hover */
     }
 
     /* --- TYPOGRAPHY & CONTENT --- */
@@ -203,119 +249,140 @@ const AboutUs = () => {
     #ks-about-page-unique-wrapper .ks-editorial-heading {
       font-family: 'Playfair Display', serif !important;
       font-size: clamp(1.4rem, 2.5vw, 1.8rem) !important; 
-      background: linear-gradient(135deg, #dc2626, #f59e0b) !important;
+      background: linear-gradient(135deg, #111, #444) !important;
       -webkit-background-clip: text !important;
       -webkit-text-fill-color: transparent !important;
-      margin: 3rem 0 1rem 0 !important;
-      font-weight: 600 !important;
-      padding-bottom: 0.4rem !important;
+      margin: 3rem 0 1.5rem 0 !important;
+      font-weight: 700 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
     }
 
     #ks-about-page-unique-wrapper .ks-editorial-body {
-      font-size: clamp(0.9rem, 1.1vw, 1rem) !important; 
-      line-height: 1.8 !important;
-      color: #444 !important;
-      margin-bottom: 1.2rem !important;
+      font-size: clamp(0.95rem, 1.1vw, 1.05rem) !important; 
+      line-height: 1.85 !important;
+      color: #555 !important;
+      margin-bottom: 1.5rem !important;
     }
 
-    /* --- PREMIUM FEATURE CARDS --- */
+    /* --- PREMIUM GLASSMORPHISM FEATURE CARDS --- */
     #ks-about-page-unique-wrapper .ks-editorial-feature {
       display: flex !important;
       text-align: left !important;
-      background: #ffffff !important; 
-      padding: 1.2rem 1.5rem !important;
-      border-radius: 14px !important; 
-      border: 1px solid rgba(0, 0, 0, 0.04) !important;
-      margin-bottom: 1rem !important;
+      background: rgba(255, 255, 255, 0.7) !important; /* Frosted glass */
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      padding: 1.5rem !important;
+      border-radius: 16px !important; 
+      border: 1px solid rgba(255, 255, 255, 1) !important;
+      margin-bottom: 1.2rem !important;
       align-items: flex-start !important;
-      transition: all 0.3s ease !important;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.02) !important;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; /* Bouncy transition */
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04) !important;
     }
 
     #ks-about-page-unique-wrapper .ks-editorial-feature:hover {
-      box-shadow: 0 8px 25px rgba(0,0,0,0.06) !important;
-      transform: translateY(-2px) !important;
-      border-color: rgba(225, 29, 72, 0.15) !important;
+      box-shadow: 0 15px 35px rgba(220, 38, 38, 0.08) !important;
+      transform: translateY(-5px) scale(1.01) !important;
+      background: rgba(255, 255, 255, 0.95) !important;
     }
 
-    #ks-about-page-unique-wrapper .ks-feature-indicator {
-      width: 8px !important;
-      height: 8px !important;
-      border-radius: 50% !important;
+    /* Icon Box replacing the old dot */
+    #ks-about-page-unique-wrapper .ks-feature-icon-box {
+      width: 32px !important;
+      height: 32px !important;
+      border-radius: 10px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       margin-right: 1.2rem !important;
-      margin-top: 0.45rem !important;
       flex-shrink: 0 !important;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
     }
 
     #ks-about-page-unique-wrapper .ks-feature-text {
       font-size: 0.95rem !important; 
       color: #444 !important;
-      line-height: 1.6 !important;
+      line-height: 1.7 !important;
       margin: 0 !important;
+      padding-top: 0.2rem !important;
     }
 
     #ks-about-page-unique-wrapper .ks-feature-title { 
-      font-weight: 600 !important; 
+      font-weight: 700 !important; 
       color: #111 !important; 
-      font-family: 'Montserrat', sans-serif !important;
+      font-size: 1.05rem !important;
+      display: block !important;
+      margin-bottom: 0.3rem !important;
     }
 
-    /* --- BOTTOM IMAGE WAPPER --- */
+    #ks-about-page-unique-wrapper .ks-feature-separator {
+      display: none !important; /* Hide separator since title is now block level */
+    }
+
+    /* --- BOTTOM IMAGE ANIMATED --- */
     #ks-about-page-unique-wrapper .ks-bottom-image-wrapper {
       width: 100% !important;
       max-width: 700px !important;
-      margin: 2rem auto 5rem auto !important;
+      margin: 3rem auto 6rem auto !important;
       display: flex !important;
       justify-content: center !important;
       align-items: center !important;
+      animation: float 7s ease-in-out infinite reverse !important; /* Counter-floating */
     }
 
     #ks-about-page-unique-wrapper .ks-bottom-img {
       width: 100% !important;
       height: auto !important;
       object-fit: contain !important;
-      border-radius: 16px !important;
+      border-radius: 20px !important;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.12) !important;
     }
 
     /* --- MOBILE OPTIMIZATION --- */
     @media (max-width: 768px) {
       #ks-about-page-unique-wrapper .ks-hero-header { 
         padding: 3rem 0 1.5rem 0 !important; 
-        text-align: center !important; 
       }
 
-      #ks-about-page-unique-wrapper .ks-pill-badge { font-size: 0.6rem !important; padding: 0.3rem 0.8rem !important; }
+      #ks-about-page-unique-wrapper .ks-blob-1 { width: 300px; height: 300px; }
+      #ks-about-page-unique-wrapper .ks-blob-2 { width: 300px; height: 300px; }
+
       #ks-about-page-unique-wrapper .ks-hero-title { font-size: 2rem !important; }
       #ks-about-page-unique-wrapper .ks-hero-subtitle { font-size: 0.85rem !important; }
       
-      /* Refined Mobile Image Styles */
       #ks-about-page-unique-wrapper .ks-hero-image-fullwidth-wrapper {
-        border-radius: 16px !important; /* Slightly smaller border radius for mobile */
+        border-radius: 16px !important; 
         margin-bottom: 2rem !important;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06) !important;
+        border-width: 3px !important;
       }
 
       #ks-about-page-unique-wrapper .ks-hero-img {
-        height: 220px !important; /* Perfectly constrained height for mobile */
+        height: 220px !important; 
         object-position: center 15% !important; 
       }
 
-      #ks-about-page-unique-wrapper .ks-editorial-heading { font-size: 1.15rem !important; margin: 1.5rem 0 1rem 0 !important; }
-      #ks-about-page-unique-wrapper .ks-editorial-body { font-size: 0.85rem !important; }
-      #ks-about-page-unique-wrapper .ks-feature-text { font-size: 0.8rem !important; }
+      #ks-about-page-unique-wrapper .ks-editorial-heading { font-size: 1.25rem !important; margin: 1.5rem 0 1rem 0 !important; }
+      #ks-about-page-unique-wrapper .ks-editorial-body { font-size: 0.9rem !important; }
       
-      #ks-about-page-unique-wrapper .ks-editorial-feature { padding: 1rem 1.2rem !important; }
+      #ks-about-page-unique-wrapper .ks-editorial-feature { padding: 1.2rem !important; flex-direction: column !important;}
+      
+      #ks-about-page-unique-wrapper .ks-feature-icon-box { margin-bottom: 0.8rem !important; }
+      #ks-about-page-unique-wrapper .ks-feature-text { font-size: 0.85rem !important; }
+      
       #ks-about-page-unique-wrapper .ks-about-content { padding: 0 1.25rem !important; }
-
-      #ks-about-page-unique-wrapper .ks-bottom-image-wrapper {
-        margin: 1.5rem auto 4rem auto !important;
-      }
+      #ks-about-page-unique-wrapper .ks-bottom-image-wrapper { margin: 1.5rem auto 4rem auto !important; }
     }
   `;
 
   return (
     <div id="ks-about-page-unique-wrapper">
       <style>{internalStyles}</style>
+
+      {/* Ambient Background Blobs */}
+      <div className="ks-bg-blob ks-blob-1"></div>
+      <div className="ks-bg-blob ks-blob-2"></div>
 
       {/* Main Content Area */}
       <div className="ks-about-content">
@@ -327,7 +394,7 @@ const AboutUs = () => {
           </p>
         </header>
 
-        {/* --- PREMIUM HERO IMAGE --- */}
+        {/* --- PREMIUM FLOATING HERO IMAGE --- */}
         <div className="ks-hero-image-fullwidth-wrapper reveal">
           <img 
             src={HERO_IMAGE} 
@@ -348,7 +415,7 @@ const AboutUs = () => {
           )}
         </div>
 
-        {/* --- BOTTOM IMAGE COMPONENT --- */}
+        {/* --- BOTTOM IMAGE ANIMATED --- */}
         <div className="ks-bottom-image-wrapper reveal">
           <img 
             src={BOTTOM_IMAGE} 
