@@ -15,7 +15,6 @@ const NEW_MOBILE_BG = 'https://res.cloudinary.com/dppiuypop/image/upload/v177288
 const AboutUs = () => {
   const [pageContent, setPageContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [lastUpdatedDate, setLastUpdatedDate] = useState('');
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -66,10 +65,6 @@ const AboutUs = () => {
             .join('');
 
           setPageContent(formattedHtml);
-          if (response.data.lastUpdated) {
-            const dateObj = new Date(response.data.lastUpdated);
-            setLastUpdatedDate(dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }));
-          }
         }
       } catch (error) {
         setPageContent("<p class='ks-error-text'>Unable to load content.</p>");
@@ -416,7 +411,7 @@ const AboutUs = () => {
           <div className="ks-pill-badge">Our Journey</div>
           <h1 className="ks-hero-title">About <span className="ks-text-gradient">Us</span></h1>
           <p className="ks-hero-subtitle">
-            {lastUpdatedDate ? `Last updated: ${lastUpdatedDate}` : "Where Tradition Meets Modern Connection"}
+            Where Tradition Meets Modern Connection
           </p>
         </header>
 
