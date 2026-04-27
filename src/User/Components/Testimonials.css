@@ -350,16 +350,43 @@
         padding: 60px 0;
     }
 
+    /* REDUCED MOBILE FONTS */
     .story-test-title {
-        font-size: 2.5rem;
+        font-size: 2rem; /* Reduced from 2.5rem */
+    }
+
+    .story-test-subtitle {
+        font-size: 0.85rem; /* Reduced from 1.05rem */
+        line-height: 1.5;
+    }
+
+    .story-test-badge {
+        font-size: 0.7rem; /* Reduced */
+        padding: 4px 12px;
+    }
+
+    .story-testimonial-text {
+        font-size: 0.85rem; /* Reduced */
+        line-height: 1.6;
+        margin-bottom: 24px;
+    }
+
+    .story-testimonial-author {
+        font-size: 0.85rem; /* Reduced */
+    }
+
+    .story-verified-badge {
+        font-size: 0.65rem; /* Reduced */
+    }
+
+    .story-author-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 0.9rem; /* Reduced */
     }
 
     .story-mobile-break {
         display: block;
-    }
-
-    .story-test-subtitle {
-        font-size: 1.05rem;
     }
 
     .story-test-media-wrapper {
