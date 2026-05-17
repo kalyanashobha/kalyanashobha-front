@@ -1,7 +1,8 @@
+
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { HeartHandshake, Sparkles, Gem } from 'lucide-react';
-import Navbar from "./Navbar.jsx"; // Adjust the path if necessary
 
 // ==========================================
 // UPDATE YOUR IMAGE LINKS HERE
@@ -25,8 +26,47 @@ const AboutUs = () => {
         const response = await axios.get('https://kalyanashobha-back.vercel.app/api/pages/about');
 
         if (response.data.success) {
-          // DIRECTLY set the HTML content provided by the admin. 
-          setPageContent(response.data.content || "<p>No content available.</p>");
+          const rawText = response.data.content;
+          let colorIndex = 0;
+          const bulletColors = [
+            'linear-gradient(135deg, #dc2626, #ef4444)', // Red
+            'linear-gradient(135deg, #f59e0b, #fbbf24)', // Amber
+            'linear-gradient(135deg, #10b981, #34d399)', // Green
+            'linear-gradient(135deg, #2563eb, #60a5fa)', // Blue
+          ];
+
+          const formattedHtml = rawText
+            .split('\n')
+            .map(line => line.trim())
+            .filter(line => line.length > 0)
+            .map((line, index) => {
+              if (line.toLowerCase() === 'about us') return '';
+
+              // Animation delay based on index for staggered effect
+              const delay = (index * 0.1).toFixed(2);
+
+              if (line.length < 35 && !line.match(/[.,!?]$/)) {
+                return `<h2 class="ks-editorial-heading reveal" style="transition-delay: ${delay}s">${line}</h2>`;
+              }
+
+              if (/^([A-Za-z\s]+)( [-–:] | to )/.test(line)) {
+                let processedLine = line.replace(/^([A-Za-z\s]+)( [-–:] | to )/g, '<span class="ks-feature-title">$1</span><span class="ks-feature-separator">$2</span>');
+                const currentColor = bulletColors[colorIndex % bulletColors.length];
+                colorIndex++;
+
+                return `
+                  <div class="ks-editorial-feature reveal" style="transition-delay: ${delay}s">
+                    <div class="ks-feature-indicator" style="background: ${currentColor} !important;"></div>
+                    <p class="ks-feature-text">${processedLine}</p>
+                  </div>
+                `;
+              }
+
+              return `<p class="ks-editorial-body reveal" style="transition-delay: ${delay}s">${line}</p>`;
+            })
+            .join('');
+
+          setPageContent(formattedHtml);
         }
       } catch (error) {
         setPageContent("<p class='ks-error-text'>Unable to load content.</p>");
@@ -38,17 +78,8 @@ const AboutUs = () => {
     fetchAboutData();
   }, []);
 
-  // Animation Trigger logic (Updated to target standard HTML tags)
+  // Animation Trigger logic
   useEffect(() => {
-    if (isLoading || !pageContent) return;
-
-    // Find the wrapper containing the injected HTML
-    const wrapper = document.querySelector('.ks-rich-text-content');
-    if (!wrapper) return;
-
-    // Grab all direct children (h2, p, ul, etc.)
-    const items = wrapper.children;
-
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -57,13 +88,8 @@ const AboutUs = () => {
       });
     }, { threshold: 0.1 });
 
-    Array.from(items).forEach((item, index) => {
-      item.classList.add('reveal');
-      // Calculate stagger delay, maxing out at 1.5s
-      const delay = Math.min(index * 0.1, 1.5).toFixed(2);
-      item.style.transitionDelay = `${delay}s`;
-      observer.observe(item);
-    });
+    const items = document.querySelectorAll('.reveal');
+    items.forEach(item => observer.observe(item));
 
     return () => observer.disconnect();
   }, [pageContent, isLoading]);
@@ -109,7 +135,7 @@ const AboutUs = () => {
                   linear-gradient(to bottom, rgba(255, 255, 255, 0) 80%, rgba(255, 255, 255, 1) 100%) !important;
     }
 
-    /* --- BOTTOM DESKTOP BACKGROUND --- */
+    /* --- BOTTOM DESKTOP BACKGROUND (NEW!) --- */
     #ks-about-page-unique-wrapper .ks-about-bottom-bg-desktop {
       position: absolute !important;
       bottom: 0 !important;
@@ -132,6 +158,7 @@ const AboutUs = () => {
       height: 90vh !important;
       z-index: 1 !important;
       pointer-events: none !important;
+      /* Smoothly fades the top of the bottom image into the white page */
       background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.6) 30%, rgba(255, 255, 255, 0.1) 100%) !important;
     }
 
@@ -144,7 +171,7 @@ const AboutUs = () => {
     /* --- CONTENT ON TOP --- */
     #ks-about-page-unique-wrapper .ks-about-content {
       position: relative !important;
-      z-index: 10 !important;
+      z-index: 10 !important; /* Keeps text above all backgrounds */
       max-width: 1000px !important;
       margin: 0 auto !important;
       padding: 0 2rem !important;
@@ -153,7 +180,6 @@ const AboutUs = () => {
       align-items: center !important;
     }
 
-    /* Animation Classes */
     #ks-about-page-unique-wrapper .reveal {
       opacity: 0 !important;
       transform: translateY(30px) !important;
@@ -164,7 +190,7 @@ const AboutUs = () => {
       transform: translateY(0) !important;
     }
 
-    #ks-about-page-unique-wrapper .ks-hero-header { padding: 8rem 0 4rem 0 !important; margin-top: 40px !important;}
+    #ks-about-page-unique-wrapper .ks-hero-header { padding: 8rem 0 4rem 0 !important; }
 
     #ks-about-page-unique-wrapper .ks-pill-badge {
       display: inline-flex !important;
@@ -200,48 +226,26 @@ const AboutUs = () => {
       line-height: 1.7 !important;
     }
 
-    /* --- RICH TEXT RENDERER SCOPED STYLES (Standard HTML Tags) --- */
     #ks-about-page-unique-wrapper .ks-rich-text-renderer {
       width: 100% !important;
       max-width: 800px !important;
-      padding-bottom: 30vh !important;
-      text-align: center !important;
+      padding-bottom: 30vh !important; /* Increased padding so content doesn't completely cover the bottom image */
     }
 
-    #ks-about-page-unique-wrapper .ks-rich-text-renderer h2 {
+    #ks-about-page-unique-wrapper .ks-editorial-heading {
       font-family: 'Playfair Display', serif !important;
       font-size: clamp(1.8rem, 3vw, 2.5rem) !important;
       margin: 4rem 0 1.5rem 0 !important;
-      color: #1a1a1a !important;
     }
 
-    #ks-about-page-unique-wrapper .ks-rich-text-renderer h3 {
-      font-family: 'Playfair Display', serif !important;
-      font-size: clamp(1.4rem, 2vw, 1.8rem) !important;
-      margin: 2.5rem 0 1rem 0 !important;
-      color: #1a1a1a !important;
-    }
-
-    #ks-about-page-unique-wrapper .ks-rich-text-renderer p {
+    #ks-about-page-unique-wrapper .ks-editorial-body {
       font-size: clamp(0.95rem, 1.1vw, 1.05rem) !important;
       line-height: 1.9 !important;
       color: #444 !important;
       margin-bottom: 1.5rem !important;
     }
 
-    #ks-about-page-unique-wrapper .ks-rich-text-renderer strong {
-      color: #111 !important;
-      font-weight: 600 !important;
-    }
-
-    /* Styled Lists to replace your old manual feature boxes */
-    #ks-about-page-unique-wrapper .ks-rich-text-renderer ul {
-      list-style: none !important;
-      padding: 0 !important;
-      margin: 2rem 0 !important;
-    }
-
-    #ks-about-page-unique-wrapper .ks-rich-text-renderer li {
+    #ks-about-page-unique-wrapper .ks-editorial-feature {
       display: flex !important;
       text-align: left !important;
       background: rgba(255, 255, 255, 0.9) !important; 
@@ -252,28 +256,23 @@ const AboutUs = () => {
       margin-bottom: 1rem !important;
       align-items: center !important;
       transition: all 0.3s ease !important;
-      color: #444 !important;
-      font-size: clamp(0.95rem, 1.1vw, 1.05rem) !important;
     }
 
-    #ks-about-page-unique-wrapper .ks-rich-text-renderer li:hover {
+    #ks-about-page-unique-wrapper .ks-editorial-feature:hover {
       box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
       transform: scale(1.02) !important;
     }
 
-    /* Creates the custom bullet point dot */
-    #ks-about-page-unique-wrapper .ks-rich-text-renderer li::before {
-      content: '' !important;
-      display: inline-block !important;
+    #ks-about-page-unique-wrapper .ks-feature-indicator {
       width: 10px !important;
       height: 10px !important;
       border-radius: 50% !important;
       margin-right: 1.2rem !important;
       flex-shrink: 0 !important;
-      background: linear-gradient(135deg, #dc2626, #f59e0b) !important;
     }
 
-    /* Skeletons */
+    #ks-about-page-unique-wrapper .ks-feature-title { font-weight: 600 !important; color: #111 !important; }
+
     #ks-about-page-unique-wrapper .ks-skeleton-container {
       display: flex !important;
       flex-direction: column !important;
@@ -300,11 +299,13 @@ const AboutUs = () => {
 
     /* --- MOBILE OPTIMIZATION --- */
     @media (max-width: 768px) {
+      /* Hide Desktop Elements completely */
       #ks-about-page-unique-wrapper .ks-about-bg-desktop,
       #ks-about-page-unique-wrapper .ks-about-overlay-desktop,
       #ks-about-page-unique-wrapper .ks-about-bottom-bg-desktop,
       #ks-about-page-unique-wrapper .ks-about-bottom-overlay-desktop { display: none !important; }
       
+      /* Show Top Mobile Image */
       #ks-about-page-unique-wrapper .ks-about-bg-mobile {
         display: block !important;
         position: absolute !important;
@@ -329,6 +330,7 @@ const AboutUs = () => {
         background: linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.5) 70%, #ffffff 100%) !important;
       }
 
+      /* Show Bottom Mobile Image (NEW!) */
       #ks-about-page-unique-wrapper .ks-about-bottom-bg-mobile {
         display: block !important;
         position: absolute !important;
@@ -354,26 +356,34 @@ const AboutUs = () => {
       }
 
       /* --- REDUCED MOBILE FONTS --- */
-      #ks-about-page-unique-wrapper .ks-hero-title { font-size: 2.2rem !important; }
-      #ks-about-page-unique-wrapper .ks-hero-subtitle { font-size: 0.85rem !important; line-height: 1.5 !important; }
-
-      /* Mobile Headings */
-      #ks-about-page-unique-wrapper .ks-rich-text-renderer h2 { margin: 2.5rem 0 1rem 0 !important; font-size: 1.4rem !important; text-align: left !important; }
-      #ks-about-page-unique-wrapper .ks-rich-text-renderer h3 { margin: 1.5rem 0 0.5rem 0 !important; font-size: 1.1rem !important; text-align: left !important; }
-
-      /* Mobile Body Text */
-      #ks-about-page-unique-wrapper .ks-rich-text-renderer p { font-size: 0.85rem !important; line-height: 1.6 !important; text-align: left !important; }
+      #ks-about-page-unique-wrapper .ks-hero-title {
+        font-size: 2.2rem !important;
+      }
       
-      /* Mobile List Adjustments */
-      #ks-about-page-unique-wrapper .ks-rich-text-renderer li {
+      #ks-about-page-unique-wrapper .ks-hero-subtitle {
         font-size: 0.85rem !important;
         line-height: 1.5 !important;
-        padding: 1rem !important;
+      }
+
+      #ks-about-page-unique-wrapper .ks-editorial-heading { 
+        margin: 2.5rem 0 1rem 0 !important; 
+        font-size: 1.4rem !important;
+      }
+
+      #ks-about-page-unique-wrapper .ks-editorial-body {
+        font-size: 0.85rem !important;
+        line-height: 1.6 !important;
+      }
+      
+      #ks-about-page-unique-wrapper .ks-feature-text {
+        font-size: 0.85rem !important;
+        line-height: 1.5 !important;
       }
 
       /* Layout adjustments */
       #ks-about-page-unique-wrapper .ks-hero-header { padding: 6rem 0 3rem 0 !important; }
       #ks-about-page-unique-wrapper .ks-pill-badge { font-size: 0.6rem !important; padding: 0.3rem 0.8rem !important; }
+      #ks-about-page-unique-wrapper .ks-editorial-feature { padding: 1rem !important; }
       #ks-about-page-unique-wrapper .ks-about-content { padding: 0 1.2rem !important; }
       #ks-about-page-unique-wrapper { text-align: left !important; } 
       #ks-about-page-unique-wrapper .ks-rich-text-renderer { align-items: flex-start !important; padding-bottom: 30vh !important; }
@@ -383,7 +393,6 @@ const AboutUs = () => {
 
   return (
     <div id="ks-about-page-unique-wrapper">
-      <Navbar />
       <style>{internalStyles}</style>
 
       {/* Top Background elements */}
@@ -392,7 +401,7 @@ const AboutUs = () => {
       <div className="ks-about-bg-mobile"></div>
       <div className="ks-about-overlay-mobile"></div>
 
-      {/* Bottom Background elements */}
+      {/* Bottom Background elements (The fix!) */}
       <div className="ks-about-bottom-bg-desktop"></div>
       <div className="ks-about-bottom-overlay-desktop"></div>
       <div className="ks-about-bottom-bg-mobile"></div>
@@ -416,10 +425,7 @@ const AboutUs = () => {
               <div className="ks-skeleton-pulse ks-skel-full"></div>
             </div>
           ) : (
-            <div 
-              className="ks-rich-text-content" 
-              dangerouslySetInnerHTML={{ __html: pageContent }} 
-            />
+            <div dangerouslySetInnerHTML={{ __html: pageContent }} />
           )}
         </div>
       </div>
