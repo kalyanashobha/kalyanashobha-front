@@ -26,7 +26,6 @@ const AboutUs = () => {
 
         if (response.data.success) {
           // DIRECTLY set the HTML content provided by the admin. 
-          // No more regex splitting or mapping!
           setPageContent(response.data.content || "<p>No content available.</p>");
         }
       } catch (error) {
@@ -60,7 +59,7 @@ const AboutUs = () => {
 
     Array.from(items).forEach((item, index) => {
       item.classList.add('reveal');
-      // Calculate stagger delay, maxing out at 1.5s so bottom elements don't take forever
+      // Calculate stagger delay, maxing out at 1.5s
       const delay = Math.min(index * 0.1, 1.5).toFixed(2);
       item.style.transitionDelay = `${delay}s`;
       observer.observe(item);
