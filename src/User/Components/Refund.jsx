@@ -12,32 +12,15 @@ const Refund = () => {
     // Scroll to top when the page loads
     window.scrollTo(0, 0);
 
-    // Fetch dynamic content from the API (Updated to /refund)
     const fetchRefundContent = async () => {
       try {
         const response = await axios.get('https://kalyanashobha-back.vercel.app/api/pages/refund');
-        
+
         if (response.data.success) {
-          
-          let rawText = response.data.content;
+          // DIRECTLY set the HTML content provided by the admin. 
+          // Do not use regex to strip or replace tags!
+          setContent(response.data.content || "<p>No content available.</p>");
 
-          // --- AGGRESSIVE MAGIC FIXES FOR PLAIN TEXT ---
-          
-          // 0. Normalize invisible line breaks from the database
-          rawText = rawText.replace(/\r\n/g, '\n');
-
-          // 1. Clean up massive gaps: Reduces 3+ empty lines down to just 2.
-          rawText = rawText.replace(/\n{3,}/g, '\n\n');
-
-          // 2. Bold Key Terms: Automatically finds "Cancellation:", "Refunds:", etc., and makes them bold.
-          rawText = rawText.replace(/(^|\n)([A-Z][a-zA-Z\s]+):/g, '$1<strong>$2:</strong>');
-
-          // 3. Ultra-Aggressive Heading Scanner: 
-          // Forces ANY line starting with a number and a dot to be an <h2>.
-          const formattedText = rawText.replace(/^(\s*\d+\.\s*.*)$/gm, '<h2 class="pro-refund-h2">$1</h2>');
-          
-          setContent(formattedText);
-          
           // Format the date if it exists
           if (response.data.lastUpdated) {
             const dateObj = new Date(response.data.lastUpdated);
@@ -49,7 +32,7 @@ const Refund = () => {
         }
       } catch (error) {
         console.error("Failed to fetch Refund Policy:", error);
-        setContent("Unable to load the Refund Policy at this time. Please try again later.");
+        setContent("<p>Unable to load the Refund Policy at this time. Please try again later.</p>");
       } finally {
         setLoading(false);
       }
@@ -74,7 +57,7 @@ const Refund = () => {
         {/* Document Content */}
         <div className="pro-refund-body-container">
           <div className="pro-refund-paper-card">
-            
+
             {loading ? (
               // Sleek loading state
               <div className="pro-refund-loader">
