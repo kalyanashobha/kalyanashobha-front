@@ -163,3 +163,86 @@
     padding-bottom: 0.25rem;
   }
 }
+
+
+
+
+/* --- NEW SCOPED RICH TEXT STYLES --- */
+/* This targets ONLY the elements inside the dynamic content */
+
+.pro-terms-rich-text {
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #333;
+}
+
+/* Headings */
+.pro-terms-rich-text h1,
+.pro-terms-rich-text h2,
+.pro-terms-rich-text h3,
+.pro-terms-rich-text h4 {
+  color: #c0392b; /* Match your theme's red/dark color */
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.pro-terms-rich-text h1 { font-size: 24px; }
+.pro-terms-rich-text h2 { font-size: 20px; }
+.pro-terms-rich-text h3 { font-size: 18px; }
+
+/* Paragraphs & Text */
+.pro-terms-rich-text p {
+  margin-bottom: 1em;
+  color: #444;
+}
+
+.pro-terms-rich-text strong,
+.pro-terms-rich-text b {
+  color: #111;
+  font-weight: bold;
+}
+
+/* Lists (Very common in Terms & Conditions) */
+.pro-terms-rich-text ul,
+.pro-terms-rich-text ol {
+  margin-bottom: 1.5em;
+  padding-left: 1.5rem;
+  color: #444;
+}
+
+.pro-terms-rich-text li {
+  margin-bottom: 0.5em;
+}
+
+/* Links */
+.pro-terms-rich-text a {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.pro-terms-rich-text a:hover {
+  text-decoration: underline;
+}
+
+/* Tables (If admin adds tabular data) */
+.pro-terms-rich-text table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5em;
+}
+
+.pro-terms-rich-text th,
+.pro-terms-rich-text td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.pro-terms-rich-text th {
+  background-color: #f4f4f4;
+  font-weight: 600;
+}
+
