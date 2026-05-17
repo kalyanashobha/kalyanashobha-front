@@ -23,7 +23,7 @@
   padding: 5rem 1rem 6rem 1rem; /* Extra bottom padding for overlap effect */
   text-align: center;
   position: relative;
-  margin-top:50px;
+  margin-top: 50px;
 }
 
 .pro-refund-header-content {
@@ -65,33 +65,66 @@
   border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
-/* --- RICH TEXT FORMATTING (The actual parsed content) --- */
+/* --- RICH TEXT FORMATTING (The actual parsed HTML content) --- */
 .pro-refund-rich-text {
   color: var(--pr-text-main);
   font-size: 1.05rem;
   line-height: 1.8;
-  white-space: pre-line; /* CRITICAL: Respects the \n line breaks from your regex */
+  /* Removed white-space: pre-line to support raw HTML properly */
 }
 
-/* Targeting the injected h2 tags */
-.pro-refund-h2 {
+/* Target standard h2 tags sent from the backend */
+.pro-refund-rich-text h2 {
   color: var(--pr-primary);
   font-size: 1.35rem;
   font-weight: 700;
   margin-top: 2.5rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--pr-border);
 }
 
-/* Removes top margin from the very first heading if it's at the top */
-.pro-refund-rich-text .pro-refund-h2:first-child {
+/* Target standard h3 tags */
+.pro-refund-rich-text h3 {
+  color: var(--pr-primary);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Paragraphs and Lists */
+.pro-refund-rich-text p {
+  margin-bottom: 1.25rem;
+}
+
+.pro-refund-rich-text ul, 
+.pro-refund-rich-text ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+}
+
+.pro-refund-rich-text li {
+  margin-bottom: 0.5rem;
+}
+
+/* Removes top margin from the very first element so it aligns nicely */
+.pro-refund-rich-text > *:first-child {
   margin-top: 0;
 }
 
 .pro-refund-rich-text strong {
   color: var(--pr-primary);
   font-weight: 600;
+}
+
+.pro-refund-rich-text a {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.pro-refund-rich-text a:hover {
+  text-decoration: underline;
 }
 
 /* --- LOADING SKELETON --- */
@@ -129,17 +162,18 @@
    MOBILE RESPONSIVENESS (SMALL FONTS)
    ========================================= */
 @media (max-width: 768px) {
-  
+
   .pro-refund-header-banner {
     padding: 3rem 1rem 4rem 1rem; /* Adjust padding for mobile */
+    margin-top: 60px; /* Adjusted slightly for mobile navbars */
   }
 
   .pro-refund-main-title {
-    font-size: 1.6rem; /* Smaller hero title */
+    font-size: 1.5rem; /* Smaller hero title */
   }
 
   .pro-refund-last-updated {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
 
   .pro-refund-body-container {
@@ -151,14 +185,35 @@
     border-radius: 12px;
   }
 
+  /* Core Text Size Reduction */
   .pro-refund-rich-text {
-    font-size: 0.85rem; /* SMALL FONT SIZE AS REQUESTED */
+    font-size: 0.85rem; /* Very compact and readable for mobile */
     line-height: 1.6;
   }
 
-  .pro-refund-h2 {
-    font-size: 1.05rem; /* Scaled down heading */
-    margin-top: 1.5rem;
+  /* Headings scaled down proportionately */
+  .pro-refund-rich-text h2 {
+    font-size: 1.1rem;
+    margin-top: 1.75rem;
+    margin-bottom: 0.75rem;
     padding-bottom: 0.25rem;
+  }
+
+  .pro-refund-rich-text h3 {
+    font-size: 0.95rem;
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Margins reduced to keep spacing tight */
+  .pro-refund-rich-text p,
+  .pro-refund-rich-text ul, 
+  .pro-refund-rich-text ol {
+    margin-bottom: 1rem;
+  }
+
+  .pro-refund-rich-text ul, 
+  .pro-refund-rich-text ol {
+    padding-left: 1.25rem;
   }
 }
