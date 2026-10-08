@@ -207,7 +207,7 @@ function App() {
         <Route path="add-fields" element={<AddCommunity />} />
         <Route path="vendor-leads" element={<AdminVendorLeads/>} />
         <Route path="help-center" element={<AdminHelpCenter/>} />
-        <Route path="data-approval" element={<Dataapproval/>} />
+        <Route path="data-approval" element={<DataApproval/>} />
         <Route path="page-content" element={<AdminPageContent/>} />
         <Route path="add-testimonial" element={<AdminPostTestimonial/>} />
         <Route path="moderater" element={<CreateModerator/>} />
